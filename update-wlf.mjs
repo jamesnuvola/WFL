@@ -3,14 +3,23 @@ import fs from 'fs';
 
 const URL = 'https://www.estrazionelotto.it/archivio-winforlife';
 const DATA_FILE = 'winforlife_draws.json';
+const DEBUG_FILE = 'debug-wlf.html';
 
 async function scrape() {
   const res = await fetch(URL);
   const html = await res.text();
+
+  // Salva HTML per debug (così possiamo vedere la struttura reale)
+  fs.writeFileSync(DEBUG_FILE, html);
+
   const $ = cheerio.load(html);
   const draws = [];
 
-  $('table tr').each((i, row) => {
+  // Prova diversi selettori comuni per trovare le righe della tabella
+  const rows = $('table tr, .archivio-table tr, .estrazione-row, div[class*="riga"]');
+  console.log(`Trovate ${rows.length} potenziali righe.`);
+
+  rows.each((i, row) => {
     const cols = $(row).find('td');
     if (cols.length >= 13) {
       const numero = parseInt($(cols[0]).text().trim(), 10);
@@ -28,6 +37,8 @@ async function scrape() {
       }
     }
   });
+
+  console.log(`Estrazioni parse: ${draws.length}`);
 
   draws.sort((a, b) => a.datetime.localeCompare(b.datetime));
 
