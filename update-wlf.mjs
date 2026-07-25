@@ -9,33 +9,56 @@ async function scrape() {
   const res = await fetch(URL);
   const html = await res.text();
 
-  // Salva HTML per debug (così possiamo vedere la struttura reale)
+  // Salva HTML per debug
   fs.writeFileSync(DEBUG_FILE, html);
 
   const $ = cheerio.load(html);
   const draws = [];
 
-  // Prova diversi selettori comuni per trovare le righe della tabella
-  const rows = $('table tr, .archivio-table tr, .estrazione-row, div[class*="riga"]');
-  console.log(`Trovate ${rows.length} potenziali righe.`);
+  // La struttura della pagina è composta da blocchi con classe specifica
+  // Ogni blocco contiene il numero dell'estrazione, la data, i 10 numeri e il Numerone
+  const blocks = $('div[class*="flex flex-col w-full bg-white border border-gray-500"]');
 
-  rows.each((i, row) => {
-    const cols = $(row).find('td');
-    if (cols.length >= 13) {
-      const numero = parseInt($(cols[0]).text().trim(), 10);
-      const data = $(cols[1]).text().trim();
-      const ora = $(cols[2]).text().trim();
-      const numbers = [];
-      for (let j = 3; j <= 12; j++) {
-        numbers.push(parseInt($(cols[j]).text().trim(), 10));
+  console.log(`Trovati ${blocks.length} blocchi estrazione.`);
+
+  blocks.each((i, block) => {
+    // Estrai il numero dell'estrazione e l'orario
+    const headerText = $(block).find('span:contains("Estrazione n°")').text().trim();
+    const numeroMatch = headerText.match(/Estrazione n°\s*(\d+)\s*\((\d{2}:\d{2})\)/);
+    if (!numeroMatch) return;
+
+    const numero = parseInt(numeroMatch[1], 10);
+    const ora = numeroMatch[2];
+
+    // Estrai la data
+    const dataText = $(block).find('span:contains("del")').text().trim();
+    const dataMatch = dataText.match(/del\s+(\d{2}-\d{2}-\d{4})/);
+    if (!dataMatch) return;
+
+    const [day, month, year] = dataMatch[1].split('-');
+    const datetime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${ora}`;
+
+    // Estrai i 10 numeri
+    const numberElements = $(block).find('div[class*="grid grid-cols-5"] div[class*="font-bold text-center"]');
+    if (numberElements.length !== 10) return;
+
+    const numbers = [];
+    numberElements.each((j, el) => {
+      const num = parseInt($(el).text().trim(), 10);
+      if (!isNaN(num) && num >= 1 && num <= 20) {
+        numbers.push(num);
       }
-      const numerone = parseInt($(cols[13]).text().trim(), 10);
-      if (!isNaN(numero) && numbers.length === 10 && !isNaN(numerone)) {
-        const [day, month, year] = data.split('/');
-        const datetime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${ora}`;
-        draws.push({ datetime, numbers, numerone, numero });
-      }
-    }
+    });
+
+    if (numbers.length !== 10) return;
+
+    // Estrai il Numerone
+    const numeroneElement = $(block).find('span[class*="bg-red-500"]');
+    if (!numeroneElement.length) return;
+    const numerone = parseInt(numeroneElement.text().trim(), 10);
+    if (isNaN(numerone) || numerone < 1 || numerone > 20) return;
+
+    draws.push({ datetime, numbers, numerone, numero });
   });
 
   console.log(`Estrazioni parse: ${draws.length}`);
