@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win for Life – SONAR</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --text: #e0e0e0;
+            --muted: #888;
+            --accent: #4caf50;
+            --red: #f44336;
+            --border: #333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; padding: 1rem; max-width: 1000px; margin: auto; }
+        h1 { color: var(--accent); margin-bottom: 1rem; }
+        button, .btn { background: var(--accent); color: #000; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 0.2rem; }
+        button:hover { opacity: 0.8; }
+        .section { background: var(--surface); padding: 1rem; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); }
+        .numbers { font-size: 1.5rem; font-weight: bold; color: #ffd54f; }
+        .small { font-size: 0.8rem; color: var(--muted); }
+        textarea { width: 100%; height: 120px; background: #2a2a2a; color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; }
+        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        th, td { padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: center; }
+        th { background: #2a2a2a; }
+        .rank { font-size: 0.7rem; color: var(--muted); }
+        .hidden { display: none; }
+        .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .badge { background: var(--accent); color: #000; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>🍀 Win for Life – SONAR</h1>
+
+    <div class="section">
+        <p id="dataStatus">Caricamento dati…</p>
+        <p>Totale estrazioni: <span id="drawCount">0</span></p>
+        <p>Ultima: <span id="lastDrawInfo">—</span></p>
+        <button id="updateDataBtn">🔄 Aggiorna dati</button>
+        <button id="toggleImportBtn">📥 Importa storico</button>
+        <div id="importArea" class="hidden">
+            <p class="small">Incolla un array JSON di estrazioni.</p>
+            <textarea id="rawInput"></textarea>
+            <button id="doImportBtn">✅ Carica</button>
+            <span id="importStatus" class="small"></span>
+        </div>
+        <button id="toggleExportBtn">📤 Esporta storico</button>
+        <div id="exportArea" class="hidden">
+            <textarea id="exportOutput" readonly></textarea>
+            <button id="copyExportBtn">📋 Copia</button>
+        </div>
+    </div>
+
+    <!-- Estrazioni di oggi con rank -->
+    <div class="section">
+        <h3>📅 Estrazioni di oggi</h3>
+        <div id="todayDraws"></div>
+    </div>
+
+    <!-- Storico paginato -->
+    <div class="section">
+        <h3>📚 Storico completo</h3>
+        <div id="historyTable"></div>
+        <div class="pagination">
+            <button id="prevPageBtn">◀ Precedenti</button>
+            <span id="pageInfo"></span>
+            <button id="nextPageBtn">Successivi ▶</button>
+        </div>
+    </div>
+
+    <!-- Generatore (invariato) -->
+    <div class="section">
+        <h3>🎲 Generatore</h3>
+        <label>Peso verticale (0‑5): <input type="range" id="weightV" min="0" max="5" value="2" step="0.5"> <span id="weightVLabel">2</span></label>
+        <label><input type="checkbox" id="chkBalance" checked> Bilanciamento 4‑7 bassi</label>
+        <label><input type="checkbox" id="chkNoDup" checked> Evita decine già uscite</label>
+        <button id="generateBtn">Genera combinazione</button>
+        <div>Decina: <span id="combination" class="numbers">—</span></div>
+        <div>Numerone: <span id="numeroneOut" class="numbers">—</span></div>
+    </div>
+
+    <!-- Backtest (invariato) -->
+    <div class="section">
+        <h3>📊 Backtest</h3>
+        <label>Training: <input type="number" id="trainSize" value="1000" min="100" step="100"></label>
+        <label>Test: <input type="number" id="testSize" value="200" min="20" step="20"></label>
+        <button id="runBacktestBtn">Avvia backtest</button>
+        <div id="backtestLog"></div>
+    </div>
+
+    <script>
+    (function() {
+        const NUM_COUNT = 20, POSITIONS = 10;
+        const DATA_URL = 'https://jamesnuvola.github.io/WFL/winforlife_draws.json';
+        const STORAGE_KEY = 'wlf_sonar_draws';
+        const HOT_WINDOW = 15, DECADE_WINDOW = 30, CLUSTER_MAX_LAG = 5, VOL_WINDOW = 20;
+        const DELAY_CENTERS = [3,3,4,4,5,5,5,4,4,3], DELAY_SIGMA = 4;
+        const POOL_WIDTH = [5,6,7,7,7,7,7,7,6,5];
+        const RANK_PROB = Array.from({length:POSITIONS}, ()=>Array(20).fill(0.05));
+        const PAGE_SIZE = 20;
+
+        let draws = [];
+        let currentPage = 0;
+
+        // ========== STORAGE ==========
+        function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(draws)); }
+        function load() { const s=localStorage.getItem(STORAGE_KEY); if(s){draws=JSON.parse(s); return true;} return false; }
+
+        // ========== REGOLE (come prima) ==========
+        function norm(map) { const vals=[...map.values()], max=Math.max(...vals,1e-9); const out=new Map(); for(const [k,v] of map) out.set(k,v/max); return out; }
+        function hotScores(hist, pos) {
+            const recent=hist.slice(-DECADE_WINDOW), halfFreq=new Map();
+            for(const d of recent) { const h=d.numbers[pos]<=10?'low':'high'; halfFreq.set(h,(halfFreq.get(h)||0)+1); }
+            const dom=[...halfFreq].sort((a,b)=>b[1]-a[1])[0]?.[0];
+            const filt=hist.filter(d=>(d.numbers[pos]<=10?'low':'high')===dom).slice(-HOT_WINDOW);
+            const freq=new Map(); for(const d of filt) { const n=d.numbers[pos]; freq.set(n,(freq.get(n)||0)+1); }
+            return freq;
+        }
+        function delayScores(hist, pos) {
+            const lastSeen=new Map(); hist.forEach((d,i)=>lastSeen.set(d.numbers[pos],i));
+            const now=hist.length, scores=new Map();
+            for(let n=1;n<=NUM_COUNT;n++){ const idx=lastSeen.get(n), delay=idx!==undefined?now-idx-1:now; scores.set(n,Math.exp(-((delay-DELAY_CENTERS[pos])**2)/(2*DELAY_SIGMA*DELAY_SIGMA))); }
+            return scores;
+        }
+        function halfScores(hist, pos) {
+            const recent=hist.slice(-DECADE_WINDOW), halfFreq=new Map();
+            for(const d of recent) { const h=d.numbers[pos]<=10?'low':'high'; halfFreq.set(h,(halfFreq.get(h)||0)+1); }
+            const dom=[...halfFreq].sort((a,b)=>b[1]-a[1])[0]?.[0];
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n, (n<=10?'low':'high')===dom ? (halfFreq.get(dom)||0) : 0);
+            return scores;
+        }
+        function clusterScores(hist, pos) {
+            const n=hist.length, scores=new Map();
+            for(let lag=1;lag<=CLUSTER_MAX_LAG&&lag<=n;lag++){ const num=hist[n-lag].numbers[pos]; scores.set(num,(scores.get(num)||0)+1/lag); }
+            return scores;
+        }
+        function volatilityScores(hist, pos) {
+            const recent=hist.slice(-VOL_WINDOW).map(d=>d.numbers[pos]), mean=recent.reduce((s,n)=>s+n,0)/recent.length;
+            const variance=recent.reduce((s,n)=>s+(n-mean)**2,0)/recent.length, sigma=Math.max(Math.sqrt(variance),2);
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n,Math.exp(-((n-mean)**2)/(2*sigma*sigma)));
+            return scores;
+        }
+        function coldHScores(hist) {
+            const recent=hist.slice(-10), freq=new Map();
+            for(const d of recent) for(const n of d.numbers) freq.set(n,(freq.get(n)||0)+1);
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n,1/(1+(freq.get(n)||0)));
+            return scores;
+        }
+        function compositeScores(hist, pos) {
+            const hot=norm(hotScores(hist,pos)), delay=norm(delayScores(hist,pos)), half=norm(halfScores(hist,pos)),
+                  clus=norm(clusterScores(hist,pos)), vol=norm(volatilityScores(hist,pos)), cold=norm(coldHScores(hist));
+            const all=new Set([...hot.keys(),...delay.keys(),...half.keys(),...clus.keys(),...vol.keys(),...cold.keys()]);
+            const scores=new Map(); for(const n of all) scores.set(n, (hot.get(n)||0)+(delay.get(n)||0)+(half.get(n)||0)+(clus.get(n)||0)+(vol.get(n)||0)+(cold.get(n)||0));
+            return scores;
+        }
+        function getRank(hist, pos, num) {
+            const ranked = [...compositeScores(hist, pos)].sort((a,b)=>b[1]-a[1]);
+            const idx = ranked.findIndex(([n])=>n===num);
+            return idx>=0 ? idx+1 : ranked.length+1;
+        }
+
+        // ========== UI ==========
+        function updateUI() {
+            document.getElementById('drawCount').textContent = draws.length;
+            if(draws.length){
+                const last=draws[draws.length-1];
+                document.getElementById('lastDrawInfo').textContent = `${last.datetime} – ${last.numbers.join(' ')} | Num: ${last.numerone}`;
+                renderToday();
+                renderHistory();
+            }
+        }
+
+        function renderToday() {
+            const today = draws.length ? draws[draws.length-1].datetime.split('T')[0] : '';
+            const todayDraws = draws.filter(d=>d.datetime.startsWith(today));
+            const container = document.getElementById('todayDraws');
+            if(!todayDraws.length) { container.innerHTML = '<p>Nessuna estrazione oggi.</p>'; return; }
+            let html = '';
+            for(const d of todayDraws.reverse()) {
+                const hist = draws.slice(0, draws.indexOf(d)); // storico prima di questa estrazione
+                html += `<div style="margin-bottom:1rem; padding:0.5rem; background:#2a2a2a; border-radius:6px;">
+                    <strong>${d.datetime.replace('T',' ')}</strong> – Numero concorso: ${d.numero||'?'}<br>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.3rem;">`;
+                for(let p=0;p<POSITIONS;p++){
+                    const num = d.numbers[p];
+                    const rank = hist.length>0 ? getRank(hist, p, num) : '?';
+                    html += `<div style="text-align:center;">
+                        <span style="font-weight:bold; color:#ffd54f;">${num}</span><br>
+                        <span class="rank">R:${rank}</span>
+                    </div>`;
+                }
+                html += `<div style="text-align:center; margin-left:1rem;">
+                    <span style="font-weight:bold; color:#f44336;">Num: ${d.numerone}</span>
+                </div></div></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderHistory() {
+            const start = currentPage * PAGE_SIZE;
+            const pageDraws = draws.slice(start, start + PAGE_SIZE);
+            const container = document.getElementById('historyTable');
+            document.getElementById('pageInfo').textContent = `Pagina ${currentPage+1} di ${Math.ceil(draws.length/PAGE_SIZE)}`;
+            let html = '<table><tr><th>Data/Ora</th><th>N.</th><th>Numeri</th><th>Num.</th></tr>';
+            for(const d of pageDraws) {
+                html += `<tr>
+                    <td>${d.datetime.replace('T',' ')}</td>
+                    <td>${d.numero||'?'}</td>
+                    <td>${d.numbers.join(' ')}</td>
+                    <td>${d.numerone}</td>
+                </tr>`;
+            }
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        document.getElementById('prevPageBtn').onclick = ()=>{ if(currentPage>0) { currentPage--; renderHistory(); } };
+        document.getElementById('nextPageBtn').onclick = ()=>{ if((currentPage+1)*PAGE_SIZE < draws.length) { currentPage++; renderHistory(); } };
+
+        // ========== FETCH / IMPORT / EXPORT ==========
+        async function fetchData() {
+            document.getElementById('dataStatus').textContent = '⏳ Scaricamento…';
+            try {
+                const res = await fetch(DATA_URL);
+                if(!res.ok) throw new Error('HTTP '+res.status);
+                const data = await res.json();
+                if(!Array.isArray(data)||data.length<10) throw new Error('Dati insuff.');
+                draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
+                save(); updateUI();
+                document.getElementById('dataStatus').textContent = '✅ Dati aggiornati';
+            } catch(e) {
+                console.warn(e);
+                if(load()){ updateUI(); document.getElementById('dataStatus').textContent = '⚠️ Uso cache locale'; }
+                else document.getElementById('dataStatus').textContent = '❌ Nessun dato';
+            }
+        }
+
+        document.getElementById('updateDataBtn').onclick = fetchData;
+        document.getElementById('toggleImportBtn').onclick = ()=> document.getElementById('importArea').classList.toggle('hidden');
+        document.getElementById('toggleExportBtn').onclick = ()=>{
+            const area = document.getElementById('exportArea');
+            if(area.classList.contains('hidden')){
+                document.getElementById('exportOutput').value = JSON.stringify(draws, null, 2);
+                area.classList.remove('hidden');
+            } else area.classList.add('hidden');
+        };
+        document.getElementById('copyExportBtn').onclick = ()=>{
+            const ta = document.getElementById('exportOutput'); ta.select(); document.execCommand('copy'); alert('Copiato!');
+        };
+        document.getElementById('doImportBtn').onclick = ()=>{
+            try {
+                const data = JSON.parse(document.getElementById('rawInput').value);
+                if(!Array.isArray(data)||data.length<5) throw new Error();
+                draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
+                save(); updateUI();
+                document.getElementById('importStatus').textContent = `Importate ${draws.length} estrazioni.`;
+            } catch(e) { document.getElementById('importStatus').textContent = 'Formato non valido.'; }
+        };
+
+        // ========== GENERATORE (come prima) ==========
+        // ... (codice già presente, non lo ripeto per brevità ma va tenuto)
+        // ========== BACKTEST (come prima) ==========
+        // ... (idem)
+
+        fetchData();
+    })();
+    </script>
+</body>
+</html>
