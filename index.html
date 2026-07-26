@@ -54,6 +54,8 @@
             <textarea id="exportOutput" readonly></textarea>
             <button id="copyExportBtn">📋 Copia</button>
         </div>
+        <button id="saveBtn">💾 Salva storico</button>
+        <span id="saveStatus" class="small"></span>
     </div>
 
     <!-- Estrazioni di oggi con rank -->
@@ -112,10 +114,24 @@
         let draws = [];
 
         // ========== STORAGE ==========
-        function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(draws)); }
-        function load() { const s=localStorage.getItem(STORAGE_KEY); if(s){draws=JSON.parse(s); return true;} return false; }
+        function save() { 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(draws)); 
+            document.getElementById('saveStatus').textContent = '✅ Salvato!';
+            setTimeout(() => { document.getElementById('saveStatus').textContent = ''; }, 2000);
+        }
+        function load() { 
+            const s=localStorage.getItem(STORAGE_KEY); 
+            if(s){
+                try {
+                    draws = JSON.parse(s);
+                    if (!Array.isArray(draws)) draws = [];
+                    return draws.length > 0;
+                } catch(e) { draws = []; }
+            }
+            return false;
+        }
 
-        // ========== REGOLE ==========
+        // ========== REGOLE (invariate) ==========
         function norm(map) { const vals=[...map.values()], max=Math.max(...vals,1e-9); const out=new Map(); for(const [k,v] of map) out.set(k,v/max); return out; }
         function hotScores(hist, pos) {
             const recent=hist.slice(-DECADE_WINDOW), halfFreq=new Map();
@@ -222,13 +238,30 @@
             container.innerHTML = html;
         }
 
+        // ========== MERGE & SORT ==========
+        function mergeDraws(newDraws) {
+            const existingKeys = new Set(draws.map(d => d.datetime));
+            let added = 0;
+            for (const d of newDraws) {
+                if (!existingKeys.has(d.datetime)) {
+                    draws.push(d);
+                    added++;
+                }
+            }
+            if (added > 0) {
+                draws.sort((a, b) => a.datetime.localeCompare(b.datetime));
+                save();
+                updateUI();
+            }
+            return added;
+        }
+
         // ========== PARSING CSV ==========
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
             const result = [];
             let started = false;
             for (const line of lines) {
-                // Salta le righe prima dell'intestazione
                 if (!started) {
                     if (line.startsWith('Concorso')) started = true;
                     continue;
@@ -237,7 +270,7 @@
                 if (parts.length < 13) continue;
                 const numero = parseInt(parts[0], 10);
                 if (isNaN(numero)) continue;
-                const data = parts[1]; // GG/MM/AAAA
+                const data = parts[1];
                 const ora = parts[2];
                 const numbers = [];
                 for (let j = 3; j <= 12; j++) {
@@ -255,25 +288,23 @@
             return result;
         }
 
-        // ========== FETCH / IMPORT / EXPORT ==========
-        async function fetchData() {
+        // ========== FETCH / IMPORT / EXPORT / SALVA ==========
+        async function fetchAndMerge() {
             document.getElementById('dataStatus').textContent = '⏳ Scaricamento…';
             try {
                 const res = await fetch(DATA_URL);
                 if(!res.ok) throw new Error('HTTP '+res.status);
                 const data = await res.json();
                 if(!Array.isArray(data)||data.length<10) throw new Error('Dati insuff.');
-                draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
-                save(); updateUI();
-                document.getElementById('dataStatus').textContent = '✅ Dati aggiornati';
+                const added = mergeDraws(data);
+                document.getElementById('dataStatus').textContent = added > 0 ? `✅ Aggiunte ${added} nuove estrazioni.` : '✅ Già aggiornato.';
             } catch(e) {
                 console.warn(e);
-                if(load()){ updateUI(); document.getElementById('dataStatus').textContent = '⚠️ Uso cache locale'; }
-                else document.getElementById('dataStatus').textContent = '❌ Nessun dato';
+                document.getElementById('dataStatus').textContent = '⚠️ Impossibile scaricare dati remoti.';
             }
         }
 
-        document.getElementById('updateDataBtn').onclick = fetchData;
+        document.getElementById('updateDataBtn').onclick = fetchAndMerge;
         document.getElementById('toggleImportBtn').onclick = ()=> document.getElementById('importArea').classList.toggle('hidden');
         document.getElementById('toggleExportBtn').onclick = ()=>{
             const area = document.getElementById('exportArea');
@@ -290,27 +321,24 @@
             if (!raw) return;
             let data;
             if (raw.startsWith('[')) {
-                // JSON
-                try {
-                    data = JSON.parse(raw);
-                } catch(e) {
-                    document.getElementById('importStatus').textContent = 'JSON non valido.';
-                    return;
+                try { data = JSON.parse(raw); } catch(e) {
+                    document.getElementById('importStatus').textContent = 'JSON non valido.'; return;
                 }
             } else {
-                // CSV
                 data = parseCSV(raw);
             }
             if(!Array.isArray(data)||data.length<5) {
-                document.getElementById('importStatus').textContent = 'Formato non riconosciuto o dati insufficienti.';
-                return;
+                document.getElementById('importStatus').textContent = 'Formato non riconosciuto o dati insufficienti.'; return;
             }
-            draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
-            save(); updateUI();
-            document.getElementById('importStatus').textContent = `Importate ${draws.length} estrazioni.`;
+            const added = mergeDraws(data);
+            document.getElementById('importStatus').textContent = `Importate ${added} nuove estrazioni. Totale: ${draws.length}.`;
+            document.getElementById('rawInput').value = '';
+        };
+        document.getElementById('saveBtn').onclick = () => {
+            save();
         };
 
-        // ========== GENERATORE ==========
+        // ========== GENERATORE (invariato) ==========
         function generateCombination(weights, noDup, balance) {
             const hist = draws;
             if(hist.length<10) return null;
@@ -399,7 +427,13 @@
             document.getElementById('backtestLog').textContent = `Media numeri: ${(hits/testData.length).toFixed(2)} (atteso 5.0) | Numerone: ${(numHits/testData.length*100).toFixed(1)}%`;
         };
 
-        fetchData();
+        // Avvio
+        if (!load()) {
+            document.getElementById('dataStatus').textContent = '❌ Nessun dato locale. Importa lo storico o aggiorna.';
+        } else {
+            updateUI();
+            document.getElementById('dataStatus').textContent = '✅ Dati caricati dalla memoria locale.';
+        }
     })();
     </script>
 </body>
