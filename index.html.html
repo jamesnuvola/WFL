@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win for Life – SONAR</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --text: #e0e0e0;
+            --muted: #888;
+            --accent: #4caf50;
+            --red: #f44336;
+            --border: #333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; padding: 1rem; max-width: 1000px; margin: auto; }
+        h1 { color: var(--accent); margin-bottom: 1rem; }
+        button, .btn { background: var(--accent); color: #000; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 0.2rem; }
+        button:hover { opacity: 0.8; }
+        .section { background: var(--surface); padding: 1rem; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); }
+        .numbers { font-size: 1.5rem; font-weight: bold; color: #ffd54f; }
+        .small { font-size: 0.8rem; color: var(--muted); }
+        textarea { width: 100%; height: 150px; background: #2a2a2a; color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; }
+        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        th, td { padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: center; }
+        th { background: #2a2a2a; }
+        .rank { font-size: 0.7rem; color: var(--muted); }
+        .hidden { display: none; }
+        .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .badge { background: var(--accent); color: #000; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        input[type=range] { width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>🍀 Win for Life – SONAR</h1>
+
+    <div class="section">
+        <p id="dataStatus">Caricamento dati…</p>
+        <p>Totale estrazioni: <span id="drawCount">0</span></p>
+        <p>Ultima: <span id="lastDrawInfo">—</span></p>
+        <button id="updateDataBtn">🔄 Aggiorna dati</button>
+        <button id="toggleImportBtn">📥 Importa storico</button>
+        <div id="importArea" class="hidden">
+            <p class="small">Incolla un array JSON o un CSV (tab come separatore).</p>
+            <textarea id="rawInput" placeholder="JSON o CSV..."></textarea>
+            <button id="doImportBtn">✅ Carica</button>
+            <span id="importStatus" class="small"></span>
+        </div>
+        <button id="toggleExportBtn">📤 Esporta storico</button>
+        <div id="exportArea" class="hidden">
+            <textarea id="exportOutput" readonly></textarea>
+            <button id="copyExportBtn">📋 Copia</button>
+        </div>
+    </div>
+
+    <!-- Estrazioni di oggi con rank -->
+    <div class="section">
+        <h3>📅 Estrazioni di oggi</h3>
+        <div id="todayDraws"></div>
+    </div>
+
+    <!-- Storico paginato -->
+    <div class="section">
+        <h3>📚 Storico recente</h3>
+        <div id="historyTable"></div>
+    </div>
+
+    <!-- Generatore -->
+    <div class="section">
+        <h3>🎲 Generatore</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <label>Peso verticale (0‑5): <input type="range" id="weightV" min="0" max="5" value="2" step="0.5"> <span id="weightVLabel">2</span></label>
+            <span class="small">Frequenza nella posizione.</span>
+            <label>Peso orizzontale (0‑5): <input type="range" id="weightH" min="0" max="5" value="1" step="0.5"> <span id="weightHLabel">1</span></label>
+            <span class="small">Frequenza globale del numero.</span>
+            <label>Peso ritardo (0‑3): <input type="range" id="weightDelay" min="0" max="3" value="1" step="0.5"> <span id="weightDelayLabel">1</span></label>
+            <span class="small">Ritardo vicino al centro ottimale.</span>
+            <label>Peso cluster (0‑3): <input type="range" id="weightCluster" min="0" max="3" value="1" step="0.5"> <span id="weightClusterLabel">1</span></label>
+            <span class="small">Uscito di recente nella stessa posizione.</span>
+        </div>
+        <div style="margin-top:1rem;">
+            <label><input type="checkbox" id="chkBalance" checked> Bilanciamento 4‑7 bassi</label>
+            <label><input type="checkbox" id="chkNoDup" checked> Evita decine già uscite</label>
+        </div>
+        <button id="generateBtn">Genera combinazione</button>
+        <div>Decina: <span id="combination" class="numbers">—</span></div>
+        <div>Numerone: <span id="numeroneOut" class="numbers">—</span></div>
+    </div>
+
+    <!-- Backtest -->
+    <div class="section">
+        <h3>📊 Backtest</h3>
+        <label>Training: <input type="number" id="trainSize" value="1000" min="100" step="100"></label>
+        <label>Test: <input type="number" id="testSize" value="200" min="20" step="20"></label>
+        <button id="runBacktestBtn">Avvia backtest</button>
+        <div id="backtestLog"></div>
+    </div>
+
+    <script>
+    (function() {
+        const NUM_COUNT = 20, POSITIONS = 10;
+        const DATA_URL = 'https://jamesnuvola.github.io/WFL/winforlife_draws.json';
+        const STORAGE_KEY = 'wlf_sonar_draws';
+        const HOT_WINDOW = 15, DECADE_WINDOW = 30, CLUSTER_MAX_LAG = 5, VOL_WINDOW = 20;
+        const DELAY_CENTERS = [3,3,4,4,5,5,5,4,4,3], DELAY_SIGMA = 4;
+        const POOL_WIDTH = [5,6,7,7,7,7,7,7,6,5];
+        const RANK_PROB = Array.from({length:POSITIONS}, ()=>Array(20).fill(0.05));
+
+        let draws = [];
+
+        // ========== STORAGE ==========
+        function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(draws)); }
+        function load() { const s=localStorage.getItem(STORAGE_KEY); if(s){draws=JSON.parse(s); return true;} return false; }
+
+        // ========== REGOLE ==========
+        function norm(map) { const vals=[...map.values()], max=Math.max(...vals,1e-9); const out=new Map(); for(const [k,v] of map) out.set(k,v/max); return out; }
+        function hotScores(hist, pos) {
+            const recent=hist.slice(-DECADE_WINDOW), halfFreq=new Map();
+            for(const d of recent) { const h=d.numbers[pos]<=10?'low':'high'; halfFreq.set(h,(halfFreq.get(h)||0)+1); }
+            const dom=[...halfFreq].sort((a,b)=>b[1]-a[1])[0]?.[0];
+            const filt=hist.filter(d=>(d.numbers[pos]<=10?'low':'high')===dom).slice(-HOT_WINDOW);
+            const freq=new Map(); for(const d of filt) { const n=d.numbers[pos]; freq.set(n,(freq.get(n)||0)+1); }
+            return freq;
+        }
+        function delayScores(hist, pos) {
+            const lastSeen=new Map(); hist.forEach((d,i)=>lastSeen.set(d.numbers[pos],i));
+            const now=hist.length, scores=new Map();
+            for(let n=1;n<=NUM_COUNT;n++){ const idx=lastSeen.get(n), delay=idx!==undefined?now-idx-1:now; scores.set(n,Math.exp(-((delay-DELAY_CENTERS[pos])**2)/(2*DELAY_SIGMA*DELAY_SIGMA))); }
+            return scores;
+        }
+        function halfScores(hist, pos) {
+            const recent=hist.slice(-DECADE_WINDOW), halfFreq=new Map();
+            for(const d of recent) { const h=d.numbers[pos]<=10?'low':'high'; halfFreq.set(h,(halfFreq.get(h)||0)+1); }
+            const dom=[...halfFreq].sort((a,b)=>b[1]-a[1])[0]?.[0];
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n, (n<=10?'low':'high')===dom ? (halfFreq.get(dom)||0) : 0);
+            return scores;
+        }
+        function clusterScores(hist, pos) {
+            const n=hist.length, scores=new Map();
+            for(let lag=1;lag<=CLUSTER_MAX_LAG&&lag<=n;lag++){ const num=hist[n-lag].numbers[pos]; scores.set(num,(scores.get(num)||0)+1/lag); }
+            return scores;
+        }
+        function volatilityScores(hist, pos) {
+            const recent=hist.slice(-VOL_WINDOW).map(d=>d.numbers[pos]), mean=recent.reduce((s,n)=>s+n,0)/recent.length;
+            const variance=recent.reduce((s,n)=>s+(n-mean)**2,0)/recent.length, sigma=Math.max(Math.sqrt(variance),2);
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n,Math.exp(-((n-mean)**2)/(2*sigma*sigma)));
+            return scores;
+        }
+        function coldHScores(hist) {
+            const recent=hist.slice(-10), freq=new Map();
+            for(const d of recent) for(const n of d.numbers) freq.set(n,(freq.get(n)||0)+1);
+            const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n,1/(1+(freq.get(n)||0)));
+            return scores;
+        }
+        function compositeScores(hist, pos, weights) {
+            const hot=norm(hotScores(hist,pos)), delay=norm(delayScores(hist,pos)), half=norm(halfScores(hist,pos)),
+                  clus=norm(clusterScores(hist,pos)), vol=norm(volatilityScores(hist,pos)), cold=norm(coldHScores(hist));
+            const all=new Set([...hot.keys(),...delay.keys(),...half.keys(),...clus.keys(),...vol.keys(),...cold.keys()]);
+            const scores=new Map(); for(const n of all) scores.set(n, (hot.get(n)||0)*weights.wV + (delay.get(n)||0)*weights.wDelay + (half.get(n)||0)*weights.wH + (clus.get(n)||0)*weights.wCluster + (vol.get(n)||0) + (cold.get(n)||0));
+            return scores;
+        }
+        function getRank(hist, pos, num) {
+            const ranked = [...compositeScores(hist, pos, {wV:2,wH:1,wDelay:1,wCluster:1})].sort((a,b)=>b[1]-a[1]);
+            const idx = ranked.findIndex(([n])=>n===num);
+            return idx>=0 ? idx+1 : ranked.length+1;
+        }
+
+        // ========== UI ==========
+        function updateUI() {
+            document.getElementById('drawCount').textContent = draws.length;
+            if(draws.length){
+                const last=draws[draws.length-1];
+                document.getElementById('lastDrawInfo').textContent = `${last.datetime} – ${last.numbers.join(' ')} | Num: ${last.numerone}`;
+                renderToday();
+                renderHistory();
+            }
+        }
+
+        function renderToday() {
+            const today = draws.length ? draws[draws.length-1].datetime.split('T')[0] : '';
+            const todayDraws = draws.filter(d=>d.datetime.startsWith(today));
+            const container = document.getElementById('todayDraws');
+            if(!todayDraws.length) { container.innerHTML = '<p>Nessuna estrazione oggi.</p>'; return; }
+            let html = '';
+            for(const d of todayDraws.reverse()) {
+                const idx = draws.indexOf(d);
+                const hist = idx > 0 ? draws.slice(0, idx) : [];
+                html += `<div style="margin-bottom:1rem; padding:0.5rem; background:#2a2a2a; border-radius:6px;">
+                    <strong>${d.datetime.replace('T',' ')}</strong> – N° ${d.numero||'?'}<br>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.3rem;">`;
+                for(let p=0;p<POSITIONS;p++){
+                    const num = d.numbers[p];
+                    const rank = hist.length>0 ? getRank(hist, p, num) : '?';
+                    html += `<div style="text-align:center;">
+                        <span style="font-weight:bold; color:#ffd54f;">${num}</span><br>
+                        <span class="rank">R:${rank}</span>
+                    </div>`;
+                }
+                html += `<div style="text-align:center; margin-left:1rem;">
+                    <span style="font-weight:bold; color:#f44336;">Num: ${d.numerone}</span>
+                </div></div></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderHistory() {
+            const recent = draws.slice(-20).reverse();
+            const container = document.getElementById('historyTable');
+            let html = '<table><tr><th>Data/Ora</th><th>N.</th><th>Numeri</th><th>Num.</th></tr>';
+            for(const d of recent) {
+                html += `<tr>
+                    <td>${d.datetime.replace('T',' ')}</td>
+                    <td>${d.numero||'?'}</td>
+                    <td>${d.numbers.join(' ')}</td>
+                    <td>${d.numerone}</td>
+                </tr>`;
+            }
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        // ========== PARSING CSV ==========
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/);
+            const result = [];
+            let started = false;
+            for (const line of lines) {
+                // Salta le righe prima dell'intestazione
+                if (!started) {
+                    if (line.startsWith('Concorso')) started = true;
+                    continue;
+                }
+                const parts = line.split('\t');
+                if (parts.length < 13) continue;
+                const numero = parseInt(parts[0], 10);
+                if (isNaN(numero)) continue;
+                const data = parts[1]; // GG/MM/AAAA
+                const ora = parts[2];
+                const numbers = [];
+                for (let j = 3; j <= 12; j++) {
+                    const n = parseInt(parts[j], 10);
+                    if (isNaN(n) || n < 1 || n > 20) break;
+                    numbers.push(n);
+                }
+                if (numbers.length !== 10) continue;
+                const numerone = parseInt(parts[13], 10);
+                if (isNaN(numerone) || numerone < 1 || numerone > 20) continue;
+                const [day, month, year] = data.split('/');
+                const datetime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${ora}`;
+                result.push({ datetime, numbers, numerone, numero });
+            }
+            return result;
+        }
+
+        // ========== FETCH / IMPORT / EXPORT ==========
+        async function fetchData() {
+            document.getElementById('dataStatus').textContent = '⏳ Scaricamento…';
+            try {
+                const res = await fetch(DATA_URL);
+                if(!res.ok) throw new Error('HTTP '+res.status);
+                const data = await res.json();
+                if(!Array.isArray(data)||data.length<10) throw new Error('Dati insuff.');
+                draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
+                save(); updateUI();
+                document.getElementById('dataStatus').textContent = '✅ Dati aggiornati';
+            } catch(e) {
+                console.warn(e);
+                if(load()){ updateUI(); document.getElementById('dataStatus').textContent = '⚠️ Uso cache locale'; }
+                else document.getElementById('dataStatus').textContent = '❌ Nessun dato';
+            }
+        }
+
+        document.getElementById('updateDataBtn').onclick = fetchData;
+        document.getElementById('toggleImportBtn').onclick = ()=> document.getElementById('importArea').classList.toggle('hidden');
+        document.getElementById('toggleExportBtn').onclick = ()=>{
+            const area = document.getElementById('exportArea');
+            if(area.classList.contains('hidden')){
+                document.getElementById('exportOutput').value = JSON.stringify(draws, null, 2);
+                area.classList.remove('hidden');
+            } else area.classList.add('hidden');
+        };
+        document.getElementById('copyExportBtn').onclick = ()=>{
+            const ta = document.getElementById('exportOutput'); ta.select(); document.execCommand('copy'); alert('Copiato!');
+        };
+        document.getElementById('doImportBtn').onclick = ()=>{
+            const raw = document.getElementById('rawInput').value.trim();
+            if (!raw) return;
+            let data;
+            if (raw.startsWith('[')) {
+                // JSON
+                try {
+                    data = JSON.parse(raw);
+                } catch(e) {
+                    document.getElementById('importStatus').textContent = 'JSON non valido.';
+                    return;
+                }
+            } else {
+                // CSV
+                data = parseCSV(raw);
+            }
+            if(!Array.isArray(data)||data.length<5) {
+                document.getElementById('importStatus').textContent = 'Formato non riconosciuto o dati insufficienti.';
+                return;
+            }
+            draws = data.sort((a,b)=>a.datetime.localeCompare(b.datetime));
+            save(); updateUI();
+            document.getElementById('importStatus').textContent = `Importate ${draws.length} estrazioni.`;
+        };
+
+        // ========== GENERATORE ==========
+        function generateCombination(weights, noDup, balance) {
+            const hist = draws;
+            if(hist.length<10) return null;
+            const perPos = [];
+            for(let p=0;p<POSITIONS;p++){
+                const full = [...compositeScores(hist, p, weights)].sort((a,b)=>b[1]-a[1]);
+                const pool = full.slice(0, POOL_WIDTH[p]);
+                perPos.push(pool.map(([n,score])=>[n, score]));
+            }
+            const sets = { decine: new Set(hist.map(d=>[...d.numbers].sort((a,b)=>a-b).join(','))) };
+            const found = new Map();
+            const ATTEMPTS = 600;
+            const seed = hist.length*100000 + (hist.length? hist[hist.length-1].numero||0 : 0);
+            let s = seed%2147483647; if(s<=0) s+=2147483646;
+            const rng = ()=>{ s=(s*16807)%2147483647; return (s-1)/2147483646; };
+            for(let att=0;att<ATTEMPTS;att++){
+                const perturbed = perPos.map(cands=>cands.map(([n,w])=>[n, w*Math.pow(rng(),3)*(0.05+rng()*4)]));
+                const chosen = [];
+                for(let p=0;p<POSITIONS;p++){
+                    const cands = perturbed[p].filter(([n])=>p===0 || n>chosen[p-1]);
+                    cands.sort((a,b)=>b[1]-a[1]);
+                    if(!cands.length) break;
+                    chosen.push(cands[0][0]);
+                }
+                if(chosen.length!==10) continue;
+                if(new Set(chosen).size!==10) continue;
+                const key = chosen.join(','); if(found.has(key)) continue;
+                if(noDup && sets.decine.has([...chosen].sort((a,b)=>a-b).join(','))) continue;
+                if(balance){ const low=chosen.filter(n=>n<=10).length; if(low<4||low>7) continue; }
+                const totalScore = chosen.reduce((sum,n,p)=>{
+                    const score = (compositeScores(hist, p, weights).get(n)||0);
+                    return sum+score;
+                },0);
+                found.set(key, {numbers:chosen, score:totalScore});
+            }
+            const sorted = [...found.values()].sort((a,b)=>b.score-a.score).slice(0,10);
+            const recentN = hist.slice(-VOL_WINDOW).map(d=>d.numerone), meanN = recentN.reduce((s,n)=>s+n,0)/recentN.length;
+            const varN = recentN.reduce((s,n)=>s+(n-meanN)**2,0)/recentN.length, sigmaN = Math.max(Math.sqrt(varN),2);
+            const coldN = coldHScores(hist);
+            const numScores = [];
+            for(let n=1;n<=NUM_COUNT;n++){
+                const delay = hist.length - 1 - (hist.map(d=>d.numerone).lastIndexOf(n));
+                const ds = Math.exp(-((delay-5)**2)/32), vs = Math.exp(-((n-meanN)**2)/(2*sigmaN*sigmaN));
+                numScores.push([n, (coldN.get(n)||0) + ds + vs]);
+            }
+            numScores.sort((a,b)=>b[1]-a[1]);
+            return { decine: sorted, numerone: numScores[0][0] };
+        }
+
+        document.getElementById('weightV').oninput = function(){ document.getElementById('weightVLabel').textContent = this.value; };
+        document.getElementById('weightH').oninput = function(){ document.getElementById('weightHLabel').textContent = this.value; };
+        document.getElementById('weightDelay').oninput = function(){ document.getElementById('weightDelayLabel').textContent = this.value; };
+        document.getElementById('weightCluster').oninput = function(){ document.getElementById('weightClusterLabel').textContent = this.value; };
+
+        document.getElementById('generateBtn').onclick = ()=>{
+            if(draws.length<10) return alert('Minimo 10 estrazioni.');
+            const wV = parseFloat(document.getElementById('weightV').value);
+            const wH = parseFloat(document.getElementById('weightH').value);
+            const wDelay = parseFloat(document.getElementById('weightDelay').value);
+            const wCluster = parseFloat(document.getElementById('weightCluster').value);
+            const noDup = document.getElementById('chkNoDup').checked;
+            const balance = document.getElementById('chkBalance').checked;
+            const res = generateCombination({wV,wH,wDelay,wCluster}, noDup, balance);
+            if(res && res.decine.length){
+                document.getElementById('combination').textContent = res.decine[0].numbers.join(' – ');
+                document.getElementById('numeroneOut').textContent = res.numerone;
+            } else {
+                document.getElementById('combination').textContent = '—';
+                document.getElementById('numeroneOut').textContent = '—';
+            }
+        };
+
+        // ========== BACKTEST ==========
+        document.getElementById('runBacktestBtn').onclick = ()=>{
+            const train = parseInt(document.getElementById('trainSize').value), test = parseInt(document.getElementById('testSize').value);
+            if(train+test>draws.length) { document.getElementById('backtestLog').textContent = 'Dati insufficienti.'; return; }
+            const trainData = draws.slice(-(train+test),-test), testData = draws.slice(-test);
+            let hits=0, numHits=0;
+            for(const d of testData){
+                const res = generateCombination({wV:2,wH:1,wDelay:1,wCluster:1}, false, true);
+                if(res && res.decine.length){
+                    hits += res.decine[0].numbers.filter(n=>d.numbers.includes(n)).length;
+                    if(res.numerone===d.numerone) numHits++;
+                }
+            }
+            document.getElementById('backtestLog').textContent = `Media numeri: ${(hits/testData.length).toFixed(2)} (atteso 5.0) | Numerone: ${(numHits/testData.length*100).toFixed(1)}%`;
+        };
+
+        fetchData();
+    })();
+    </script>
+</body>
+</html>
