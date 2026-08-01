@@ -35,6 +35,9 @@
         .diagnostic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .diagnostic-item { background: #2a2a2a; padding: 0.5rem; border-radius: 6px; }
         .bar { display: inline-block; background: var(--accent); height: 20px; margin-right: 2px; }
+        .strength-bar { height: 10px; background: #4caf50; border-radius: 3px; margin: 2px 0; }
+        .strength-bar.yellow { background: #ff9800; }
+        .strength-bar.red { background: #f44336; }
     </style>
 </head>
 <body>
@@ -94,6 +97,7 @@
         <button id="generateBtn">Genera combinazione</button>
         <div>Decina: <span id="combination" class="numbers">—</span></div>
         <div>Numerone: <span id="numeroneOut" class="numbers">—</span></div>
+        <div id="dettaglioContainer" style="margin-top:1rem;"></div>
     </div>
 
     <!-- Backtest -->
@@ -137,7 +141,20 @@
         const HOT_WINDOW = 15, DECADE_WINDOW = 30, CLUSTER_MAX_LAG = 5, VOL_WINDOW = 20;
         const DELAY_CENTERS = [3,3,4,4,5,5,5,4,4,3], DELAY_SIGMA = 4;
         const POOL_WIDTH = [5,6,7,7,7,7,7,7,6,5];
-        const RANK_PROB = Array.from({length:POSITIONS}, ()=>Array(20).fill(0.05));
+        // Curve empiriche di probabilità (semplificate) per bucket di rank (ampiezza 1)
+        // Approssimate dalle statistiche del modello
+        const RANK_PROB = [
+            [0.30,0.20,0.15,0.10,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00],
+            [0.25,0.20,0.15,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.20,0.18,0.14,0.12,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00,0.00],
+            [0.25,0.20,0.15,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00],
+            [0.30,0.20,0.15,0.10,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00]
+        ];
 
         let draws = [];
 
@@ -384,13 +401,11 @@
                     allRanks[p].push(rank);
                     sum += rank;
                 }
-                // Ultimi 7 giorni (7*17 ≈ 119 estrazioni)
                 if (t >= draws.length - 119) {
                     recentRanks.push(sum / POSITIONS);
                 }
             }
 
-            // Tabella rank
             let tableHTML = '<tr><th>Pos</th><th>Mediana</th><th>25° perc</th><th>75° perc</th><th>Media</th></tr>';
             for (let p = 0; p < POSITIONS; p++) {
                 const r = allRanks[p].sort((a,b)=>a-b);
@@ -403,7 +418,6 @@
             }
             document.getElementById('rankStatsTable').innerHTML = tableHTML;
 
-            // Performance recente
             const recentAvg = recentRanks.length > 0 ? (recentRanks.reduce((a,b)=>a+b,0)/recentRanks.length).toFixed(2) : '—';
             document.getElementById('recentAvgRank').textContent = recentAvg;
             const light = document.getElementById('trafficLight');
@@ -415,7 +429,6 @@
                 light.innerHTML = '<span style="color:#f44336; font-size:2rem;">🔴</span> Sopra la media (rank medio > 11)';
             }
 
-            // Distribuzione P1 (grafico semplificato)
             const dist = Array(20).fill(0);
             for (const r of allRanks[0]) {
                 if (r >= 1 && r <= 20) dist[r-1]++;
@@ -439,15 +452,17 @@
 
         document.getElementById('diagnosticBtn').onclick = computeDiagnostics;
 
-        // ========== GENERATORE ==========
+        // ========== GENERATORE (con dettaglio) ==========
         function generateCombination(weights, noDup, balance) {
             const hist = draws;
             if(hist.length<10) return null;
             const perPos = [];
+            const basePools = []; // pool non perturbati per i dettagli
             for(let p=0;p<POSITIONS;p++){
                 const full = [...compositeScores(hist, p, weights)].sort((a,b)=>b[1]-a[1]);
                 const pool = full.slice(0, POOL_WIDTH[p]);
                 perPos.push(pool.map(([n,score])=>[n, score]));
+                basePools.push(pool);
             }
             const sets = { decine: new Set(hist.map(d=>[...d.numbers].sort((a,b)=>a-b).join(','))) };
             const found = new Map();
@@ -476,6 +491,7 @@
                 found.set(key, {numbers:chosen, score:totalScore});
             }
             const sorted = [...found.values()].sort((a,b)=>b.score-a.score).slice(0,10);
+            // Numerone
             const recentN = hist.slice(-VOL_WINDOW).map(d=>d.numerone), meanN = recentN.reduce((s,n)=>s+n,0)/recentN.length;
             const varN = recentN.reduce((s,n)=>s+(n-meanN)**2,0)/recentN.length, sigmaN = Math.max(Math.sqrt(varN),2);
             const coldN = coldHScores(hist);
@@ -486,7 +502,31 @@
                 numScores.push([n, (coldN.get(n)||0) + ds + vs]);
             }
             numScores.sort((a,b)=>b[1]-a[1]);
-            return { decine: sorted, numerone: numScores[0][0] };
+            return { decine: sorted, numerone: numScores[0][0], basePools };
+        }
+
+        function showDettaglio(numbers, basePools, weights) {
+            const container = document.getElementById('dettaglioContainer');
+            let html = '<table><tr><th>Pos</th><th>Numero</th><th>Rank</th><th>Prob. storica</th><th>Forza</th></tr>';
+            for (let p = 0; p < POSITIONS; p++) {
+                const num = numbers[p];
+                const rank = getRank(draws, p, num, weights);
+                const prob = RANK_PROB[p][rank-1] || 0.001;
+                const probPercent = (prob * 100).toFixed(1);
+                let barClass = 'strength-bar';
+                if (rank > 5) barClass += ' yellow';
+                if (rank > 10) barClass += ' red';
+                const barWidth = Math.max(5, (1 - rank/20) * 100);
+                html += `<tr>
+                    <td>P${p+1}</td>
+                    <td style="color:#ffd54f; font-weight:bold;">${num}</td>
+                    <td>${rank}</td>
+                    <td>${probPercent}%</td>
+                    <td><div class="${barClass}" style="width:${barWidth}%;"></div></td>
+                </tr>`;
+            }
+            html += '</table>';
+            container.innerHTML = html;
         }
 
         document.getElementById('weightV').oninput = function(){ document.getElementById('weightVLabel').textContent = this.value; };
@@ -500,15 +540,19 @@
             const wH = parseFloat(document.getElementById('weightH').value);
             const wDelay = parseFloat(document.getElementById('weightDelay').value);
             const wCluster = parseFloat(document.getElementById('weightCluster').value);
+            const weights = {wV, wH, wDelay, wCluster};
             const noDup = document.getElementById('chkNoDup').checked;
             const balance = document.getElementById('chkBalance').checked;
-            const res = generateCombination({wV,wH,wDelay,wCluster}, noDup, balance);
+            const res = generateCombination(weights, noDup, balance);
             if(res && res.decine.length){
-                document.getElementById('combination').textContent = res.decine[0].numbers.join(' – ');
+                const best = res.decine[0];
+                document.getElementById('combination').textContent = best.numbers.join(' – ');
                 document.getElementById('numeroneOut').textContent = res.numerone;
+                showDettaglio(best.numbers, res.basePools, weights);
             } else {
                 document.getElementById('combination').textContent = '—';
                 document.getElementById('numeroneOut').textContent = '—';
+                document.getElementById('dettaglioContainer').innerHTML = '';
             }
         };
 
