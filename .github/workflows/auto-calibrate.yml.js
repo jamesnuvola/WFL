@@ -1,0 +1,175 @@
+import { readFileSync, writeFileSync } from 'fs';
+
+const DATA_FILE = 'winforlife_draws.json';
+const NUM_COUNT = 20;
+const POSITIONS = 10;
+const HOT_WINDOW = 15;
+const DECADE_WINDOW = 30;
+const CLUSTER_MAX_LAG = 5;
+const VOL_WINDOW = 20;
+const DELAY_CENTERS = [3, 3, 4, 4, 5, 5, 5, 4, 4, 3];
+const DELAY_SIGMA = 4;
+
+// ========== UTILITÀ ==========
+function norm(map) {
+  const vals = [...map.values()];
+  const max = Math.max(...vals, 1e-9);
+  const out = new Map();
+  for (const [k, v] of map) out.set(k, v / max);
+  return out;
+}
+
+// ========== REGOLE ==========
+function hotScores(hist, pos) {
+  const recent = hist.slice(-DECADE_WINDOW);
+  const halfFreq = new Map();
+  for (const d of recent) {
+    const h = d.numbers[pos] <= 10 ? 'low' : 'high';
+    halfFreq.set(h, (halfFreq.get(h) || 0) + 1);
+  }
+  const dom = [...halfFreq].sort((a, b) => b[1] - a[1])[0]?.[0];
+  const filt = hist.filter(d => (d.numbers[pos] <= 10 ? 'low' : 'high') === dom).slice(-HOT_WINDOW);
+  const freq = new Map();
+  for (const d of filt) {
+    const n = d.numbers[pos];
+    freq.set(n, (freq.get(n) || 0) + 1);
+  }
+  return freq;
+}
+
+function delayScores(hist, pos) {
+  const lastSeen = new Map();
+  hist.forEach((d, i) => lastSeen.set(d.numbers[pos], i));
+  const now = hist.length;
+  const scores = new Map();
+  for (let n = 1; n <= NUM_COUNT; n++) {
+    const idx = lastSeen.get(n);
+    const delay = idx !== undefined ? now - idx - 1 : now;
+    scores.set(n, Math.exp(-((delay - DELAY_CENTERS[pos]) ** 2) / (2 * DELAY_SIGMA * DELAY_SIGMA)));
+  }
+  return scores;
+}
+
+function halfScores(hist, pos) {
+  const recent = hist.slice(-DECADE_WINDOW);
+  const halfFreq = new Map();
+  for (const d of recent) {
+    const h = d.numbers[pos] <= 10 ? 'low' : 'high';
+    halfFreq.set(h, (halfFreq.get(h) || 0) + 1);
+  }
+  const dom = [...halfFreq].sort((a, b) => b[1] - a[1])[0]?.[0];
+  const scores = new Map();
+  for (let n = 1; n <= NUM_COUNT; n++) {
+    scores.set(n, (n <= 10 ? 'low' : 'high') === dom ? (halfFreq.get(dom) || 0) : 0);
+  }
+  return scores;
+}
+
+function clusterScores(hist, pos) {
+  const n = hist.length;
+  const scores = new Map();
+  for (let lag = 1; lag <= CLUSTER_MAX_LAG && lag <= n; lag++) {
+    const num = hist[n - lag].numbers[pos];
+    scores.set(num, (scores.get(num) || 0) + 1 / lag);
+  }
+  return scores;
+}
+
+function volatilityScores(hist, pos) {
+  const recent = hist.slice(-VOL_WINDOW).map(d => d.numbers[pos]);
+  const mean = recent.reduce((s, n) => s + n, 0) / recent.length;
+  const variance = recent.reduce((s, n) => s + (n - mean) ** 2, 0) / recent.length;
+  const sigma = Math.max(Math.sqrt(variance), 2);
+  const scores = new Map();
+  for (let n = 1; n <= NUM_COUNT; n++) {
+    scores.set(n, Math.exp(-((n - mean) ** 2) / (2 * sigma * sigma)));
+  }
+  return scores;
+}
+
+function coldHScores(hist) {
+  const recent = hist.slice(-10);
+  const freq = new Map();
+  for (const d of recent) {
+    for (const n of d.numbers) freq.set(n, (freq.get(n) || 0) + 1);
+  }
+  const scores = new Map();
+  for (let n = 1; n <= NUM_COUNT; n++) {
+    scores.set(n, 1 / (1 + (freq.get(n) || 0)));
+  }
+  return scores;
+}
+
+function compositeScores(hist, pos, weights) {
+  const hot = norm(hotScores(hist, pos));
+  const delay = norm(delayScores(hist, pos));
+  const half = norm(halfScores(hist, pos));
+  const clus = norm(clusterScores(hist, pos));
+  const vol = norm(volatilityScores(hist, pos));
+  const cold = norm(coldHScores(hist));
+  const all = new Set([...hot.keys(), ...delay.keys(), ...half.keys(), ...clus.keys(), ...vol.keys(), ...cold.keys()]);
+  const scores = new Map();
+  for (const n of all) {
+    scores.set(
+      n,
+      (hot.get(n) || 0) * weights.wV +
+        (delay.get(n) || 0) * weights.wDelay +
+        (half.get(n) || 0) * weights.wH +
+        (clus.get(n) || 0) * weights.wCluster +
+        (vol.get(n) || 0) +
+        (cold.get(n) || 0)
+    );
+  }
+  return scores;
+}
+
+function getRank(hist, pos, num, weights = { wV: 2, wH: 1, wDelay: 1, wCluster: 1 }) {
+  const ranked = [...compositeScores(hist, pos, weights)].sort((a, b) => b[1] - a[1]);
+  const idx = ranked.findIndex(([n]) => n === num);
+  return idx >= 0 ? idx + 1 : ranked.length + 1;
+}
+
+// ========== CARICAMENTO DATI ==========
+const draws = JSON.parse(readFileSync(DATA_FILE, 'utf-8'));
+draws.sort((a, b) => a.datetime.localeCompare(b.datetime));
+
+// ========== CONFIGURAZIONI DA TESTARE ==========
+const configs = [
+  { wV: 2, wH: 1, wDelay: 1, wCluster: 1 },
+  { wV: 3, wH: 1, wDelay: 1, wCluster: 0.5 },
+  { wV: 1, wH: 2, wDelay: 2, wCluster: 1 },
+  { wV: 2, wH: 1, wDelay: 0.5, wCluster: 2 },
+  { wV: 2.5, wH: 1.5, wDelay: 1, wCluster: 1 },
+  { wV: 2, wH: 2, wDelay: 1, wCluster: 1 },
+  { wV: 1.5, wH: 1, wDelay: 1.5, wCluster: 1.5 },
+];
+
+const VALIDATION_DAYS = 7;
+const lastValidationDraw = draws.length;
+const firstValidationDraw = Math.max(0, lastValidationDraw - VALIDATION_DAYS * 17);
+
+let bestConfig = configs[0];
+let bestScore = Infinity;
+
+for (const cfg of configs) {
+  let sumRank = 0;
+  let count = 0;
+  for (let t = firstValidationDraw; t < lastValidationDraw; t++) {
+    const history = draws.slice(0, t);
+    const current = draws[t];
+    for (let p = 0; p < POSITIONS; p++) {
+      const rank = getRank(history, p, current.numbers[p], cfg);
+      sumRank += rank;
+      count++;
+    }
+  }
+  const avgRank = sumRank / count;
+  console.log(`Config ${JSON.stringify(cfg)}: rank medio = ${avgRank.toFixed(2)}`);
+  if (avgRank < bestScore) {
+    bestScore = avgRank;
+    bestConfig = cfg;
+  }
+}
+
+writeFileSync('weights.json', JSON.stringify(bestConfig, null, 2));
+console.log('Nuovi pesi:', bestConfig);
