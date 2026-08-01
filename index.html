@@ -25,19 +25,12 @@
         .small { font-size: 0.8rem; color: var(--muted); }
         textarea { width: 100%; height: 150px; background: #2a2a2a; color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; }
         table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        th, td { padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: center; }
+        th, td { padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: center; font-size: 0.8rem; }
         th { background: #2a2a2a; }
-        .rank { font-size: 0.7rem; color: var(--muted); }
         .hidden { display: none; }
-        .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; }
-        .badge { background: var(--accent); color: #000; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        input[type=range] { width: 200px; }
         .diagnostic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .diagnostic-item { background: #2a2a2a; padding: 0.5rem; border-radius: 6px; }
-        .bar { display: inline-block; background: var(--accent); height: 20px; margin-right: 2px; }
-        .strength-bar { height: 10px; background: #4caf50; border-radius: 3px; margin: 2px 0; }
-        .strength-bar.yellow { background: #ff9800; }
-        .strength-bar.red { background: #f44336; }
+        .heatmap-cell { width: 30px; height: 30px; text-align: center; vertical-align: middle; font-weight: bold; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -63,6 +56,7 @@
         <button id="saveBtn">💾 Salva storico</button>
         <span id="saveStatus" class="small"></span>
         <button id="diagnosticBtn" style="background:#ff9800;">📊 Diagnostica</button>
+        <button id="crossDiagnosticBtn" style="background:#2196f3;">🔍 Diagnostica incrociata</button>
     </div>
 
     <!-- Estrazioni di oggi con rank -->
@@ -98,6 +92,7 @@
         <div>Decina: <span id="combination" class="numbers">—</span></div>
         <div>Numerone: <span id="numeroneOut" class="numbers">—</span></div>
         <div id="dettaglioContainer" style="margin-top:1rem;"></div>
+        <div id="suggestedWeights" class="small" style="margin-top:0.5rem;"></div>
     </div>
 
     <!-- Backtest -->
@@ -109,28 +104,32 @@
         <div id="backtestLog"></div>
     </div>
 
-    <!-- DIAGNOSTICA -->
+    <!-- DIAGNOSTICA STANDARD -->
     <div class="section hidden" id="diagnosticSection">
         <h3>📈 Diagnostica</h3>
-        <p class="small">Statistiche calcolate sulle ultime 500 estrazioni (walk‑forward). Premere il pulsante arancione "📊 Diagnostica" per aggiornare.</p>
+        <p class="small">Statistiche calcolate sulle ultime 500 estrazioni (walk‑forward).</p>
         <div class="diagnostic-grid">
             <div class="diagnostic-item">
                 <h4>Rank medi per posizione</h4>
                 <table id="rankStatsTable">
-                    <tr><th>Pos</th><th>Mediana</th><th>25° perc</th><th>75° perc</th><th>Media</th></tr>
+                    <tr><th>Pos</th><th>Mediana</th><th>25° perc</th><th>75° perc</th><th>Media oss.</th><th>Media attesa</th><th>Rapporto</th></tr>
                 </table>
             </div>
             <div class="diagnostic-item">
                 <h4>Performance recente (7 giorni)</h4>
                 <p>Rank medio: <strong id="recentAvgRank">—</strong></p>
-                <p>Atteso casuale: <strong>10.5</strong></p>
+                <p>Atteso complessivo: <strong id="expectedOverall">—</strong></p>
                 <p id="trafficLight"></p>
             </div>
         </div>
-        <div class="diagnostic-item" style="margin-top:1rem;">
-            <h4>Distribuzione rank P1</h4>
-            <div id="rankDistP1" style="display:flex; align-items:flex-end; height:100px;"></div>
-        </div>
+    </div>
+
+    <!-- DIAGNOSTICA INCROCIATA (NUMERO × POSIZIONE) -->
+    <div class="section hidden" id="crossDiagnosticSection">
+        <h3>🔍 Diagnostica incrociata (ultimi 7 giorni)</h3>
+        <p class="small">Frequenza di ciascun numero in ciascuna posizione. Colori: verde = alta frequenza, rosso = bassa.</p>
+        <div id="heatmapContainer" style="overflow-x:auto;"></div>
+        <p class="small" style="margin-top:0.5rem;">Il generatore può usare queste frequenze come pesi aggiuntivi. Premi "Genera" dopo aver visualizzato la mappa per applicare i suggerimenti.</p>
     </div>
 
     <script>
@@ -141,8 +140,6 @@
         const HOT_WINDOW = 15, DECADE_WINDOW = 30, CLUSTER_MAX_LAG = 5, VOL_WINDOW = 20;
         const DELAY_CENTERS = [3,3,4,4,5,5,5,4,4,3], DELAY_SIGMA = 4;
         const POOL_WIDTH = [5,6,7,7,7,7,7,7,6,5];
-        // Curve empiriche di probabilità (semplificate) per bucket di rank (ampiezza 1)
-        // Approssimate dalle statistiche del modello
         const RANK_PROB = [
             [0.30,0.20,0.15,0.10,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00],
             [0.25,0.20,0.15,0.10,0.08,0.05,0.04,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.00,0.00,0.00,0.00,0.00],
@@ -157,6 +154,8 @@
         ];
 
         let draws = [];
+        // Frequenze recenti calcolate dall'ultima diagnostica incrociata
+        let recentFreq = null; // Array 2D: [posizione][numero] = frequenza (0-1)
 
         // ========== STORAGE ==========
         function save() { 
@@ -216,15 +215,23 @@
             const scores=new Map(); for(let n=1;n<=NUM_COUNT;n++) scores.set(n,1/(1+(freq.get(n)||0)));
             return scores;
         }
-        function compositeScores(hist, pos, weights) {
+        function compositeScores(hist, pos, weights, freqMap = null) {
             const hot=norm(hotScores(hist,pos)), delay=norm(delayScores(hist,pos)), half=norm(halfScores(hist,pos)),
                   clus=norm(clusterScores(hist,pos)), vol=norm(volatilityScores(hist,pos)), cold=norm(coldHScores(hist));
             const all=new Set([...hot.keys(),...delay.keys(),...half.keys(),...clus.keys(),...vol.keys(),...cold.keys()]);
-            const scores=new Map(); for(const n of all) scores.set(n, (hot.get(n)||0)*weights.wV + (delay.get(n)||0)*weights.wDelay + (half.get(n)||0)*weights.wH + (clus.get(n)||0)*weights.wCluster + (vol.get(n)||0) + (cold.get(n)||0));
+            const scores=new Map();
+            for(const n of all) {
+                let bonus = 0;
+                // Se abbiamo una mappa delle frequenze recenti, aggiungiamo un bonus proporzionale
+                if (freqMap && freqMap[pos] && freqMap[pos][n]) {
+                    bonus = freqMap[pos][n] * 2; // peso extra, regolabile
+                }
+                scores.set(n, (hot.get(n)||0)*weights.wV + (delay.get(n)||0)*weights.wDelay + (half.get(n)||0)*weights.wH + (clus.get(n)||0)*weights.wCluster + (vol.get(n)||0) + (cold.get(n)||0) + bonus);
+            }
             return scores;
         }
-        function getRank(hist, pos, num, weights = {wV:2,wH:1,wDelay:1,wCluster:1}) {
-            const ranked = [...compositeScores(hist, pos, weights)].sort((a,b)=>b[1]-a[1]);
+        function getRank(hist, pos, num, weights = {wV:2,wH:1,wDelay:1,wCluster:1}, freqMap = null) {
+            const ranked = [...compositeScores(hist, pos, weights, freqMap)].sort((a,b)=>b[1]-a[1]);
             const idx = ranked.findIndex(([n])=>n===num);
             return idx>=0 ? idx+1 : ranked.length+1;
         }
@@ -381,7 +388,7 @@
         };
         document.getElementById('saveBtn').onclick = () => { save(); };
 
-        // ========== DIAGNOSTICA ==========
+        // ========== DIAGNOSTICA STANDARD ==========
         function computeDiagnostics() {
             if (draws.length < 300) {
                 alert('Servono almeno 300 estrazioni per una diagnostica significativa.');
@@ -390,61 +397,71 @@
             const start = Math.max(0, draws.length - 500);
             const weights = {wV:2, wH:1, wDelay:1, wCluster:1};
             const allRanks = Array.from({length: POSITIONS}, () => []);
-            const recentRanks = [];
+            const recentRanks = Array.from({length: POSITIONS}, () => []);
+            const candidatePools = Array.from({length: POSITIONS}, () => new Set());
 
             for (let t = start; t < draws.length; t++) {
                 const history = draws.slice(0, t);
                 const current = draws[t];
-                let sum = 0;
                 for (let p = 0; p < POSITIONS; p++) {
                     const rank = getRank(history, p, current.numbers[p], weights);
                     allRanks[p].push(rank);
-                    sum += rank;
-                }
-                if (t >= draws.length - 119) {
-                    recentRanks.push(sum / POSITIONS);
+                    if (t >= draws.length - 119) {
+                        recentRanks[p].push(rank);
+                    }
+                    candidatePools[p].add(current.numbers[p]);
                 }
             }
 
-            let tableHTML = '<tr><th>Pos</th><th>Mediana</th><th>25° perc</th><th>75° perc</th><th>Media</th></tr>';
+            let tableHTML = '<tr><th>Pos</th><th>Mediana</th><th>25° perc</th><th>75° perc</th><th>Media oss.</th><th>Media attesa</th><th>Rapporto</th></tr>';
+            let totalObservedMean = 0;
+            let totalExpectedMean = 0;
             for (let p = 0; p < POSITIONS; p++) {
                 const r = allRanks[p].sort((a,b)=>a-b);
                 const n = r.length;
                 const median = n > 0 ? r[Math.floor(n/2)] : '—';
                 const p25 = n > 0 ? r[Math.floor(n*0.25)] : '—';
                 const p75 = n > 0 ? r[Math.floor(n*0.75)] : '—';
-                const avg = n > 0 ? (r.reduce((a,b)=>a+b,0)/n).toFixed(1) : '—';
-                tableHTML += `<tr><td>P${p+1}</td><td>${median}</td><td>${p25}</td><td>${p75}</td><td>${avg}</td></tr>`;
+                const avgObserved = n > 0 ? (r.reduce((a,b)=>a+b,0)/n) : 0;
+                const uniqueCandidates = candidatePools[p].size;
+                const avgCandidates = Math.max(uniqueCandidates, 2);
+                const expectedMean = (avgCandidates + 1) / 2;
+                const ratio = avgObserved > 0 ? avgObserved / expectedMean : 0;
+                totalObservedMean += avgObserved;
+                totalExpectedMean += expectedMean;
+                tableHTML += `<tr>
+                    <td>P${p+1}</td>
+                    <td>${median}</td>
+                    <td>${p25}</td>
+                    <td>${p75}</td>
+                    <td>${avgObserved.toFixed(1)}</td>
+                    <td>${expectedMean.toFixed(1)}</td>
+                    <td style="color:${ratio < 0.95 ? '#4caf50' : ratio > 1.05 ? '#f44336' : '#ff9800'}">${ratio.toFixed(2)}</td>
+                </tr>`;
             }
             document.getElementById('rankStatsTable').innerHTML = tableHTML;
 
-            const recentAvg = recentRanks.length > 0 ? (recentRanks.reduce((a,b)=>a+b,0)/recentRanks.length).toFixed(2) : '—';
-            document.getElementById('recentAvgRank').textContent = recentAvg;
-            const light = document.getElementById('trafficLight');
-            if (recentAvg < 9.5) {
-                light.innerHTML = '<span style="color:#4caf50; font-size:2rem;">🟢</span> Buona performance (rank medio < 9.5)';
-            } else if (recentAvg < 11) {
-                light.innerHTML = '<span style="color:#ff9800; font-size:2rem;">🟡</span> Nella media (rank medio tra 9.5 e 11)';
-            } else {
-                light.innerHTML = '<span style="color:#f44336; font-size:2rem;">🔴</span> Sopra la media (rank medio > 11)';
+            const recentAvgs = [];
+            for (let p = 0; p < POSITIONS; p++) {
+                const rr = recentRanks[p];
+                if (rr.length > 0) {
+                    const avg = rr.reduce((a,b)=>a+b,0)/rr.length;
+                    recentAvgs.push(avg);
+                }
             }
+            const overallRecentAvg = recentAvgs.length > 0 ? (recentAvgs.reduce((a,b)=>a+b,0) / recentAvgs.length) : 0;
+            const expectedOverall = totalExpectedMean / POSITIONS;
+            document.getElementById('recentAvgRank').textContent = overallRecentAvg.toFixed(2);
+            document.getElementById('expectedOverall').textContent = expectedOverall.toFixed(2);
 
-            const dist = Array(20).fill(0);
-            for (const r of allRanks[0]) {
-                if (r >= 1 && r <= 20) dist[r-1]++;
-            }
-            const maxCount = Math.max(...dist, 1);
-            const barContainer = document.getElementById('rankDistP1');
-            barContainer.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
-                const bar = document.createElement('div');
-                bar.style.width = '15px';
-                bar.style.height = `${(dist[i]/maxCount)*80}px`;
-                bar.style.background = '#4caf50';
-                bar.style.margin = '0 1px';
-                bar.style.display = 'inline-block';
-                bar.title = `Rank ${i+1}: ${dist[i]} volte`;
-                barContainer.appendChild(bar);
+            let recentRatio = overallRecentAvg / expectedOverall;
+            const light = document.getElementById('trafficLight');
+            if (recentRatio < 0.95) {
+                light.innerHTML = '<span style="color:#4caf50; font-size:2rem;">🟢</span> Stai battendo il caso in modo significativo';
+            } else if (recentRatio > 1.05) {
+                light.innerHTML = '<span style="color:#f44336; font-size:2rem;">🔴</span> Il modello sta facendo peggio del caso';
+            } else {
+                light.innerHTML = '<span style="color:#ff9800; font-size:2rem;">🟡</span> Prestazioni in linea con la casualità';
             }
 
             document.getElementById('diagnosticSection').classList.remove('hidden');
@@ -452,14 +469,81 @@
 
         document.getElementById('diagnosticBtn').onclick = computeDiagnostics;
 
-        // ========== GENERATORE (con dettaglio) ==========
+        // ========== DIAGNOSTICA INCROCIATA ==========
+        function computeCrossDiagnostics() {
+            if (draws.length < 119) {
+                alert('Servono almeno 7 giorni di estrazioni.');
+                return;
+            }
+            const recentDraws = draws.slice(-119); // ultimi 7 giorni
+            // Matrice frequenza: freq[pos][num] (0-20)
+            const freq = Array.from({length: POSITIONS}, () => Array(NUM_COUNT+1).fill(0));
+            for (const d of recentDraws) {
+                for (let p = 0; p < POSITIONS; p++) {
+                    const num = d.numbers[p];
+                    freq[p][num]++;
+                }
+            }
+
+            // Normalizza per posizione in modo che la somma delle frequenze sia 1 (per usarlo come peso)
+            const freqNorm = Array.from({length: POSITIONS}, () => Array(NUM_COUNT+1).fill(0));
+            for (let p = 0; p < POSITIONS; p++) {
+                const total = freq[p].reduce((a,b)=>a+b, 0);
+                if (total > 0) {
+                    for (let n = 1; n <= NUM_COUNT; n++) {
+                        freqNorm[p][n] = freq[p][n] / total;
+                    }
+                }
+            }
+
+            // Salviamo la mappa normalizzata per usarla nel generatore
+            recentFreq = freqNorm;
+
+            // Costruisci la tabella heatmap (20 righe x 10 colonne)
+            let html = '<table><tr><th>Num</th>';
+            for (let p = 0; p < POSITIONS; p++) html += `<th>P${p+1}</th>`;
+            html += '</tr>';
+            const maxFreq = Math.max(...freqNorm.flat().filter(v=>v>0));
+            const minFreq = Math.min(...freqNorm.flat().filter(v=>v>0));
+            for (let n = 1; n <= NUM_COUNT; n++) {
+                html += `<tr><td style="font-weight:bold; color:#ffd54f;">${n}</td>`;
+                for (let p = 0; p < POSITIONS; p++) {
+                    const val = freqNorm[p][n];
+                    let color = '#333';
+                    if (val > 0) {
+                        const intensity = maxFreq > 0 ? (val - minFreq) / (maxFreq - minFreq) : 0;
+                        // scala dal rosso (bassa) al verde (alta)
+                        const r = Math.round(255 * (1 - intensity));
+                        const g = Math.round(100 + 155 * intensity);
+                        const b = Math.round(100 * (1 - intensity));
+                        color = `rgb(${r},${g},${b})`;
+                    }
+                    html += `<td class="heatmap-cell" style="background:${color};" title="Freq: ${(val*100).toFixed(1)}%">${val > 0.05 ? (val*100).toFixed(0)+'%' : ''}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table>';
+            document.getElementById('heatmapContainer').innerHTML = html;
+            document.getElementById('crossDiagnosticSection').classList.remove('hidden');
+
+            // Suggerimento automatico: se il semaforo era rosso, suggeriamo di usare la mappa
+            if (document.getElementById('trafficLight').innerText.includes('🔴')) {
+                document.getElementById('suggestedWeights').textContent = '💡 Le prestazioni attuali sono sotto la media. Prova a generare ora: il modello userà automaticamente le frequenze recenti come bonus.';
+            } else {
+                document.getElementById('suggestedWeights').textContent = '✅ Le prestazioni sono buone. La generazione userà comunque le frequenze recenti come bonus leggero.';
+            }
+        }
+
+        document.getElementById('crossDiagnosticBtn').onclick = computeCrossDiagnostics;
+
+        // ========== GENERATORE (con supporto alla mappa frequenze recenti) ==========
         function generateCombination(weights, noDup, balance) {
             const hist = draws;
             if(hist.length<10) return null;
             const perPos = [];
-            const basePools = []; // pool non perturbati per i dettagli
+            const basePools = [];
             for(let p=0;p<POSITIONS;p++){
-                const full = [...compositeScores(hist, p, weights)].sort((a,b)=>b[1]-a[1]);
+                const full = [...compositeScores(hist, p, weights, recentFreq)].sort((a,b)=>b[1]-a[1]);
                 const pool = full.slice(0, POOL_WIDTH[p]);
                 perPos.push(pool.map(([n,score])=>[n, score]));
                 basePools.push(pool);
@@ -485,13 +569,12 @@
                 if(noDup && sets.decine.has([...chosen].sort((a,b)=>a-b).join(','))) continue;
                 if(balance){ const low=chosen.filter(n=>n<=10).length; if(low<4||low>7) continue; }
                 const totalScore = chosen.reduce((sum,n,p)=>{
-                    const score = (compositeScores(hist, p, weights).get(n)||0);
+                    const score = (compositeScores(hist, p, weights, recentFreq).get(n)||0);
                     return sum+score;
                 },0);
                 found.set(key, {numbers:chosen, score:totalScore});
             }
             const sorted = [...found.values()].sort((a,b)=>b.score-a.score).slice(0,10);
-            // Numerone
             const recentN = hist.slice(-VOL_WINDOW).map(d=>d.numerone), meanN = recentN.reduce((s,n)=>s+n,0)/recentN.length;
             const varN = recentN.reduce((s,n)=>s+(n-meanN)**2,0)/recentN.length, sigmaN = Math.max(Math.sqrt(varN),2);
             const coldN = coldHScores(hist);
@@ -510,7 +593,7 @@
             let html = '<table><tr><th>Pos</th><th>Numero</th><th>Rank</th><th>Prob. storica</th><th>Forza</th></tr>';
             for (let p = 0; p < POSITIONS; p++) {
                 const num = numbers[p];
-                const rank = getRank(draws, p, num, weights);
+                const rank = getRank(draws, p, num, weights, recentFreq);
                 const prob = RANK_PROB[p][rank-1] || 0.001;
                 const probPercent = (prob * 100).toFixed(1);
                 let barClass = 'strength-bar';
@@ -549,6 +632,9 @@
                 document.getElementById('combination').textContent = best.numbers.join(' – ');
                 document.getElementById('numeroneOut').textContent = res.numerone;
                 showDettaglio(best.numbers, res.basePools, weights);
+                if (recentFreq) {
+                    document.getElementById('suggestedWeights').textContent = 'ℹ️ Generazione che include le frequenze recenti calcolate dalla diagnostica incrociata.';
+                }
             } else {
                 document.getElementById('combination').textContent = '—';
                 document.getElementById('numeroneOut').textContent = '—';
