@@ -31,6 +31,9 @@
         .diagnostic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .diagnostic-item { background: #2a2a2a; padding: 0.5rem; border-radius: 6px; }
         .heatmap-cell { width: 30px; height: 30px; text-align: center; vertical-align: middle; font-weight: bold; border-radius: 4px; }
+        .strength-bar { height: 10px; background: #4caf50; border-radius: 3px; margin: 2px 0; }
+        .strength-bar.yellow { background: #ff9800; }
+        .strength-bar.red { background: #f44336; }
     </style>
 </head>
 <body>
@@ -47,6 +50,14 @@
             <textarea id="rawInput" placeholder="JSON o CSV..."></textarea>
             <button id="doImportBtn">✅ Carica</button>
             <span id="importStatus" class="small"></span>
+        </div>
+        <button id="toggleTextImportBtn">📝 Importa da testo</button>
+        <div id="textImportArea" class="hidden" style="margin-top:0.5rem;">
+            <p class="small">Incolla l'estrazione nel formato:<br>
+            <code>Estrazione n° XXXX (HH:MM)<br>del GG-MM-AAAA<br>ESTRATTI<br>num1<br>num2<br>...<br>NUMERONE<br>numerone</code></p>
+            <textarea id="textDrawInput" placeholder="Incolla qui il testo..."></textarea>
+            <button id="doTextImportBtn">✅ Aggiungi</button>
+            <span id="textImportStatus" class="small"></span>
         </div>
         <button id="toggleExportBtn">📤 Esporta storico</button>
         <div id="exportArea" class="hidden">
@@ -154,8 +165,7 @@
         ];
 
         let draws = [];
-        // Frequenze recenti calcolate dall'ultima diagnostica incrociata
-        let recentFreq = null; // Array 2D: [posizione][numero] = frequenza (0-1)
+        let recentFreq = null;
 
         // ========== STORAGE ==========
         function save() { 
@@ -222,9 +232,8 @@
             const scores=new Map();
             for(const n of all) {
                 let bonus = 0;
-                // Se abbiamo una mappa delle frequenze recenti, aggiungiamo un bonus proporzionale
                 if (freqMap && freqMap[pos] && freqMap[pos][n]) {
-                    bonus = freqMap[pos][n] * 2; // peso extra, regolabile
+                    bonus = freqMap[pos][n] * 2;
                 }
                 scores.set(n, (hot.get(n)||0)*weights.wV + (delay.get(n)||0)*weights.wDelay + (half.get(n)||0)*weights.wH + (clus.get(n)||0)*weights.wCluster + (vol.get(n)||0) + (cold.get(n)||0) + bonus);
             }
@@ -340,6 +349,44 @@
             return result;
         }
 
+        // ========== PARSER TESTO (Importa da testo) ==========
+        function parseTextDraw(text) {
+            const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const headerMatch = lines[0].match(/Estrazione n[°º]\s*(\d+)\s*\((\d{2}:\d{2})\)/i);
+            if (!headerMatch) return null;
+            const numero = parseInt(headerMatch[1], 10);
+            const ora = headerMatch[2];
+            const dateMatch = lines[1].match(/del\s+(\d{2}-\d{2}-\d{4})/i);
+            if (!dateMatch) return null;
+            const [day, month, year] = dateMatch[1].split('-');
+            const datetime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${ora}`;
+            const numbers = [];
+            let numerone = null;
+            let inNumerone = false;
+            for (let i = 2; i < lines.length; i++) {
+                if (lines[i].toUpperCase() === 'NUMERONE') {
+                    inNumerone = true;
+                    continue;
+                }
+                if (inNumerone) {
+                    const n = parseInt(lines[i], 10);
+                    if (!isNaN(n) && n >= 1 && n <= 20) {
+                        numerone = n;
+                        break;
+                    }
+                } else {
+                    const n = parseInt(lines[i], 10);
+                    if (!isNaN(n) && n >= 1 && n <= 20 && numbers.length < 10) {
+                        numbers.push(n);
+                    }
+                }
+            }
+            if (numbers.length === 10 && numerone !== null) {
+                return { datetime, numbers, numerone, numero };
+            }
+            return null;
+        }
+
         // ========== FETCH / IMPORT / EXPORT / SALVA ==========
         async function fetchAndMerge() {
             document.getElementById('dataStatus').textContent = '⏳ Scaricamento…';
@@ -387,6 +434,29 @@
             document.getElementById('rawInput').value = '';
         };
         document.getElementById('saveBtn').onclick = () => { save(); };
+
+        // Importa da testo
+        document.getElementById('toggleTextImportBtn').onclick = ()=> document.getElementById('textImportArea').classList.toggle('hidden');
+        document.getElementById('doTextImportBtn').onclick = ()=>{
+            const raw = document.getElementById('textDrawInput').value.trim();
+            if (!raw) return;
+            const draw = parseTextDraw(raw);
+            if (!draw) {
+                document.getElementById('textImportStatus').textContent = 'Formato non riconosciuto.';
+                return;
+            }
+            const exists = draws.some(d => d.numero === draw.numero || d.datetime === draw.datetime);
+            if (exists) {
+                document.getElementById('textImportStatus').textContent = 'Estrazione già presente.';
+                return;
+            }
+            draws.push(draw);
+            draws.sort((a, b) => a.datetime.localeCompare(b.datetime));
+            save();
+            updateUI();
+            document.getElementById('textImportStatus').textContent = `Aggiunta estrazione n° ${draw.numero}. Totale: ${draws.length}.`;
+            document.getElementById('textDrawInput').value = '';
+        };
 
         // ========== DIAGNOSTICA STANDARD ==========
         function computeDiagnostics() {
@@ -475,8 +545,7 @@
                 alert('Servono almeno 7 giorni di estrazioni.');
                 return;
             }
-            const recentDraws = draws.slice(-119); // ultimi 7 giorni
-            // Matrice frequenza: freq[pos][num] (0-20)
+            const recentDraws = draws.slice(-119);
             const freq = Array.from({length: POSITIONS}, () => Array(NUM_COUNT+1).fill(0));
             for (const d of recentDraws) {
                 for (let p = 0; p < POSITIONS; p++) {
@@ -484,8 +553,6 @@
                     freq[p][num]++;
                 }
             }
-
-            // Normalizza per posizione in modo che la somma delle frequenze sia 1 (per usarlo come peso)
             const freqNorm = Array.from({length: POSITIONS}, () => Array(NUM_COUNT+1).fill(0));
             for (let p = 0; p < POSITIONS; p++) {
                 const total = freq[p].reduce((a,b)=>a+b, 0);
@@ -495,11 +562,8 @@
                     }
                 }
             }
-
-            // Salviamo la mappa normalizzata per usarla nel generatore
             recentFreq = freqNorm;
 
-            // Costruisci la tabella heatmap (20 righe x 10 colonne)
             let html = '<table><tr><th>Num</th>';
             for (let p = 0; p < POSITIONS; p++) html += `<th>P${p+1}</th>`;
             html += '</tr>';
@@ -512,7 +576,6 @@
                     let color = '#333';
                     if (val > 0) {
                         const intensity = maxFreq > 0 ? (val - minFreq) / (maxFreq - minFreq) : 0;
-                        // scala dal rosso (bassa) al verde (alta)
                         const r = Math.round(255 * (1 - intensity));
                         const g = Math.round(100 + 155 * intensity);
                         const b = Math.round(100 * (1 - intensity));
@@ -526,7 +589,6 @@
             document.getElementById('heatmapContainer').innerHTML = html;
             document.getElementById('crossDiagnosticSection').classList.remove('hidden');
 
-            // Suggerimento automatico: se il semaforo era rosso, suggeriamo di usare la mappa
             if (document.getElementById('trafficLight').innerText.includes('🔴')) {
                 document.getElementById('suggestedWeights').textContent = '💡 Le prestazioni attuali sono sotto la media. Prova a generare ora: il modello userà automaticamente le frequenze recenti come bonus.';
             } else {
