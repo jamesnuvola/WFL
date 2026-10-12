@@ -9,7 +9,7 @@ let draws=[], selectedWindow=localStorage.getItem(WINDOW_KEY)||'50';
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=d=>d&&Number.isInteger(Number(d.numero))&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===10&&d.numbers.every(n=>Number.isInteger(Number(n))&&n>=1&&n<=20)&&new Set(d.numbers.map(Number)).size===10&&Number.isInteger(Number(d.numerone))&&Number(d.numerone)>=1&&Number(d.numerone)<=20;
 const normalize=d=>({datetime:String(d.datetime),numbers:d.numbers.map(Number).sort((a,b)=>a-b),numerone:Number(d.numerone),numero:Number(d.numero)});
-function merge(...sources){const map=new Map(),conflicts=[];for(const source of sources){for(const raw of Array.isArray(source)?source:[]){if(!valid(raw))continue;const d=normalize(raw),old=map.get(d.numero);if(!old)map.set(d.numero,d);else if(old.datetime!==d.datetime||old.numerone!==d.numerone||old.numbers.join(',')!==d.numbers.join(','))conflicts.push(d.numero);}}return {draws:[...map.values()].sort((a,b)=>a.datetime.localeCompare(b.datetime)||a.numero-b.numero),conflicts:[...new Set(conflicts)]};}
+function merge(...sources){const map=new Map(),conflicts=[];for(const source of sources){for(const raw of Array.isArray(source)?source:[]){if(!valid(raw))continue;const d=normalize(raw),id=String(d.datetime).slice(0,4)+':'+d.numero,old=map.get(id);if(!old)map.set(id,d);else if(old.datetime!==d.datetime||old.numerone!==d.numerone||old.numbers.join(',')!==d.numbers.join(','))conflicts.push(id);}}return {draws:[...map.values()].sort((a,b)=>a.datetime.localeCompare(b.datetime)||a.numero-b.numero),conflicts:[...new Set(conflicts)]};}
 function save(){try{localStorage.setItem(CACHE_KEY,JSON.stringify(draws));}catch(e){setStatus('Impossibile salvare la cache locale: esporta una copia dello storico.','error');}}
 function setStatus(msg,type){const el=$('dataStatus');if(el){el.textContent=msg;el.className='wfl-statusline '+(type==='error'?'wfl-error':type==='success'?'wfl-success':'');}}
 function render(){
@@ -18,8 +18,8 @@ function render(){
  if($('drawCount'))$('drawCount').textContent=validDraws.length.toLocaleString('it-IT')+' estrazioni';
  if($('historyRange'))$('historyRange').textContent=validDraws.length?validDraws[0].datetime.slice(0,10)+' → '+validDraws.at(-1).datetime.slice(0,10):'Archivio vuoto';
  const nums=validDraws.flatMap(d=>d.numbers), sums=validDraws.map(d=>d.numbers.reduce((a,b)=>a+b,0)), mean=sums.length?sums.reduce((a,b)=>a+b,0)/sums.length:0;
- const ids=[...new Set(validDraws.map(d=>Number(d.numero)).filter(Number.isFinite))].sort((a,b)=>a-b);
- const missingDraws=ids.length?Math.max(0,ids[ids.length-1]-ids[0]+1-ids.length):0;
+ const idsByYear=new Map();validDraws.forEach(d=>{const y=String(d.datetime).slice(0,4);if(!idsByYear.has(y))idsByYear.set(y,new Set());idsByYear.get(y).add(Number(d.numero));});
+ const missingDraws=[...idsByYear.values()].reduce((sum,set)=>{const ids=[...set].sort((a,b)=>a-b);return sum+(ids.length?Math.max(0,ids.at(-1)-ids[0]+1-ids.length):0);},0);
  const topNum=Array.from({length:20},(_,i)=>({n:i+1,c:nums.filter(n=>n===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  const nFreq=Array.from({length:20},(_,i)=>({n:i+1,c:validDraws.filter(d=>d.numerone===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  $('wflOverview').innerHTML=[

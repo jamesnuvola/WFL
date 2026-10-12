@@ -34,7 +34,8 @@ async function main(){
  const tokenMatch=firstHtml.match(/name=["']_token["']\s+value=["']([^"']+)["']/i);
  const token=tokenMatch?.[1];
  if(!token)throw new Error('Token form non trovato: backfill fermato in sicurezza.');
- const byNumber=new Map(current.map(d=>[Number(d.numero),d]));
+ const key=d=>`${String(d.datetime).slice(0,4)}:${Number(d.numero)}`;
+ const byNumber=new Map(current.map(d=>[key(d),d]));
  if(fs.existsSync(DATA_FILE)){
   const snapshot=`${BACKUP_DIR}/winforlife_draws_before_backfill_${new Date().toISOString().slice(0,10)}.json`;
   if(!fs.existsSync(snapshot))fs.copyFileSync(DATA_FILE,snapshot);
@@ -47,7 +48,7 @@ async function main(){
   const html=await response.text();
   const found=parseDraws(html).filter(d=>d.datetime.slice(0,10)===next);
   if(!found.length)throw new Error(`Zero draws parsed for ${next}; checkpoint not advanced, existing history preserved. Check source form response.`);
-  for(const d of found){const prev=byNumber.get(d.numero);if(prev){if(prev.datetime!==d.datetime||prev.numerone!==d.numerone||prev.numbers.join(',')!==d.numbers.join(','))throw new Error(`Conflict at draw ${d.numero}; dataset not written.`);}else{byNumber.set(d.numero,d);added++;}}
+  for(const d of found){const id=key(d),prev=byNumber.get(id);if(prev){if(prev.datetime!==d.datetime||prev.numerone!==d.numerone||prev.numbers.join(',')!==d.numbers.join(','))throw new Error(`Conflict at draw ${id}; dataset not written.`);}else{byNumber.set(id,d);added++;}}
   done++;next=dateAdd(next,1);await sleep(PAUSE_MS);
  }
  const merged=[...byNumber.values()].sort((a,b)=>a.datetime.localeCompare(b.datetime)||a.numero-b.numero);
