@@ -1,7 +1,7 @@
 /* WFL SONAR Lab UI: lossless history merge, import/export and automatic diagnostics. */
 (function(){
 "use strict";
-const DATA_URL='winforlife_draws.json';
+const DATA_URL=new URL('winforlife_draws.json',document.currentScript.src).href;
 const CACHE_KEY='wfl_sonar_history_v2';
 const WINDOW_KEY='wfl_sonar_window';
 const $=id=>document.getElementById(id);
@@ -29,10 +29,12 @@ function render(){
  ['Numero più frequente',topNum?topNum.n:'—',topNum?topNum.c+' occorrenze nella decina':''],
  ['Somma media',mean.toLocaleString('it-IT',{maximumFractionDigits:2}),'Sui dieci numeri principali']
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
- if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(validDraws,selectedWindow);
- renderRecent(validDraws);
- renderResearch(validDraws);
- renderGenerator();
+ // Keep the historical table visible even if a secondary analytics module fails.
+ try{if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(validDraws,selectedWindow);}
+ catch(e){const root=$('wflSonarDashboard');if(root)root.innerHTML='<div class="wfl-card wfl-error">Grafici non disponibili: '+esc(e.message)+'</div>';}
+ try{renderRecent(validDraws);}catch(e){const root=$('recentHistory');if(root)root.innerHTML='<p class="wfl-error">Tabella storico non disponibile: '+esc(e.message)+'</p>';}
+ try{renderResearch(validDraws);}catch(e){const root=$('researchPanel');if(root)root.innerHTML='<p class="wfl-error">Test non disponibili: '+esc(e.message)+'</p>';}
+ try{renderGenerator();}catch(e){const root=$('generatorResult');if(root)root.innerHTML='<p class="wfl-error">Generatore non disponibile: '+esc(e.message)+'</p>';}
 }
 function renderRecent(ds){$('recentHistory').innerHTML='<table class="wfl-table"><thead><tr><th>Concorso</th><th>Data/ora</th><th>Dieci numeri</th><th>Numerone</th></tr></thead><tbody>'+ds.slice(-25).reverse().map(d=>'<tr><td>'+esc(d.numero)+'</td><td>'+esc(d.datetime.replace('T',' '))+'</td><td>'+d.numbers.join(' · ')+'</td><td><strong>'+d.numerone+'</strong></td></tr>').join('')+'</tbody></table>';}
 function rankFreq(hist,key){const f=Array(20).fill(0);hist.forEach(d=>(key==='numerone'?[d.numerone]:d.numbers).forEach(n=>f[Number(n)-1]++));return f.map((v,i)=>({n:i+1,v})).sort((a,b)=>b.v-a.v||a.n-b.n);}
@@ -61,7 +63,7 @@ function expectedLatestSlot(){
 async function refresh(){
  $('systemStatus').textContent='Verifica archivio ufficiale…';
  try{
-  const res=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store'});
+  const res=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store',headers:{'cache-control':'no-cache','pragma':'no-cache'}});
   if(!res.ok)throw new Error('HTTP '+res.status);
   const remote=await res.json();
   if(!Array.isArray(remote)||!remote.length)throw new Error('Archivio remoto vuoto o non valido');
