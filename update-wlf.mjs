@@ -157,7 +157,7 @@ async function main() {
   // Read one or more concatenated JSON arrays without losing historical records.
   function parseArchiveFile(raw) {
     let text = String(raw).replace(/^\uFEFF/, '');
-    if (text.endsWith('\\\\n')) text = text.slice(0, -2);
+    if (text.endsWith('\\n')) text = text.slice(0, -2);
     const arrays = []; let i = 0;
     while (i < text.length) {
       while (i < text.length && /\s/.test(text[i])) i++;
