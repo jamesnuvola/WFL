@@ -19,7 +19,7 @@ function render(){
  if($('historyRange'))$('historyRange').textContent=validDraws.length?validDraws[0].datetime.slice(0,10)+' → '+validDraws.at(-1).datetime.slice(0,10):'Archivio vuoto';
  const nums=validDraws.flatMap(d=>d.numbers), sums=validDraws.map(d=>d.numbers.reduce((a,b)=>a+b,0)), mean=sums.length?sums.reduce((a,b)=>a+b,0)/sums.length:0;
  const idsByYear=new Map();validDraws.forEach(d=>{const y=String(d.datetime).slice(0,4);if(!idsByYear.has(y))idsByYear.set(y,new Set());idsByYear.get(y).add(Number(d.numero));});
- const missingDraws=[...idsByYear.values()].reduce((sum,set)=>{const ids=[...set].sort((a,b)=>a-b);return sum+(ids.length?Math.max(0,ids.at(-1)-ids[0]+1-ids.length):0);},0);
+ const missingDraws=[...idsByYear.values()].reduce((sum,set)=>{const maxId=Math.max(0,...set);return sum+Math.max(0,maxId-set.size);},0);
  const topNum=Array.from({length:20},(_,i)=>({n:i+1,c:nums.filter(n=>n===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  const nFreq=Array.from({length:20},(_,i)=>({n:i+1,c:validDraws.filter(d=>d.numerone===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  $('wflOverview').innerHTML=[
