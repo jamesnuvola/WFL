@@ -27,4 +27,4 @@ for(const file of ['wfl-sonar-theme.css','wfl-sonar-dashboard.js','wfl-sonar-eng
 const app=fs.readFileSync('wfl-sonar-app.js','utf8');
 assert(app.includes('Concorsi mancanti'),'missing-contest KPI must be visible');
 assert(html.includes('Statistical Lab'),'new SONAR lab page is not active in branch');
-console.log(JSON.stringify({status:'PASS',datasetRecords:data.length,baselineRecords:baseline.length,baselinePreserved:true,uniqueContestIds:ids.size,first:data[0].datetime,last:data.at(-1).datetime,missingContestIds:[...new Set(data.map(d=>d.datetime.slice(0,4)))].reduce((sum,y)=>{const ys=data.filter(d=>d.datetime.startsWith(y)).map(d=>d.numero);return sum+Math.max(...ys)-Math.min(...ys)+1-new Set(ys).size;},0)},null,2));
+console.log(JSON.stringify({status:'PASS',datasetRecords:data.length,baselineRecords:baseline.length,baselinePreserved:true,uniqueContestIds:ids.size,first:data[0].datetime,last:data.at(-1).datetime,missingContestIds:[...new Set(data.map(d=>d.datetime.slice(0,4)))].reduce((sum,y)=>{const ys=data.filter(d=>d.datetime.startsWith(y)).map(d=>d.numero);return sum+Math.max(...ys)-new Set(ys).size;},0)},null,2));
