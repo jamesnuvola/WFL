@@ -1,5 +1,9 @@
 name: WFL SONAR full-history backfill
 on:
+  push:
+    paths:
+      - 'backfill-wlf.mjs'
+      - '.github/workflows/backfill-history.yml'
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
