@@ -103,7 +103,6 @@
       pool.splice(pool.findIndex(x=>x.number===picked.number),1);
     }
     selected.sort((a,b)=>a-b);
-    const numeroneRank = rankNumbers(hist.map(d=>({numbers:[d.numerone], numerone:d.numerone})).filter(d=>d.numbers.length===10), cfg);
     // Numerone is independent: analyze its own history, never reuse main-number counts.
     const numHist = hist.map(d=>({numbers:Array.from({length:10},(_,i)=>i+1), numerone:d.numerone}));
     const nr = counts(numHist,"numerone");
