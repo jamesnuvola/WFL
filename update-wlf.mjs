@@ -154,7 +154,10 @@ async function main() {
   let scraped = [];
   for (const set of sourceSets) scraped = dedupe([...scraped, ...set.draws]);
 
-  const current = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : [];
+  const rawCurrent = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : '[]';
+  // Recover the previous writer's literal backslash-n suffix without discarding any records.
+  const cleanCurrent = rawCurrent.replace(/\\\\n\\s*$/, '').trim();
+  const current = JSON.parse(cleanCurrent);
   if (!Array.isArray(current) || current.some(d => !valid(d))) {
     throw new Error('Existing dataset is invalid; refusing to overwrite or repair it automatically.');
   }
@@ -192,7 +195,7 @@ async function main() {
   fs.mkdirSync(BACKUP_DIR,{recursive:true});
   const snapshot=`${BACKUP_DIR}/winforlife_draws_${new Date().toISOString().slice(0,10)}.json`;
   if (fs.existsSync(DATA_FILE) && !fs.existsSync(snapshot)) fs.copyFileSync(DATA_FILE,snapshot);
-  fs.writeFileSync(DATA_FILE,JSON.stringify(merged,null,2)+'\\n');
+  fs.writeFileSync(DATA_FILE,JSON.stringify(merged,null,2)+'\n');
   console.log(JSON.stringify({
     sources:sourceSets.map(s=>({name:s.label,count:s.draws.length,latest:s.draws.at(-1)?.datetime,contest:s.draws.at(-1)?.numero})),
     added,unchanged,before:current.length,after:merged.length,
