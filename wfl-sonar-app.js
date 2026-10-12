@@ -18,11 +18,14 @@ function render(){
  if($('drawCount'))$('drawCount').textContent=validDraws.length.toLocaleString('it-IT')+' estrazioni';
  if($('historyRange'))$('historyRange').textContent=validDraws.length?validDraws[0].datetime.slice(0,10)+' → '+validDraws.at(-1).datetime.slice(0,10):'Archivio vuoto';
  const nums=validDraws.flatMap(d=>d.numbers), sums=validDraws.map(d=>d.numbers.reduce((a,b)=>a+b,0)), mean=sums.length?sums.reduce((a,b)=>a+b,0)/sums.length:0;
+ const ids=[...new Set(validDraws.map(d=>Number(d.numero)).filter(Number.isFinite))].sort((a,b)=>a-b);
+ const missingDraws=ids.length?Math.max(0,ids[ids.length-1]-ids[0]+1-ids.length):0;
  const topNum=Array.from({length:20},(_,i)=>({n:i+1,c:nums.filter(n=>n===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  const nFreq=Array.from({length:20},(_,i)=>({n:i+1,c:validDraws.filter(d=>d.numerone===i+1).length})).sort((a,b)=>b.c-a.c)[0];
  $('wflOverview').innerHTML=[
  ['Storico valido',validDraws.length.toLocaleString('it-IT'),'Record unici per concorso'],
- ['Intervallo coperto',validDraws.length?validDraws[0].datetime.slice(0,10)+' – '+validDraws.at(-1).datetime.slice(0,10):'—','Da verificare rispetto all’archivio ufficiale'],
+ ['Intervallo coperto',validDraws.length?validDraws[0].datetime.slice(0,10)+' – '+validDraws.at(-1).datetime.slice(0,10):'—','Estremi temporali dei record presenti'],
+ ['Concorsi mancanti',missingDraws.toLocaleString('it-IT'),missingDraws?'Backfill storico ancora necessario':'Nessun buco negli ID del campione'],
  ['Numero più frequente',topNum?topNum.n:'—',topNum?topNum.c+' occorrenze nella decina':''],
  ['Somma media',mean.toLocaleString('it-IT',{maximumFractionDigits:2}),'Sui dieci numeri principali']
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
