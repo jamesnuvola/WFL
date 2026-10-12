@@ -693,10 +693,10 @@
             container.innerHTML = html;
         }
 
-        document.getElementById('weightV').oninput = function(){ document.getElementById('weightVLabel').textContent = this.value; };
-        document.getElementById('weightH').oninput = function(){ document.getElementById('weightHLabel').textContent = this.value; };
-        document.getElementById('weightDelay').oninput = function(){ document.getElementById('weightDelayLabel').textContent = this.value; };
-        document.getElementById('weightCluster').oninput = function(){ document.getElementById('weightClusterLabel').textContent = this.value; };
+        if (document.getElementById('weightV')) document.getElementById('weightV').oninput = function(){ document.getElementById('weightVLabel').textContent = this.value; };
+        if (document.getElementById('weightH')) document.getElementById('weightH').oninput = function(){ document.getElementById('weightHLabel').textContent = this.value; };
+        if (document.getElementById('weightDelay')) document.getElementById('weightDelay').oninput = function(){ document.getElementById('weightDelayLabel').textContent = this.value; };
+        if (document.getElementById('weightCluster')) document.getElementById('weightCluster').oninput = function(){ document.getElementById('weightClusterLabel').textContent = this.value; };
 
         document.getElementById('generateBtn').onclick = ()=>{
             if(draws.length<10) return alert('Minimo 10 estrazioni.');
