@@ -71,6 +71,15 @@
         <button id="crossDiagnosticBtn" style="background:#2196f3;">🔍 Diagnostica incrociata</button>
     </div>
 
+    <!-- SONAR Analytics: statistiche descrittive indipendenti dal generatore -->
+    <div class="section">
+        <h3>📊 SONAR Analytics</h3>
+        <p class="small">Frequenze, trend e micro-regimi calcolati sullo storico WFL caricato.</p>
+        <div id="wflSonarDashboard" aria-live="polite">
+            <div class="wfl-empty">Caricamento delle statistiche…</div>
+        </div>
+    </div>
+
     <!-- Estrazioni di oggi con rank -->
     <div class="section">
         <h3>📅 Estrazioni di oggi</h3>
@@ -144,6 +153,7 @@
         <p class="small" style="margin-top:0.5rem;">Il generatore può usare queste frequenze come pesi aggiuntivi. Premi "Genera" dopo aver visualizzato la mappa per applicare i suggerimenti.</p>
     </div>
 
+    <script src="wfl-sonar-dashboard.js"></script>
     <script>
     (function() {
         const NUM_COUNT = 20, POSITIONS = 10;
@@ -255,6 +265,7 @@
                 renderToday();
                 renderHistory();
             }
+            if (typeof window.renderWflSonarDashboard === 'function') window.renderWflSonarDashboard(draws);
         }
 
         function renderToday() {
@@ -728,6 +739,7 @@
             updateUI();
             document.getElementById('dataStatus').textContent = '✅ Dati caricati dalla memoria locale.';
         }
+        if (typeof window.renderWflSonarDashboard === 'function') window.renderWflSonarDashboard(draws);
     })();
     </script>
 </body>
