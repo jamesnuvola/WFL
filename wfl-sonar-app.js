@@ -31,8 +31,8 @@ function render(){
  ['Somma media',mean.toLocaleString('it-IT',{maximumFractionDigits:2}),'Sui dieci numeri principali']
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
  // Keep the historical table visible even if a secondary analytics module fails.
- try{if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(analysis,selectedWindow,currentProposal);}
- catch(e){const root=$('wflSonarDashboard');if(root)root.innerHTML='<div class="wfl-card wfl-error">Grafici non disponibili: '+esc(e.message)+'</div>';}
+ try{if(window.WFLSonarDashboard&&typeof window.WFLSonarDashboard.render==='function')window.WFLSonarDashboard.render(analysis,selectedWindow,currentProposal);else throw new Error('modulo grafici non caricato');}
+ catch(e){const root=$('wflSonarDashboard');if(root)root.innerHTML='<div class="wfl-card wfl-error">Grafici non disponibili: '+esc(e.message)+'. Ricarica la pagina per riprovare.</div>';}
  try{renderRecent(validDraws);}catch(e){const root=$('recentHistory');if(root)root.innerHTML='<p class="wfl-error">Tabella storico non disponibile: '+esc(e.message)+'</p>';}
  try{renderResearch(analysis);}catch(e){const root=$('researchPanel');if(root)root.innerHTML='<p class="wfl-error">Test non disponibili: '+esc(e.message)+'</p>';}
  try{renderGenerator(analysis);}catch(e){const root=$('generatorResult');if(root)root.innerHTML='<p class="wfl-error">Generatore non disponibile: '+esc(e.message)+'</p>';}
@@ -57,7 +57,7 @@ function renderResearch(ds){
 function expectedLatestSlot(){
  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).reduce((o,x)=>(o[x.type]=x.value,o),{});
  let y=Number(p.year),m=Number(p.month),d=Number(p.day),h=Number(p.hour),minute=Number(p.minute);
- if(h>=7&&h<=23&&minute<25)h--;
+ if(h>=7&&h<=23&&minute<45)h--;
  if(h<7){const prev=new Date(Date.UTC(y,m-1,d));prev.setUTCDate(prev.getUTCDate()-1);y=prev.getUTCFullYear();m=prev.getUTCMonth()+1;d=prev.getUTCDate();h=23;}
  return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')+'T'+String(h).padStart(2,'0')+':00';
 }
