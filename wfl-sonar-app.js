@@ -82,12 +82,28 @@ async function refresh(){
 }
 function download(){const blob=new Blob([JSON.stringify(draws,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wfl-sonar-history-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);}
 async function importFile(file){try{const raw=JSON.parse(await file.text());if(!Array.isArray(raw))throw new Error('Il file deve contenere un array JSON.');const good=raw.filter(valid);if(!good.length)throw new Error('Nessuna estrazione valida trovata.');const merged=merge(draws,good);if(merged.conflicts.length)throw new Error('Conflitti sui concorsi '+merged.conflicts.join(', ')+'. Import annullato per evitare perdita dati.');const before=draws.length;draws=merged.draws;save();render();setStatus('Importazione completata senza sovrascrivere record: '+before+' → '+draws.length+'.','success');}catch(e){setStatus('Import non completato: '+e.message,'error');}}
+function activateTab(tab){
+ const buttons=[...document.querySelectorAll('.wfl-tabs [data-tab]')];
+ const panels=[...document.querySelectorAll('.wfl-tab-panel[data-panel]')];
+ if(!buttons.some(b=>b.dataset.tab===tab))tab='draws';
+ buttons.forEach(b=>{const active=b.dataset.tab===tab;b.setAttribute('aria-selected',String(active));b.setAttribute('tabindex',active?'0':'-1');});
+ panels.forEach(p=>{const active=p.dataset.panel===tab;p.hidden=!active;p.setAttribute('aria-hidden',String(!active));});
+ try{localStorage.setItem('wfl_sonar_active_tab',tab);}catch(e){}
+}
 function init(){
- document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{const tab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==tab);try{localStorage.setItem('wfl_sonar_active_tab',tab);}catch(e){} }));
- try{const active=localStorage.getItem('wfl_sonar_active_tab');if(active){const b=document.querySelector('[data-tab="'+active+'"]');if(b)b.click();}}catch(e){}
- $('generateNumbers').addEventListener('click',renderGenerator);$('generatorWindow').addEventListener('change',renderGenerator);$('generatorPool').addEventListener('change',renderGenerator);$('copyProposal').addEventListener('click',()=>{const t=$('generatorResult')?.dataset.proposal;if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>setStatus('Proposta copiata.','success')).catch(()=>setStatus('Copia non riuscita.','error'));});
- $('refreshData').addEventListener('click',refresh);$('exportData').addEventListener('click',download);$('runAnalysis').addEventListener('click',render);$('importData').addEventListener('change',e=>{if(e.target.files[0])importFile(e.target.files[0]);e.target.value='';});
- $('windowPicker').addEventListener('click',e=>{const b=e.target.closest('button[data-window]');if(!b)return;selectedWindow=b.dataset.window;localStorage.setItem(WINDOW_KEY,selectedWindow);$('windowPicker').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();});
+ const tabNav=document.querySelector('.wfl-tabs');
+ if(tabNav){
+  tabNav.addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b&&tabNav.contains(b))activateTab(b.dataset.tab);});
+  tabNav.addEventListener('keydown',e=>{
+   const buttons=[...tabNav.querySelectorAll('button[data-tab]')],i=buttons.indexOf(document.activeElement);if(i<0)return;
+   let next=i;if(e.key==='ArrowRight')next=(i+1)%buttons.length;else if(e.key==='ArrowLeft')next=(i-1+buttons.length)%buttons.length;else return;
+   e.preventDefault();buttons[next].focus();activateTab(buttons[next].dataset.tab);
+  });
+ }
+ let initialTab='draws';try{initialTab=localStorage.getItem('wfl_sonar_active_tab')||'draws';}catch(e){}activateTab(initialTab);
+ $('generateNumbers').addEventListener('click',renderGenerator);$('generatorWindow').addEventListener('change',renderGenerator);$('generatorPool').addEventListener('change',renderGenerator);
+ $('copyProposal').addEventListener('click',()=>{const t=$('generatorResult')?.dataset.proposal;if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>setStatus('Proposta copiata.','success')).catch(()=>setStatus('Copia non riuscita.','error'));});
+ $('windowPicker').addEventListener('click',e=>{const b=e.target.closest('button[data-window]');if(!b)return;selectedWindow=b.dataset.window;try{localStorage.setItem(WINDOW_KEY,selectedWindow);}catch(e){}$('windowPicker').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();});
  try{const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'[]');draws=merge(cached).draws;}catch(e){draws=[];}
  // Merge the older app cache too, without deleting records held in it.
  try{const legacy=JSON.parse(localStorage.getItem('wlf_sonar_draws')||'[]');draws=merge(draws,legacy).draws;}catch(e){}
