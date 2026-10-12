@@ -1,25 +1,26 @@
 name: Update Win for Life data
-
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
-
+permissions:
+  contents: write
+concurrency:
+  group: wfl-data-maintenance
+  cancel-in-progress: false
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies
-        run: npm install cheerio
-      - name: Run scraper
+      - name: Parse latest archive page and merge without loss
         run: node update-wlf.mjs
-      - name: Commit and push
+      - name: Commit data and immutable snapshots
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add winforlife_draws.json debug-wlf.html
-          git diff --staged --quiet || (git commit -m "Update Win for Life draws + debug" && git push)
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add winforlife_draws.json debug-wlf.html data/archive
+          git diff --staged --quiet || (git commit -m "Update WFL history without data loss" && git push)
