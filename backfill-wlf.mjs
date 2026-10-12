@@ -6,8 +6,8 @@ const DATA_FILE='winforlife_draws.json';
 const STATE_FILE='data/archive/backfill-state.json';
 const BACKUP_DIR='data/archive';
 const MIN_DATE='2022-01-25';
-const DAYS_PER_RUN=30;
-const PAUSE_MS=350;
+const DAYS_PER_RUN=120;
+const PAUSE_MS=250;
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function dateAdd(iso,days){const d=new Date(iso+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
