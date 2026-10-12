@@ -156,16 +156,17 @@ async function main() {
 
   // Read one or more concatenated JSON arrays without losing historical records.
   function parseArchiveFile(raw) {
-    const text = String(raw).replace(/^\\uFEFF/, '').replace(/\\\\n\\s*$/, '');
+    let text = String(raw).replace(/^\uFEFF/, '');
+    if (text.endsWith('\\\\n')) text = text.slice(0, -2);
     const arrays = []; let i = 0;
     while (i < text.length) {
-      while (i < text.length && /\\s/.test(text[i])) i++;
+      while (i < text.length && /\s/.test(text[i])) i++;
       if (i >= text.length) break;
       if (text[i] !== '[') throw new Error('Unexpected archive content at character ' + i + ': ' + JSON.stringify(text.slice(i, i + 80)) + '; refusing to discard history.');
       const start = i; let depth = 0, inString = false, escaped = false, end = -1;
       for (; i < text.length; i++) {
         const ch = text[i];
-        if (inString) { if (escaped) escaped = false; else if (ch === '\\\\') escaped = true; else if (ch === '"') inString = false; continue; }
+        if (inString) { if (escaped) escaped = false; else if (ch === '\\') escaped = true; else if (ch === '"') inString = false; continue; }
         if (ch === '"') { inString = true; continue; }
         if (ch === '[' || ch === '{') depth++;
         else if (ch === ']' || ch === '}') { depth--; if (depth === 0) { end = i + 1; break; } if (depth < 0) throw new Error('Unbalanced archive JSON; refusing to write.'); }
