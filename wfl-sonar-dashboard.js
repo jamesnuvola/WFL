@@ -1,87 +1,19 @@
-/* WFL SONAR — dashboard statistica indipendente dal generatore.
- * Riceve lo storico WFL già caricato dall'app; non scarica né importa dati esterni.
- */
-(function () {
-  "use strict";
-  const WINDOWS = [10, 20, 50, 100];
-  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-  const validDraw = d => d && Array.isArray(d.numbers) && d.numbers.length === 10 &&
-    d.numbers.every(n => Number.isInteger(Number(n)) && Number(n) >= 1 && Number(n) <= 20);
-  const fmt = n => Number.isFinite(n) ? n.toLocaleString("it-IT", {maximumFractionDigits: 2}) : "—";
-  const sum = d => d.numbers.reduce((a, n) => a + Number(n), 0);
-  const freqFor = hist => {
-    const freq = Array(20).fill(0);
-    hist.forEach(d => d.numbers.forEach(n => freq[Number(n) - 1]++));
-    return freq;
-  };
-  function barChart(freq, nDraws) {
-    const max = Math.max(1, ...freq);
-    const theoretical = nDraws * 10 / 20;
-    return '<div class="wfl-chart-scroll"><div class="wfl-bars" role="img" aria-label="Frequenze dei numeri da 1 a 20">' +
-      freq.map((v, i) => '<div class="wfl-bar-col" title="Numero ' + (i+1) + ': ' + v + ' occorrenze">' +
-        '<span class="wfl-bar-value">' + v + '</span><div class="wfl-bar-track"><span class="wfl-bar-fill" style="height:' +
-        (v / max * 100).toFixed(2) + '%"></span><span class="wfl-bar-expected" style="bottom:' +
-        (theoretical / max * 100).toFixed(2) + '%"></span></div><span class="wfl-bar-label">' + (i+1) + '</span></div>').join("") +
-      '</div></div><p class="wfl-chart-note">Linea oro: frequenza teorica media (' + fmt(theoretical) +
-      ' occorrenze per numero). È un riferimento descrittivo, non una previsione.</p>';
-  }
-  function trendChart(hist) {
-    const rows = hist.slice(-60).map((d, i) => ({d, originalIndex: Math.max(0, hist.length - Math.min(60, hist.length)) + i, value: sum(d)}));
-    if (!rows.length) return '<p class="wfl-empty">Nessuna estrazione disponibile.</p>';
-    const values = rows.map(x => x.value);
-    const avg = values.reduce((a,b)=>a+b,0) / values.length;
-    const min = Math.min(...values), max = Math.max(...values), range = Math.max(1, max-min);
-    const w=720, h=190, pad=18;
-    const pts=values.map((v,i)=> {
-      const x=pad + (values.length === 1 ? 0 : i*(w-2*pad)/(values.length-1));
-      const y=h-pad-(v-min)/range*(h-2*pad);
-      return x.toFixed(1)+","+y.toFixed(1);
-    }).join(" ");
-    const avgY=(h-pad-(avg-min)/range*(h-2*pad)).toFixed(1);
-    return '<div class="wfl-svg-wrap"><svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Somma dei dieci numeri nelle ultime '+values.length+' estrazioni">' +
-      '<line x1="'+pad+'" y1="'+avgY+'" x2="'+(w-pad)+'" y2="'+avgY+'" stroke="var(--gold)" stroke-dasharray="5 5" stroke-width="2"/>' +
-      '<polyline points="'+pts+'" fill="none" stroke="var(--accent-2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<text x="'+pad+'" y="12" fill="var(--muted)" font-size="11">Min '+min+'</text><text x="'+(w-pad)+'" y="12" text-anchor="end" fill="var(--muted)" font-size="11">Max '+max+'</text>' +
-      '</svg></div><p class="wfl-chart-note">Ultime '+values.length+' estrazioni · media somme: <strong>'+fmt(avg)+'</strong> · linea oro: media della finestra.</p>';
-  }
-  function heatmap(hist) {
-    return '<div class="wfl-regime-grid">' + WINDOWS.map(windowSize => {
-      const slice=hist.slice(-windowSize), freq=freqFor(slice), max=Math.max(1,...freq);
-      const complete=hist.length >= windowSize;
-      return '<section class="wfl-regime-card"><div class="wfl-regime-head"><strong>Ultime '+windowSize+'</strong><span>' +
-        (complete ? slice.length+' estrazioni' : 'Storico parziale: '+slice.length+'/'+windowSize) + '</span></div><div class="wfl-heatmap">' +
-        freq.map((count,i) => {
-          const intensity=count/max;
-          const alpha=(0.12+intensity*0.75).toFixed(2);
-          return '<div class="wfl-heat-cell" title="Numero '+(i+1)+': '+count+' occorrenze" style="--heat:'+alpha+'"><span>'+(i+1)+'</span><small>'+count+'</small></div>';
-        }).join("") + '</div><p class="wfl-chart-note">Attese in media per numero: '+fmt(slice.length/2)+'.</p></section>';
-    }).join("") + '</div>';
-  }
-  function render(draws) {
-    const root=document.getElementById("wflSonarDashboard");
-    if (!root) return;
-    const hist=Array.isArray(draws) ? draws.filter(validDraw) : [];
-    if (!hist.length) {
-      root.innerHTML='<div class="wfl-empty">Carica o importa lo storico WFL per visualizzare le statistiche.</div>';
-      return;
-    }
-    const freq=freqFor(hist), totalNumbers=hist.length*10;
-    const sorted=freq.map((count,i)=>({n:i+1,count})).sort((a,b)=>b.count-a.count || a.n-b.n);
-    const last=hist[hist.length-1], sums=hist.map(sum), mean=sums.reduce((a,b)=>a+b,0)/sums.length;
-    const latestDate=esc(String(last.datetime || "Data non disponibile").replace("T"," "));
-    root.innerHTML =
-      '<div class="wfl-kpi-grid">' +
-      '<article class="wfl-kpi"><span>Estrazioni analizzate</span><strong>'+hist.length+'</strong><small>Storico WFL valido</small></article>' +
-      '<article class="wfl-kpi"><span>Ultima estrazione</span><strong class="wfl-kpi-date">'+latestDate+'</strong><small>'+esc(last.numbers.map(Number).join(" · "))+' · Numerone '+esc(last.numerone)+'</small></article>' +
-      '<article class="wfl-kpi"><span>Numero più frequente</span><strong>'+sorted[0].n+'</strong><small>'+sorted[0].count+' occorrenze su '+totalNumbers+' numeri estratti</small></article>' +
-      '<article class="wfl-kpi"><span>Somma media</span><strong>'+fmt(mean)+'</strong><small>Media dei 10 numeri per estrazione</small></article>' +
-      '</div>' +
-      '<div class="wfl-chart-grid"><section class="wfl-panel"><h3>Frequenze · numeri 1–20</h3><p class="wfl-chart-note">Tutte le 10 posizioni considerate insieme; Numerone escluso.</p>'+barChart(freq,hist.length)+'</section>' +
-      '<section class="wfl-panel"><h3>Trend delle somme</h3><p class="wfl-chart-note">Somma dei 10 numeri per estrazione, ultime 60.</p>'+trendChart(hist)+'</section></div>' +
-      '<section class="wfl-panel"><h3>Micro-regimi · finestre mobili</h3><p class="wfl-chart-note">Confronta come cambia la frequenza recente su finestre di diversa ampiezza. Le frequenze non indicano probabilità future.</p>'+heatmap(hist)+'</section>' +
-      '<p class="wfl-disclaimer">Analisi descrittive dello storico caricato. Non cambiano i parametri del generatore e non costituiscono una previsione dell’estrazione successiva.</p>';
-  }
-  window.renderWflSonarDashboard = render;
+/* WFL SONAR visual analytics: descriptive only, independent of strategy scoring. */
+(function(){
+"use strict";
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=v=>Number(v).toLocaleString("it-IT",{maximumFractionDigits:2});
+const valid=d=>d&&Array.isArray(d.numbers)&&d.numbers.length===10&&d.numbers.every(n=>Number.isInteger(Number(n))&&n>=1&&n<=20)&&new Set(d.numbers.map(Number)).size===10&&Number.isInteger(Number(d.numerone))&&d.numerone>=1&&d.numerone<=20;
+const sum=d=>d.numbers.reduce((a,n)=>a+Number(n),0);
+function freq(ds,key){const a=Array(20).fill(0);ds.forEach(d=>(key==="numerone"?[Number(d.numerone)]:d.numbers.map(Number)).forEach(n=>a[n-1]++));return a;}
+function bars(values,expected,label){const max=Math.max(1,...values,expected);return '<div class="sonar-bars" style="display:grid;grid-template-columns:repeat(20,minmax(18px,1fr));gap:4px;align-items:end;min-width:620px;height:190px;padding-top:12px">'+values.map((v,i)=>'<div title="Numero '+(i+1)+': '+v+' occorrenze" style="display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:4px"><small style="font-size:10px;color:var(--muted)">'+v+'</small><div style="height:130px;width:100%;display:flex;align-items:end;position:relative;background:var(--surface-2);border-radius:4px;overflow:hidden"><span style="display:block;width:100%;height:'+Math.max(2,v/max*100)+'%;background:'+(v>expected*1.18?'#d6b65c':v<expected*.82?'#4b8f91':'#20b6aa')+';border-radius:4px 4px 0 0"></span><i style="position:absolute;left:0;right:0;bottom:'+Math.min(99,expected/max*100)+'%;border-top:2px solid #e6bd62"></i></div><b style="font-size:11px">'+(i+1)+'</b></div>').join("")+'</div><p class="sub">Linea oro = attesa media teorica '+fmt(expected)+' '+label+' per numero. Le differenze osservate possono essere casuali.</p>';}
+function lineChart(ds){const rows=ds.slice(-60),vals=rows.map(sum);if(!vals.length)return '<p>Nessun dato.</p>';const min=Math.min(...vals),max=Math.max(...vals),avg=vals.reduce((a,b)=>a+b,0)/vals.length,range=Math.max(1,max-min),w=740,h=210,p=24;const pts=vals.map((v,i)=>(p+i*(w-2*p)/Math.max(1,vals.length-1))+','+(h-p-(v-min)/range*(h-2*p))).join(' ');const ay=h-p-(avg-min)/range*(h-2*p);return '<div style="overflow:auto"><svg viewBox="0 0 '+w+' '+h+'" style="width:100%;min-width:460px" role="img" aria-label="Trend somme ultime '+vals.length+' estrazioni"><line x1="'+p+'" y1="'+ay+'" x2="'+(w-p)+'" y2="'+ay+'" stroke="#e6bd62" stroke-dasharray="6 5" stroke-width="2"/><polyline points="'+pts+'" fill="none" stroke="#20b6aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><text x="'+p+'" y="14" fill="var(--muted)" font-size="12">Min '+min+'</text><text x="'+(w-p)+'" y="14" text-anchor="end" fill="var(--muted)" font-size="12">Max '+max+'</text></svg></div><p class="sub">Ultime '+vals.length+' estrazioni · somma media '+fmt(avg)+' · linea oro: media della finestra.</p>';}
+function heatmap(ds){const rows=Array.from({length:10},()=>Array(20).fill(0));ds.forEach(d=>d.numbers.forEach((n,p)=>rows[p][Number(n)-1]++));const max=Math.max(1,...rows.flat());return '<div style="overflow:auto"><div style="min-width:660px"><div style="display:grid;grid-template-columns:44px repeat(20,minmax(22px,1fr));gap:3px;margin-bottom:4px"><span></span>'+Array.from({length:20},(_,i)=>'<small style="text-align:center;color:var(--muted)">'+(i+1)+'</small>').join('')+'</div>'+rows.map((row,p)=>'<div style="display:grid;grid-template-columns:44px repeat(20,minmax(22px,1fr));gap:3px;margin-bottom:3px"><small style="align-self:center;color:var(--muted)">Pos. '+(p+1)+'</small>'+row.map((v,i)=>'<div title="Posizione '+(p+1)+', numero '+(i+1)+': '+v+'" style="height:25px;border-radius:4px;display:grid;place-items:center;background:rgba(32,182,170,'+(0.08+0.8*v/max).toFixed(2)+');font-size:10px;color:#f4f7fb">'+(v||'·')+'</div>').join('')+'</div>').join('')+'</div></div><p class="sub">Posizioni intese come ordine crescente della decina estratta, non come urne indipendenti.</p>';}
+function regimes(ds){return [10,20,50,100].map(w=>{const sub=ds.slice(-w),f=freq(sub,'main'),expected=sub.length/2,top=f.map((v,i)=>({n:i+1,v,delta:v-expected})).sort((a,b)=>b.delta-a.delta);return '<div class="wfl-card"><h3>Ultime '+w+' estrazioni</h3><p class="sub">'+sub.length+'/'+w+' disponibili · attesa teorica '+fmt(expected)+'</p><div style="display:flex;gap:5px;align-items:end;height:70px">'+f.map((v,i)=>'<div title="'+(i+1)+': '+v+'" style="flex:1;min-width:2px;height:'+Math.max(3,v/Math.max(1,...f)*100)+'%;background:'+(v>expected?'#20b6aa':'#50627b')+';border-radius:3px 3px 0 0"></div>').join('')+'</div><p class="sub">Sopra attesa: '+top.filter(x=>x.delta>0).slice(0,3).map(x=>x.n+' (+'+fmt(x.delta)+')').join(' · ')+'</p></div>';}).join('');}
+function transitions(ds){const rows=ds.slice(-Math.min(50,ds.length));let overlaps=[];for(let i=1;i<rows.length;i++){const a=new Set(rows[i-1].numbers.map(Number));overlaps.push(rows[i].numbers.filter(n=>a.has(Number(n))).length);}const avg=overlaps.length?overlaps.reduce((a,b)=>a+b,0)/overlaps.length:0;const counts=Array(11).fill(0);overlaps.forEach(n=>counts[n]++);return '<div class="wfl-metrics"><div class="wfl-metric"><span>Overlap medio consecutivo</span><strong>'+fmt(avg)+'</strong><small>Numeri condivisi tra estrazioni adiacenti</small></div><div class="wfl-metric"><span>Riferimento casuale</span><strong>5,00</strong><small>Attesa teorica per due decine da 10 su 20</small></div><div class="wfl-metric"><span>Massimo osservato</span><strong>'+Math.max(0,...overlaps)+'</strong><small>Nella finestra recente</small></div><div class="wfl-metric"><span>Campione</span><strong>'+overlaps.length+'</strong><small>Coppie consecutive analizzate</small></div></div><div style="display:grid;grid-template-columns:repeat(11,minmax(14px,1fr));gap:4px;margin-top:14px">'+counts.map((v,i)=>'<div title="'+i+' numeri condivisi: '+v+' casi" style="text-align:center"><div style="height:70px;display:flex;align-items:end;background:var(--surface-2);border-radius:4px;overflow:hidden"><span style="display:block;width:100%;height:'+(v/Math.max(1,...counts)*100)+'%;background:#b9a05a"></span></div><small>'+i+'</small><br><small style="color:var(--muted)">'+v+'</small></div>').join('')+'</div>';}
+function render(draws,windowSize){const root=document.getElementById('wflSonarDashboard');if(!root)return;const ds=(Array.isArray(draws)?draws:[]).filter(valid).sort((a,b)=>String(a.datetime).localeCompare(String(b.datetime)));if(!ds.length){root.innerHTML='<div class="wfl-card">Nessuna estrazione valida: importa o aggiorna lo storico.</div>';return;}const chosen=windowSize==='all'?ds:ds.slice(-Number(windowSize||50));const allFreq=freq(ds,'main'),f=freq(chosen,'main'),nf=freq(chosen,'numerone'),expected=chosen.length/2;const last=ds[ds.length-1],sumMean=ds.reduce((a,d)=>a+sum(d),0)/ds.length;const top=allFreq.map((v,i)=>({n:i+1,v})).sort((a,b)=>b.v-a.v)[0];const nTop=nf.map((v,i)=>({n:i+1,v})).sort((a,b)=>b.v-a.v)[0];const recentSums=ds.slice(-60).map(sum);const currentAvg=recentSums.length?recentSums.reduce((a,b)=>a+b,0)/recentSums.length:0;
+root.innerHTML='<div class="wfl-metrics"><div class="wfl-metric"><span>Estrazioni archiviate</span><strong>'+ds.length.toLocaleString('it-IT')+'</strong><small>Record validi e deduplicati</small></div><div class="wfl-metric"><span>Ultimo concorso</span><strong>'+esc(last.numero||'—')+'</strong><small>'+esc(String(last.datetime||'').replace('T',' '))+'</small></div><div class="wfl-metric"><span>Somma media storica</span><strong>'+fmt(sumMean)+'</strong><small>Dieci numeri principali</small></div><div class="wfl-metric"><span>Numerone più frequente</span><strong>'+nTop.n+'</strong><small>'+nTop.v+' occorrenze nella finestra selezionata</small></div></div>'+
+'<div class="wfl-lab-grid" style="margin-top:14px"><section class="wfl-card"><h3>Frequenze dei numeri · 1–20</h3><p class="sub">Finestra selezionata: '+(windowSize==='all'?'intero storico':'ultime '+windowSize)+' · decina principale, Numerone escluso.</p><div style="overflow:auto">'+bars(f,expected,'occorrenze')+'</div></section><section class="wfl-card"><h3>Numerone · distribuzione</h3><p class="sub">Serie indipendente rispetto ai dieci numeri principali.</p><div style="overflow:auto">'+bars(nf,chosen.length/20,'occorrenze Numerone')+'</div></section><section class="wfl-card"><h3>Traiettoria delle somme</h3><p class="sub">Le somme aiutano a leggere la struttura recente, non anticipano la prossima estrazione.</p>'+lineChart(ds)+'</section><section class="wfl-card"><h3>Regimi mobili</h3><p class="sub">Confronto rapido fra finestre brevi e medie, con attese teoriche.</p><div class="wfl-lab-grid">'+regimes(ds)+'</div></section><section class="wfl-card" style="grid-column:1/-1"><h3>Mappa numero × posizione ordinata</h3><p class="sub">Mappa descrittiva per posizione crescente; le posizioni sono dipendenti perché i numeri vengono ordinati.</p>'+heatmap(chosen)+'</section><section class="wfl-card" style="grid-column:1/-1"><h3>Transizioni tra estrazioni consecutive</h3><p class="sub">Quanti numeri si ripetono fra una decina e la successiva.</p>'+transitions(ds)+'</section></div><p class="wfl-note" style="margin-top:12px">Campione grafici principali: '+chosen.length+' estrazioni. Le frequenze storiche non cambiano la probabilità teorica di una singola estrazione indipendente.</p>';
+}
+window.WFLSonarDashboard={render};
 })();
