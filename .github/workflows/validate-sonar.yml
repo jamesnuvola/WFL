@@ -1,0 +1,27 @@
+name: Validate WFL SONAR
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [redesign/vincicasa-style]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check JavaScript syntax
+        run: |
+          node --check wfl-sonar-dashboard.js
+          node --check wfl-sonar-engine.js
+          node --check wfl-sonar-app.js
+          node --check update-wlf.mjs
+          node --check backfill-wlf.mjs
+          node --check sonar-research-cycle.mjs
+          node --check tests/validate-wfl.mjs
+      - name: Verify archive and immutable baseline
+        run: node tests/validate-wfl.mjs
