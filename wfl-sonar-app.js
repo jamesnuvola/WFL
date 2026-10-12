@@ -51,9 +51,34 @@ function renderResearch(ds){
  '<article class="wfl-card"><h3>Distribuzione hit per estrazione</h3><p class="sub">Campione walk-forward: '+r.steps+' target, training iniziale '+r.train+' estrazioni.</p><div style="display:grid;grid-template-columns:repeat(11,minmax(12px,1fr));gap:4px;align-items:end;height:100px">'+r.hitDist.map((v,i)=>'<div title="'+i+' hit: '+v+'" style="height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px"><small>'+v+'</small><div style="width:100%;height:'+Math.max(2,v/Math.max(1,...r.hitDist)*70)+'px;background:#20b6aa;border-radius:3px 3px 0 0"></div><small>'+i+'</small></div>').join('')+'</div><p class="sub">Baseline semplice; verrà confrontata con strategie alternative e controllo casuale nel registro automatico.</p></article>'+
  '<article class="wfl-card"><h3>Regola di promozione</h3><p>Nessun aggiustamento automatico dei pesi manuali. I candidati devono superare il benchmark in test fuori campione ripetuti, con risultati registrati e nessuna selezione retrospettiva della finestra migliore.</p><p class="sub">Questo pannello ricalcola i risultati a ogni caricamento; il registro persistente e la validazione programmata verranno gestiti dalla pipeline GitHub.</p></article>';
 }
+function expectedLatestSlot(){
+ const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).reduce((o,x)=>(o[x.type]=x.value,o),{});
+ let y=Number(p.year),m=Number(p.month),d=Number(p.day),h=Number(p.hour),minute=Number(p.minute);
+ if(h>=7&&h<=23&&minute<25)h--;
+ if(h<7){const prev=new Date(Date.UTC(y,m-1,d));prev.setUTCDate(prev.getUTCDate()-1);y=prev.getUTCFullYear();m=prev.getUTCMonth()+1;d=prev.getUTCDate();h=23;}
+ return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')+'T'+String(h).padStart(2,'0')+':00';
+}
 async function refresh(){
- $('systemStatus').textContent='Aggiornamento archivio…';
- try{const res=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('HTTP '+res.status);const remote=await res.json();if(!Array.isArray(remote)||!remote.length)throw new Error('Archivio remoto vuoto o non valido');const merged=merge(draws,remote);if(merged.conflicts.length){setStatus('ATTENZIONE: conflitti nei concorsi '+merged.conflicts.join(', ')+'. Nessun record è stato sovrascritto; verifica il file sorgente.','error');}const before=draws.length;draws=merged.draws;save();render();const latest=draws.at(-1);const latestLabel=latest?latest.datetime.replace('T',' '):'non disponibile';setStatus('Sincronizzazione '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+' · ultima estrazione disponibile: '+latestLabel+' · archivio '+before+' → '+draws.length+' record.','success');$('systemStatus').textContent='Sincronizzato · ultima '+latestLabel;}catch(e){render();setStatus('Impossibile aggiornare dal server ('+e.message+'). Mostro la copia locale disponibile; esportala se devi fare un backup.','error');$('systemStatus').textContent='Modalità locale';}
+ $('systemStatus').textContent='Verifica archivio ufficiale…';
+ try{
+  const res=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store'});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const remote=await res.json();
+  if(!Array.isArray(remote)||!remote.length)throw new Error('Archivio remoto vuoto o non valido');
+  const merged=merge(draws,remote);
+  if(merged.conflicts.length){setStatus('ATTENZIONE: conflitti nei concorsi '+merged.conflicts.join(', ')+'. Nessun record è stato sovrascritto; verifica il file sorgente.','error');}
+  const before=draws.length;draws=merged.draws;save();render();
+  const latest=draws.at(-1),latestLabel=latest?latest.datetime.replace('T',' '):'non disponibile',expected=expectedLatestSlot();
+  if(latest&&latest.datetime<expected){
+   setStatus('ARCHIVIO NON AGGIORNATO · ultima estrazione '+latestLabel+' · attesa almeno '+expected+'. Le analisi mostrano lo storico disponibile ma non sono certificate aggiornate.','error');
+   $('systemStatus').textContent='Dati in ritardo · ultima '+latestLabel;
+   return;
+  }
+  setStatus('Archivio verificato '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+' · ultima estrazione '+latestLabel+' · archivio '+before+' → '+draws.length+' record.','success');
+  $('systemStatus').textContent='Aggiornato · ultima '+latestLabel;
+ }catch(e){
+  render();setStatus('Verifica archivio non riuscita ('+e.message+'). Mostro la copia locale disponibile, non certificata come aggiornata.','error');$('systemStatus').textContent='Aggiornamento non verificato';
+ }
 }
 function download(){const blob=new Blob([JSON.stringify(draws,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wfl-sonar-history-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);}
 async function importFile(file){try{const raw=JSON.parse(await file.text());if(!Array.isArray(raw))throw new Error('Il file deve contenere un array JSON.');const good=raw.filter(valid);if(!good.length)throw new Error('Nessuna estrazione valida trovata.');const merged=merge(draws,good);if(merged.conflicts.length)throw new Error('Conflitti sui concorsi '+merged.conflicts.join(', ')+'. Import annullato per evitare perdita dati.');const before=draws.length;draws=merged.draws;save();render();setStatus('Importazione completata senza sovrascrivere record: '+before+' → '+draws.length+'.','success');}catch(e){setStatus('Import non completato: '+e.message,'error');}}
