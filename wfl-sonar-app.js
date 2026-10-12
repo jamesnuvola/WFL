@@ -22,6 +22,7 @@ function renderTrajectoryFallback(ds,proposal){
  let svg=[1,5,10,15,20].map(n=>'<line x1="'+L+'" y1="'+y(n)+'" x2="'+(W-R)+'" y2="'+y(n)+'" stroke="var(--border)"/><text x="'+(L-8)+'" y="'+(y(n)+4)+'" fill="var(--muted)" font-size="11" text-anchor="end">'+n+'</text>').join('');
  for(let p=0;p<10;p++){
   svg+='<polyline fill="none" stroke="'+colors[p]+'" stroke-width="2" points="'+rows.map((d,i)=>x(i)+','+y(d.numbers[p])).join(' ')+'"/>';
+  rows.forEach((d,i)=>{svg+='<text x="'+x(i)+'" y="'+(y(d.numbers[p])-5-(p%2)*2)+'" fill="'+colors[p]+'" font-size="9" text-anchor="middle">'+d.numbers[p]+'</text>';});
   const last=Number(rows.at(-1).numbers[p]);svg+='<text x="'+(x(rows.length-1)+5)+'" y="'+(y(last)+(p%2?11:-5))+'" fill="'+colors[p]+'" font-size="12" font-weight="700">'+last+'</text>';
  }
  svg+='<polyline fill="none" stroke="#ffffff" stroke-width="3.5" stroke-dasharray="9 5" points="'+rows.map((d,i)=>x(i)+','+y(d.numerone)).join(' ')+'"/>';
