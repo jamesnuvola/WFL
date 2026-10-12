@@ -125,14 +125,34 @@ function latestExpectedSlot(now = new Date()) {
 }
 async function main() {
   const errors = [];
-  let scraped = [];
-  try { scraped = parseOfficial(await fetchText(OFFICIAL_URL)); }
-  catch (e) { errors.push(`official source: ${e.message}`); }
-  if (!scraped.length) {
-    try { scraped = parseFallback(await fetchText(FALLBACK_URL)); }
-    catch (e) { errors.push(`fallback source: ${e.message}`); }
+  const sourceSets = [];
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone:'Europe/Rome', year:'numeric', month:'2-digit', day:'2-digit'
+  }).formatToParts(now).reduce((o,p)=>(o[p.type]=p.value,o), {});
+  const monthNames = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  const dailyUrl = `${OFFICIAL_URL}/${parts.year}/${monthNames[Number(parts.month)-1]}/${Number(parts.day)}`;
+
+  // The root archive can lag behind even while the daily page has newer contests.
+  // Fetch each independently and union them; never treat a partial root page as complete.
+  for (const [label, url] of [['official-root', OFFICIAL_URL], ['official-daily', dailyUrl]]) {
+    try {
+      const parsed = parseOfficial(await fetchText(url));
+      if (parsed.length) sourceSets.push({label, draws:parsed});
+      else errors.push(`${label}: no complete draws parsed`);
+    } catch (e) { errors.push(`${label}: ${e.message}`); }
   }
-  if (!scraped.length) throw new Error(`No valid draws parsed. ${errors.join(' | ')}`);
+  // The official root is sometimes cached/stale. Use the secondary archive only to
+  // fill missing contests; duplicate contests must agree exactly or the sync stops.
+  try {
+    const parsed = parseFallback(await fetchText(FALLBACK_URL));
+    if (parsed.length) sourceSets.push({label:'secondary-fallback', draws:parsed});
+    else errors.push('secondary-fallback: no complete draws parsed');
+  } catch (e) { errors.push(`secondary-fallback: ${e.message}`); }
+
+  if (!sourceSets.length) throw new Error(`No valid draws parsed. ${errors.join(' | ')}`);
+  let scraped = [];
+  for (const set of sourceSets) scraped = dedupe([...scraped, ...set.draws]);
 
   const current = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : [];
   if (!Array.isArray(current) || current.some(d => !valid(d))) {
@@ -151,7 +171,7 @@ async function main() {
     if (prev) {
       if (prev.datetime!==d.datetime || Number(prev.numerone)!==d.numerone ||
           JSON.stringify(prev.numbers.map(Number).sort((a,b)=>a-b))!==JSON.stringify(d.numbers)) {
-        throw new Error(`Official source conflicts with stored draw ${id}; no data written.`);
+        throw new Error(`Source conflicts with stored draw ${id}; no data written.`);
       }
       unchanged++;
     } else { byNumber.set(id,d); added++; }
@@ -162,10 +182,9 @@ async function main() {
   const latest=merged.at(-1);
   const expected=latestExpectedSlot();
   if (latest.datetime < expected) {
-    throw new Error(`Official archive is stale: latest stored draw ${latest.datetime}, expected at least ${expected}. No sync marked successful and no write performed.`);
+    throw new Error(`Official/secondary archives are stale: latest stored draw ${latest.datetime}, expected at least ${expected}. No sync marked successful and no write performed. Sources: ${sourceSets.map(s=>s.label+':'+s.draws.at(-1)?.datetime).join(', ')}. ${errors.join(' | ')}`);
   }
   if (latest.datetime > expected) {
-    // A future-dated result is suspicious; don't silently accept it.
     const delta = Date.parse(latest.datetime) - Date.parse(expected);
     if (delta > 60*60*1000) throw new Error(`Unexpected future draw ${latest.datetime} versus expected slot ${expected}; write blocked.`);
   }
@@ -173,10 +192,10 @@ async function main() {
   fs.mkdirSync(BACKUP_DIR,{recursive:true});
   const snapshot=`${BACKUP_DIR}/winforlife_draws_${new Date().toISOString().slice(0,10)}.json`;
   if (fs.existsSync(DATA_FILE) && !fs.existsSync(snapshot)) fs.copyFileSync(DATA_FILE,snapshot);
-  fs.writeFileSync(DATA_FILE,JSON.stringify(merged,null,2)+'\n');
+  fs.writeFileSync(DATA_FILE,JSON.stringify(merged,null,2)+'\\n');
   console.log(JSON.stringify({
-    source:'WinForLife.it official archive',
-    sourceDraws:scraped.length,added,unchanged,before:current.length,after:merged.length,
+    sources:sourceSets.map(s=>({name:s.label,count:s.draws.length,latest:s.draws.at(-1)?.datetime,contest:s.draws.at(-1)?.numero})),
+    added,unchanged,before:current.length,after:merged.length,
     expectedLatest:expected,latest:latest.datetime,latestContest:latest.numero,
     first:merged[0]?.datetime,snapshot,errors
   },null,2));
