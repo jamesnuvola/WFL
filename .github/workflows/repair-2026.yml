@@ -1,0 +1,35 @@
+name: Repair WFL 2026 from official archive
+on:
+  push:
+    paths:
+      - 'repair-2026-wfl.mjs'
+      - '.github/workflows/repair-2026.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: wfl-data-maintenance
+  cancel-in-progress: false
+jobs:
+  repair-2026:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Rebuild 2026 only from official daily archive with strict validation
+        run: node repair-2026-wfl.mjs
+      - name: Commit repaired archive and pre-repair backup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add winforlife_draws.json data/archive
+          if ! git diff --staged --quiet; then
+            git commit -m "Repair 2026 WFL archive from official results"
+            git pull --rebase origin main
+            git push
+          else
+            echo "No archive changes to commit."
+          fi
