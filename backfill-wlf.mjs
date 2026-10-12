@@ -39,12 +39,12 @@ async function fetchDay(iso){
 async function main(){
  fs.mkdirSync(BACKUP_DIR,{recursive:true});
  function parseArchiveFile(raw){
-  const text=String(raw).replace(/^\\uFEFF/,'');
+  const text=String(raw).replace(/^\uFEFF/,'');
   const arrays=[];let i=0;
   while(i<text.length){
-   while(i<text.length&&/\\s/.test(text[i]))i++;
+   while(i<text.length&&/\s/.test(text[i]))i++;
    if(i>=text.length)break;
-   if(text[i]!=='[')throw new Error(`Unexpected non-whitespace archive content at byte/character ${i} (\\${JSON.stringify(text.slice(i,i+80))}); refusing to discard history.`);
+   if(text[i]!=='[')throw new Error('Unexpected non-whitespace archive content at character '+i+' ('+JSON.stringify(text.slice(i,i+80))+'); refusing to discard history.');
    const start=i;let depth=0,inString=false,escaped=false,end=-1;
    for(;i<text.length;i++){
     const c=text[i];
@@ -53,7 +53,7 @@ async function main(){
     if(c==='['||c==='{')depth++;
     else if(c===']'||c==='}'){depth--;if(depth===0){end=i+1;break;}if(depth<0)throw new Error('Unbalanced archive JSON; refusing to write.');}
    }
-   if(end<0)throw new Error(`Incomplete JSON array beginning at ${start}; refusing to write.`);
+   if(end<0)throw new Error('Incomplete JSON array beginning at '+start+'; refusing to write.');
    const value=JSON.parse(text.slice(start,end));
    if(!Array.isArray(value))throw new Error('Archive segment is not an array; refusing to write.');
    arrays.push(value);i=end;
