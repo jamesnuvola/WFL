@@ -5,7 +5,7 @@ const DATA_URL=new URL('winforlife_draws.json',document.currentScript.src).href;
 const CACHE_KEY='wfl_sonar_history_v2';
 const WINDOW_KEY='wfl_sonar_window';
 const $=id=>document.getElementById(id);
-let draws=[], selectedWindow=localStorage.getItem(WINDOW_KEY)||'50';
+let draws=[], selectedWindow=localStorage.getItem(WINDOW_KEY)||'50', currentProposal=null;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=d=>d&&Number.isInteger(Number(d.numero))&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===10&&d.numbers.every(n=>Number.isInteger(Number(n))&&n>=1&&n<=20)&&new Set(d.numbers.map(Number)).size===10&&Number.isInteger(Number(d.numerone))&&Number(d.numerone)>=1&&Number(d.numerone)<=20;
 const normalize=d=>({datetime:String(d.datetime),numbers:d.numbers.map(Number).sort((a,b)=>a-b),numerone:Number(d.numerone),numero:Number(d.numero)});
@@ -31,7 +31,7 @@ function render(){
  ['Somma media',mean.toLocaleString('it-IT',{maximumFractionDigits:2}),'Sui dieci numeri principali']
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
  // Keep the historical table visible even if a secondary analytics module fails.
- try{if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(validDraws,selectedWindow);}
+ try{if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(analysis,selectedWindow,currentProposal);}
  catch(e){const root=$('wflSonarDashboard');if(root)root.innerHTML='<div class="wfl-card wfl-error">Grafici non disponibili: '+esc(e.message)+'</div>';}
  try{renderRecent(validDraws);}catch(e){const root=$('recentHistory');if(root)root.innerHTML='<p class="wfl-error">Tabella storico non disponibile: '+esc(e.message)+'</p>';}
  try{renderResearch(analysis);}catch(e){const root=$('researchPanel');if(root)root.innerHTML='<p class="wfl-error">Test non disponibili: '+esc(e.message)+'</p>';}
@@ -45,7 +45,7 @@ function research(ds){
  for(let t=start;t<ds.length;t++){const past=ds.slice(0,t),actual=ds[t];const main=rankFreq(past,'main').slice(0,10).map(x=>x.n),num=rankFreq(past,'numerone')[0].n;const h=main.filter(n=>actual.numbers.includes(n)).length;hits+=h;hitDist[h]++;if(num===actual.numerone)numHits++;randomHits+=5;}
  return {ready:true,steps,train:start,meanHits:hits/steps,expected:randomHits/steps,delta:hits/steps-5,hitDist,numeroneRate:numHits/steps,numHits};
 }
-function renderGenerator(ds=analysisDraws()){const out=$('generatorResult');if(!out)return;if(!window.WFLSonarEngine||ds.length<10){out.innerHTML='<p class="wfl-note">Servono almeno 10 estrazioni valide.</p>';return;}const w=Number($('generatorWindow')?.value||50),pool=Number($('generatorPool')?.value||14);const pred=window.WFLSonarEngine.makeCombination(ds,{window:w,pool});if(pred.error){out.innerHTML='<p class="wfl-error">'+esc(pred.error)+'</p>';return;}out.innerHTML='<p class="wfl-note">Calcolata su '+draws.length+' estrazioni · finestra '+w+' · pool '+pool+'.</p><h3>Decina proposta</h3><div class="wfl-proposed-numbers">'+pred.numbers.map(n=>'<span class="wfl-ball">'+n+'</span>').join('')+'</div><h3>Numerone separato</h3><div class="wfl-proposed-numbers"><span class="wfl-ball gold">'+pred.numerone+'</span></div><p class="wfl-note">'+esc(pred.note||'Punteggi esplorativi, senza garanzia predittiva.')+'</p>';out.dataset.proposal=pred.numbers.join(' ')+' | Numerone '+pred.numerone;}
+function renderGenerator(ds=analysisDraws()){const out=$('generatorResult');if(!out)return;if(!window.WFLSonarEngine||ds.length<10){out.innerHTML='<p class="wfl-note">Servono almeno 10 estrazioni valide.</p>';return;}const w=Number($('generatorWindow')?.value||50),pool=Number($('generatorPool')?.value||14);const pred=window.WFLSonarEngine.makeCombination(ds,{window:w,pool});if(pred.error){currentProposal=null;out.innerHTML='<p class="wfl-error">'+esc(pred.error)+'</p>';if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(analysisDraws(),selectedWindow,currentProposal);return;}currentProposal=pred.numbers.map(Number).sort((a,b)=>a-b);out.innerHTML='<p class="wfl-note">Calcolata su '+ds.length+' estrazioni 2026 · finestra '+w+' · pool '+pool+'.</p><h3>Decina proposta</h3><div class="wfl-proposed-numbers">'+pred.numbers.map(n=>'<span class="wfl-ball">'+n+'</span>').join('')+'</div><h3>Numerone separato</h3><div class="wfl-proposed-numbers"><span class="wfl-ball gold">'+pred.numerone+'</span></div><p class="wfl-note">'+esc(pred.note||'Punteggi esplorativi, senza garanzia predittiva.')+'</p>';out.dataset.proposal=pred.numbers.join(' ')+' | Numerone '+pred.numerone;if(window.WFLSonarDashboard)window.WFLSonarDashboard.render(analysisDraws(),selectedWindow,currentProposal);}
 function renderResearch(ds){
  const r=research(ds);$('researchStatus').textContent=r.ready?'Test automatico aggiornato':'Storico insufficiente';
  if(!r.ready){$('researchPanel').innerHTML='<article class="wfl-card"><h3>Walk-forward</h3><p>'+esc(r.reason)+'</p><p class="sub">Lo storico completo viene prima di tutto; nessuna strategia è promossa automaticamente in assenza di campione sufficiente.</p></article>';return;}
