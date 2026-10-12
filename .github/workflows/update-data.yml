@@ -1,5 +1,9 @@
 name: Update Win for Life data
 on:
+  push:
+    paths:
+      - 'update-wlf.mjs'
+      - '.github/workflows/update-data.yml'
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -11,6 +15,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
