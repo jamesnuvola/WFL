@@ -13,6 +13,16 @@ function merge(...sources){const map=new Map(),conflicts=[];for(const source of 
 function save(){try{localStorage.setItem(CACHE_KEY,JSON.stringify(draws));}catch(e){setStatus('Impossibile salvare la cache locale: esporta una copia dello storico.','error');}}
 function setStatus(msg,type){const el=$('dataStatus');if(el){el.textContent=msg;el.className='wfl-statusline '+(type==='error'?'wfl-error':type==='success'?'wfl-success':'');}}
 function analysisDraws(){return draws.filter(d=>valid(d)&&String(d.datetime||'').startsWith('2026-'));}
+function renderTrajectoryFallback(ds,proposal){
+ const root=$('wflSonarDashboard');if(!root)return;
+ const rows=(Array.isArray(ds)?ds:[]).filter(d=>valid(d)&&String(d.datetime||'').startsWith('2026-')).sort((a,b)=>String(a.datetime).localeCompare(String(b.datetime))).slice(-30);
+ if(!rows.length){root.innerHTML='<div class="wfl-card">Nessuna estrazione 2026 disponibile per il grafico.</div>';return;}
+ const W=1000,H=320,L=42,R=16,T=20,B=42,pw=W-L-R,ph=H-T-B,colors=['#00d4ff','#f0c040','#9d7fff','#20c997','#ff6b6b','#4dabf7','#ff922b','#e599f7','#a9e34b','#f06595'];
+ const x=i=>L+i*pw/Math.max(1,rows.length-1),y=n=>T+ph-(Number(n)-1)/19*ph;
+ let svg=[1,5,10,15,20].map(n=>'<line x1="'+L+'" y1="'+y(n)+'" x2="'+(W-R)+'" y2="'+y(n)+'" stroke="var(--border)"/><text x="'+(L-8)+'" y="'+(y(n)+4)+'" fill="var(--muted)" font-size="11" text-anchor="end">'+n+'</text>').join('');
+ for(let p=0;p<10;p++){svg+='<polyline fill="none" stroke="'+colors[p]+'" stroke-width="1.8" points="'+rows.map((d,i)=>x(i)+','+y(d.numbers[p])).join(' ')+'"/>';}
+ root.innerHTML='<section class="wfl-card"><h3>Traiettoria · ultime '+rows.length+' estrazioni del 2026</h3><p class="sub">Visualizzazione di ripiego. Da '+esc(rows[0].datetime.replace('T',' '))+' a '+esc(rows[rows.length-1].datetime.replace('T',' '))+'. Posizioni ordinate 1–10.</p><div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Traiettoria delle ultime 30 estrazioni" style="width:100%;min-width:700px;height:auto">'+svg+'</svg></div></section>';
+}
 function render(){
  const validDraws=draws.filter(valid), analysis=analysisDraws();
  if($('systemStatus'))$('systemStatus').textContent=validDraws.length+' record validi';
@@ -32,7 +42,7 @@ function render(){
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
  // Keep the historical table visible even if a secondary analytics module fails.
  try{if(window.WFLSonarDashboard&&typeof window.WFLSonarDashboard.render==='function')window.WFLSonarDashboard.render(analysis,selectedWindow,currentProposal);else throw new Error('modulo grafici non caricato');}
- catch(e){const root=$('wflSonarDashboard');if(root)root.innerHTML='<div class="wfl-card wfl-error">Grafici non disponibili: '+esc(e.message)+'. Ricarica la pagina per riprovare.</div>';}
+ catch(e){renderTrajectoryFallback(analysis,currentProposal);const root=$('wflSonarDashboard');if(root)root.insertAdjacentHTML('afterbegin','<p class="wfl-error">Modulo grafici principale non disponibile; grafico di ripiego attivo ('+esc(e.message)+').</p>');}
  try{renderRecent(validDraws);}catch(e){const root=$('recentHistory');if(root)root.innerHTML='<p class="wfl-error">Tabella storico non disponibile: '+esc(e.message)+'</p>';}
  try{renderResearch(analysis);}catch(e){const root=$('researchPanel');if(root)root.innerHTML='<p class="wfl-error">Test non disponibili: '+esc(e.message)+'</p>';}
  try{renderGenerator(analysis);}catch(e){const root=$('generatorResult');if(root)root.innerHTML='<p class="wfl-error">Generatore non disponibile: '+esc(e.message)+'</p>';}
