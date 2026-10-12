@@ -17,13 +17,20 @@ function renderTrajectoryFallback(ds,proposal){
  const root=$('wflSonarDashboard');if(!root)return;
  const rows=(Array.isArray(ds)?ds:[]).filter(d=>valid(d)&&String(d.datetime||'').startsWith('2026-')).sort((a,b)=>String(a.datetime).localeCompare(String(b.datetime))).slice(-30);
  if(!rows.length){root.innerHTML='<div class="wfl-card">Nessuna estrazione 2026 disponibile per il grafico.</div>';return;}
- const W=1000,H=320,L=42,R=16,T=20,B=42,pw=W-L-R,ph=H-T-B,colors=['#00d4ff','#f0c040','#9d7fff','#20c997','#ff6b6b','#4dabf7','#ff922b','#e599f7','#a9e34b','#f06595'];
+ const W=1500,H=440,L=48,R=24,T=24,B=92,pw=W-L-R,ph=H-T-B,colors=['#00d4ff','#f0c040','#9d7fff','#20c997','#ff6b6b','#4dabf7','#ff922b','#e599f7','#a9e34b','#f06595'];
  const x=i=>L+i*pw/Math.max(1,rows.length-1),y=n=>T+ph-(Number(n)-1)/19*ph;
  let svg=[1,5,10,15,20].map(n=>'<line x1="'+L+'" y1="'+y(n)+'" x2="'+(W-R)+'" y2="'+y(n)+'" stroke="var(--border)"/><text x="'+(L-8)+'" y="'+(y(n)+4)+'" fill="var(--muted)" font-size="11" text-anchor="end">'+n+'</text>').join('');
- for(let p=0;p<10;p++){svg+='<polyline fill="none" stroke="'+colors[p]+'" stroke-width="1.8" points="'+rows.map((d,i)=>x(i)+','+y(d.numbers[p])).join(' ')+'"/>';}
- root.innerHTML='<section class="wfl-card"><h3>Traiettoria · ultime '+rows.length+' estrazioni del 2026</h3><p class="sub">Visualizzazione di ripiego. Da '+esc(rows[0].datetime.replace('T',' '))+' a '+esc(rows[rows.length-1].datetime.replace('T',' '))+'. Posizioni ordinate 1–10.</p><div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Traiettoria delle ultime 30 estrazioni" style="width:100%;min-width:700px;height:auto">'+svg+'</svg></div></section>';
-}
-function render(){
+ for(let p=0;p<10;p++){
+  svg+='<polyline fill="none" stroke="'+colors[p]+'" stroke-width="2" points="'+rows.map((d,i)=>x(i)+','+y(d.numbers[p])).join(' ')+'"/>';
+  const last=Number(rows.at(-1).numbers[p]);svg+='<text x="'+(x(rows.length-1)+5)+'" y="'+(y(last)+(p%2?11:-5))+'" fill="'+colors[p]+'" font-size="12" font-weight="700">'+last+'</text>';
+ }
+ svg+='<polyline fill="none" stroke="#ffffff" stroke-width="3.5" stroke-dasharray="9 5" points="'+rows.map((d,i)=>x(i)+','+y(d.numerone)).join(' ')+'"/>';
+ rows.forEach((d,i)=>{svg+='<path d="M '+x(i)+' '+(y(d.numerone)-4)+' L '+(x(i)+4)+' '+y(d.numerone)+' L '+x(i)+' '+(y(d.numerone)+4)+' L '+(x(i)-4)+' '+y(d.numerone)+' Z" fill="#ffffff"><title>'+esc(d.datetime.replace('T',' '))+' · Numerone '+d.numerone+'</title></path>';});
+ svg+='<text x="'+(x(rows.length-1)+5)+'" y="'+(y(rows.at(-1).numerone)+15)+'" fill="#ffffff" font-size="12" font-weight="800">'+rows.at(-1).numerone+' N</text>';
+ const ticks=rows.map((d,i)=>'<text transform="translate('+x(i)+' '+(H-B+18)+') rotate(-48)" text-anchor="end" fill="var(--muted)" font-size="10">'+esc(d.datetime.slice(5,10)+' '+d.datetime.slice(11,16))+'</text>').join('');
+ const legend=colors.map((c,i)=>'<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 8px;font-size:.8rem"><i style="display:inline-block;width:18px;height:3px;background:'+c+'"></i>Pos. '+(i+1)+'</span>').join('')+'<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 8px;font-size:.8rem"><i style="width:18px;border-top:3px dashed #fff"></i>Numerone</span>';
+ root.innerHTML='<section class="wfl-card"><h3>Traiettoria · ultime '+rows.length+' estrazioni del 2026</h3><p class="sub">Da '+esc(rows[0].datetime.replace('T',' '))+' a '+esc(rows.at(-1).datetime.replace('T',' '))+'. Le dieci linee colorate sono i numeri principali; la linea bianca tratteggiata è il Numerone.</p><div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Traiettoria delle ultime 30 estrazioni con Numerone" style="width:100%;min-width:1100px;height:auto">'+svg+ticks+'</svg></div><div style="margin-top:8px">'+legend+'</div></section>';
+}function render(){
  const validDraws=draws.filter(valid), analysis=analysisDraws();
  if($('systemStatus'))$('systemStatus').textContent=validDraws.length+' record validi';
  if($('drawCount'))$('drawCount').textContent=validDraws.length.toLocaleString('it-IT')+' estrazioni';
@@ -42,7 +49,7 @@ function render(){
  ].map(x=>'<div class="wfl-metric"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>').join('');
  // Keep the historical table visible even if a secondary analytics module fails.
  try{if(window.WFLSonarDashboard&&typeof window.WFLSonarDashboard.render==='function')window.WFLSonarDashboard.render(analysis,selectedWindow,currentProposal);else throw new Error('modulo grafici non caricato');}
- catch(e){renderTrajectoryFallback(analysis,currentProposal);const root=$('wflSonarDashboard');if(root)root.insertAdjacentHTML('afterbegin','<p class="wfl-error">Modulo grafici principale non disponibile; grafico di ripiego attivo ('+esc(e.message)+').</p>');}
+ catch(e){renderTrajectoryFallback(analysis,currentProposal);}
  try{renderRecent(validDraws);}catch(e){const root=$('recentHistory');if(root)root.innerHTML='<p class="wfl-error">Tabella storico non disponibile: '+esc(e.message)+'</p>';}
  try{renderResearch(analysis);}catch(e){const root=$('researchPanel');if(root)root.innerHTML='<p class="wfl-error">Test non disponibili: '+esc(e.message)+'</p>';}
  try{renderGenerator(analysis);}catch(e){const root=$('generatorResult');if(root)root.innerHTML='<p class="wfl-error">Generatore non disponibile: '+esc(e.message)+'</p>';}
@@ -116,7 +123,7 @@ function init(){
  let initialTab='draws';try{initialTab=localStorage.getItem('wfl_sonar_active_tab')||'draws';}catch(e){}activateTab(initialTab);
  $('generateNumbers').addEventListener('click',()=>renderGenerator(analysisDraws()));$('generatorWindow').addEventListener('change',()=>renderGenerator(analysisDraws()));$('generatorPool').addEventListener('change',()=>renderGenerator(analysisDraws()));
  $('copyProposal').addEventListener('click',()=>{const t=$('generatorResult')?.dataset.proposal;if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>setStatus('Proposta copiata.','success')).catch(()=>setStatus('Copia non riuscita.','error'));});
- $('windowPicker').addEventListener('click',e=>{const b=e.target.closest('button[data-window]');if(!b)return;selectedWindow=b.dataset.window;try{localStorage.setItem(WINDOW_KEY,selectedWindow);}catch(e){}$('windowPicker').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();});
+
  try{const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'[]');draws=merge(cached).draws;}catch(e){draws=[];}
  // Merge the older app cache too, without deleting records held in it.
  try{const legacy=JSON.parse(localStorage.getItem('wlf_sonar_draws')||'[]');draws=merge(draws,legacy).draws;}catch(e){}
