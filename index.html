@@ -92,37 +92,44 @@
         <div id="historyTable"></div>
     </div>
 
-    <!-- Generatore -->
+    <!-- Nuovo WFL SONAR Engine -->
     <div class="section">
-        <h3>🎲 Generatore</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-            <label>Peso verticale (0‑5): <input type="range" id="weightV" min="0" max="5" value="2" step="0.5"> <span id="weightVLabel">2</span></label>
-            <span class="small">Frequenza nella posizione.</span>
-            <label>Peso orizzontale (0‑5): <input type="range" id="weightH" min="0" max="5" value="1" step="0.5"> <span id="weightHLabel">1</span></label>
-            <span class="small">Frequenza globale del numero.</span>
-            <label>Peso ritardo (0‑3): <input type="range" id="weightDelay" min="0" max="3" value="1" step="0.5"> <span id="weightDelayLabel">1</span></label>
-            <span class="small">Ritardo vicino al centro ottimale.</span>
-            <label>Peso cluster (0‑3): <input type="range" id="weightCluster" min="0" max="3" value="1" step="0.5"> <span id="weightClusterLabel">1</span></label>
-            <span class="small">Uscito di recente nella stessa posizione.</span>
+        <h3>🎯 WFL SONAR Engine</h3>
+        <p class="small">Motore sperimentale dedicato a Win for Life Classico. Le statistiche storiche sono segnali esplorativi, non probabilità predittive garantite.</p>
+        <div class="diagnostic-grid" style="margin-top:0.8rem;">
+            <label>Finestra recente
+                <select id="sonarWindow"><option value="10">10 estrazioni</option><option value="20">20 estrazioni</option><option value="50" selected>50 estrazioni</option><option value="100">100 estrazioni</option></select>
+            </label>
+            <label>Ampiezza pool
+                <select id="sonarPool"><option value="10">10 numeri</option><option value="12">12 numeri</option><option value="14" selected>14 numeri</option><option value="16">16 numeri</option><option value="20">20 numeri</option></select>
+            </label>
+            <label>Peso recente <input id="sonarRecent" type="range" min="0" max="1" step="0.05" value="0.35"></label>
+            <label>Peso ritardo <input id="sonarDelay" type="range" min="0" max="0.5" step="0.05" value="0.15"></label>
+            <label>Peso transizioni <input id="sonarTransition" type="range" min="0" max="0.5" step="0.05" value="0.15"></label>
+            <label>Peso co-occorrenze <input id="sonarPair" type="range" min="0" max="0.5" step="0.05" value="0.10"></label>
         </div>
-        <div style="margin-top:1rem;">
-            <label><input type="checkbox" id="chkBalance" checked> Bilanciamento 4‑7 bassi</label>
-            <label><input type="checkbox" id="chkNoDup" checked> Evita decine già uscite</label>
-        </div>
-        <button id="generateBtn">Genera combinazione</button>
-        <div>Decina: <span id="combination" class="numbers">—</span></div>
-        <div>Numerone: <span id="numeroneOut" class="numbers">—</span></div>
+        <button id="generateBtn">Genera combinazione SONAR</button>
+        <div style="margin-top:0.8rem;">10 numeri: <span id="combination" class="numbers">—</span></div>
+        <div style="margin-top:0.4rem;">Numerone: <span id="numeroneOut" class="numbers">—</span></div>
         <div id="dettaglioContainer" style="margin-top:1rem;"></div>
         <div id="suggestedWeights" class="small" style="margin-top:0.5rem;"></div>
     </div>
 
-    <!-- Backtest -->
+    <!-- Walk-forward backtest -->
     <div class="section">
-        <h3>📊 Backtest</h3>
-        <label>Training: <input type="number" id="trainSize" value="1000" min="100" step="100"></label>
-        <label>Test: <input type="number" id="testSize" value="200" min="20" step="20"></label>
+        <h3>🧪 Backtest walk-forward</h3>
+        <p class="small">Ogni previsione usa esclusivamente le estrazioni precedenti al concorso testato. Il riferimento teorico per 10 numeri su 20 è 5 hit medi; per il Numerone è 5%.</p>
+        <label>Training minimo: <input type="number" id="trainSize" value="100" min="10" step="10"></label>
+        <label>Numero test: <input type="number" id="testSize" value="100" min="10" step="10"></label>
         <button id="runBacktestBtn">Avvia backtest</button>
-        <div id="backtestLog"></div>
+        <div id="backtestLog" style="margin-top:0.8rem;"></div>
+    </div>
+
+    <div class="section">
+        <h3>📐 Diagnostica SONAR</h3>
+        <p class="small">Frequenze osservate contro l'attesa teorica sulle finestre disponibili. Le deviazioni possono essere rumore casuale.</p>
+        <button id="sonarRunDiagnostics">Calcola diagnostica</button>
+        <div id="sonarDiagnostics" class="diagnostic-grid" style="margin-top:0.8rem;"></div>
     </div>
 
     <!-- DIAGNOSTICA STANDARD -->
@@ -153,7 +160,7 @@
         <p class="small" style="margin-top:0.5rem;">Il generatore può usare queste frequenze come pesi aggiuntivi. Premi "Genera" dopo aver visualizzato la mappa per applicare i suggerimenti.</p>
     </div>
 
-    <script src="wfl-sonar-dashboard.js"></script>
+    <script src="wfl-sonar-dashboard.js"></script>\n    <script src="wfl-sonar-engine.js"></script>
     <script>
     (function() {
         const NUM_COUNT = 20, POSITIONS = 10;
@@ -742,5 +749,5 @@
         if (typeof window.renderWflSonarDashboard === 'function') window.renderWflSonarDashboard(draws);
     })();
     </script>
-</body>
+    <script src="wfl-sonar-app.js"></script>\n</body>
 </html>
