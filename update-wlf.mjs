@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const OFFICIAL_URL = 'https://www.winforlife.it/archivio-estrazioni-classico?anno=2026&fromSchedina=1&game=wflc';
+const OFFICIAL_URL = 'https://www.winforlife.it/archivio-estrazioni-classico';
 const FALLBACK_URL = 'https://www.estrazionelotto.it/archivio-winforlife';
 const DATA_FILE = 'winforlife_draws.json';
 const BACKUP_DIR = 'data/archive';
