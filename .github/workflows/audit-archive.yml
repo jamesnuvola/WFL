@@ -1,0 +1,37 @@
+name: WFL pre-2026 archive audit
+on:
+  push:
+    paths:
+      - 'audit-wfl-archive.mjs'
+      - '.github/workflows/audit-archive.yml'
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: wfl-archive-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Compare 2022–2025 official daily results with stored archive
+        run: node audit-wfl-archive.mjs
+      - name: Commit audit report and checkpoint only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/archive/wfl-archive-audit-state.json data/archive/wfl-archive-audit-2022-2025.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Audit pre-2026 WFL archive batch"
+            git pull --rebase origin main
+            git push
+          else
+            echo "No audit report changes."
+          fi
