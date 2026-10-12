@@ -1,77 +1,184 @@
 import fs from 'node:fs';
 
-const URL = 'https://www.estrazionelotto.it/archivio-winforlife';
+const OFFICIAL_URL = 'https://www.winforlife.it/archivio-estrazioni-classico?anno=2026&fromSchedina=1&game=wflc';
+const FALLBACK_URL = 'https://www.estrazionelotto.it/archivio-winforlife';
 const DATA_FILE = 'winforlife_draws.json';
-const DEBUG_FILE = 'debug-wlf.html';
 const BACKUP_DIR = 'data/archive';
 
-function parseDraws(html) {
+const MONTHS = {
+  gennaio:'01', febbraio:'02', marzo:'03', aprile:'04', maggio:'05', giugno:'06',
+  luglio:'07', agosto:'08', settembre:'09', ottobre:'10', novembre:'11', dicembre:'12'
+};
+
+function valid(d) {
+  return d && Number.isInteger(Number(d.numero)) &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime || '') &&
+    Array.isArray(d.numbers) && d.numbers.length === 10 &&
+    d.numbers.every(n => Number.isInteger(Number(n)) && n >= 1 && n <= 20) &&
+    new Set(d.numbers.map(Number)).size === 10 &&
+    Number.isInteger(Number(d.numerone)) && Number(d.numerone) >= 1 && Number(d.numerone) <= 20;
+}
+function decode(s) {
+  return s.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/gi, '&')
+    .replace(/&deg;/gi, '°').replace(/&#(?:186|xba);/gi, 'º')
+    .replace(/&egrave;/gi, 'è').replace(/&agrave;/gi, 'à')
+    .replace(/&igrave;/gi, 'ì').replace(/&ograve;/gi, 'ò').replace(/&ugrave;/gi, 'ù')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'");
+}
+function plainText(html) {
+  return decode(html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '));
+}
+function parseOfficial(html) {
+  // Parse each official archive row. Expected text: "Nº 4833 del 12 Ottobre 2026 11:00 [10 numbers] [Numerone]".
+  const text = plainText(html);
+  const blocks = text.split(/(?=N\s*[º°]\s*\d+\s+del\s+)/i).slice(1);
+  const out = [];
+  for (const block of blocks) {
+    const head = block.match(/^N\s*[º°]\s*(\d+)\s+del\s+(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\s+(\d{4})\s+([01]\d|2[0-3]):([0-5]\d)/i);
+    if (!head) continue;
+    const month = MONTHS[head[3].toLocaleLowerCase('it')];
+    if (!month) continue;
+    const timeEnd = head[0].length;
+    const nextHeader = block.slice(timeEnd);
+    const values = (nextHeader.match(/\b(?:[1-9]|1[0-9]|20)\b/g) || []).map(Number);
+    if (values.length < 11) continue;
+    const numbers = values.slice(0, 10);
+    const numerone = values[10];
+    const d = {
+      datetime: `${head[4]}-${month}-${String(head[2]).padStart(2,'0')}T${head[5]}:${head[6]}`,
+      numbers: numbers.sort((a,b) => a-b),
+      numerone,
+      numero: Number(head[1])
+    };
+    if (valid(d)) out.push(d);
+  }
+  return dedupe(out);
+}
+function parseFallback(html) {
   const blocks = [...html.matchAll(/Estrazione\s+n[°º]\s*(\d+)\s*\((\d{2}:\d{2})\)([\s\S]*?)(?=Estrazione\s+n[°º]\s*\d+\s*\(\d{2}:\d{2}\)|$)/gi)];
   const out = [];
   for (const m of blocks) {
-    const plain = m[3].replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, ' ').replace(/\s+/g, ' ');
+    const plain = decode(m[3].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' '));
     const date = plain.match(/del\s+(\d{2})-(\d{2})-(\d{4})/i);
     const extractedAt = plain.search(/ESTRATTI/i);
     const numeroneAt = plain.search(/NUMERONE/i);
     if (!date || extractedAt < 0 || numeroneAt < extractedAt) continue;
-    const numbers = (plain.slice(extractedAt + 'ESTRATTI'.length, numeroneAt).match(/\b(?:[1-9]|1[0-9]|20)\b/g) || []).map(Number);
-    const numeroneMatch = plain.slice(numeroneAt).match(/NUMERONE\s+(\d{1,2})/i);
-    if (numbers.length < 10 || new Set(numbers.slice(0, 10)).size !== 10 || !numeroneMatch) continue;
-    const numerone = Number(numeroneMatch[1]);
-    if (numerone < 1 || numerone > 20) continue;
-    out.push({
+    const numbers = (plain.slice(extractedAt + 7, numeroneAt).match(/\b(?:[1-9]|1[0-9]|20)\b/g) || []).map(Number);
+    const nm = plain.slice(numeroneAt).match(/NUMERONE\s+(\d{1,2})/i);
+    const d = {
       datetime: `${date[3]}-${date[2]}-${date[1]}T${m[2]}`,
-      numbers: numbers.slice(0, 10).sort((a,b)=>a-b),
-      numerone,
+      numbers: numbers.slice(0,10).sort((a,b) => a-b),
+      numerone: Number(nm?.[1]),
       numero: Number(m[1])
-    });
+    };
+    if (valid(d)) out.push(d);
   }
-  return out;
+  return dedupe(out);
 }
-function valid(d) {
-  return d && Number.isInteger(Number(d.numero)) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime || '') &&
-    Array.isArray(d.numbers) && d.numbers.length === 10 &&
-    d.numbers.every(n=>Number.isInteger(Number(n)) && n>=1 && n<=20) &&
-    new Set(d.numbers.map(Number)).size === 10 &&
-    Number.isInteger(Number(d.numerone)) && d.numerone>=1 && d.numerone<=20;
+function dedupe(draws) {
+  const map = new Map();
+  for (const d of draws) {
+    const key = `${d.datetime.slice(0,4)}:${d.numero}`;
+    const prev = map.get(key);
+    if (prev && JSON.stringify(prev) !== JSON.stringify(d)) {
+      throw new Error(`Source contains conflicting versions for draw ${key}`);
+    }
+    map.set(key, d);
+  }
+  return [...map.values()].sort((a,b) => a.datetime.localeCompare(b.datetime) || a.numero-b.numero);
+}
+async function fetchText(url) {
+  const separator = url.includes('?') ? '&' : '?';
+  const response = await fetch(url + separator + '_wfl_refresh=' + Date.now(), {
+    cache: 'no-store',
+    headers: {
+      'user-agent': 'WFL-SONAR-data-maintenance/2.0 (+https://github.com/jamesnuvola/WFL)',
+      'cache-control': 'no-cache, no-store, max-age=0',
+      'pragma': 'no-cache',
+      'accept': 'text/html,application/xhtml+xml'
+    }
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status} from ${url} `);
+  return response.text();
+}
+function latestExpectedSlot(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Rome', year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', hourCycle:'h23'
+  }).formatToParts(now).reduce((o,p) => (o[p.type]=p.value,o), {});
+  let y=Number(parts.year), m=Number(parts.month), d=Number(parts.day), h=Number(parts.hour);
+  const minute=Number(parts.minute);
+  // Allow the previous slot for the first 25 minutes after the scheduled draw.
+  if (h >= 7 && h <= 23 && minute < 25) h--;
+  if (h > 23) h=23;
+  if (h < 7) {
+    const previous = new Date(Date.UTC(y,m-1,d));
+    previous.setUTCDate(previous.getUTCDate()-1);
+    y=previous.getUTCFullYear(); m=previous.getUTCMonth()+1; d=previous.getUTCDate(); h=23;
+  }
+  if (h > 23) h=23;
+  if (h < 7) h=23;
+  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(h).padStart(2,'0')}:00`;
 }
 async function main() {
-  const response = await fetch(URL, {headers:{'user-agent':'WFL-SONAR-data-maintenance/1.0'}});
-  if (!response.ok) throw new Error(`Archive HTTP ${response.status}`);
-  const html = await response.text();
-  fs.writeFileSync(DEBUG_FILE, html);
-  const scraped = parseDraws(html).filter(valid);
-  if (!scraped.length) throw new Error('Parser produced zero valid draws; refusing to alter historical dataset.');
-  const current = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : [];
-  if (!Array.isArray(current)) throw new Error('Existing dataset is not an array; refusing overwrite.');
-  const byNumber = new Map();
-  const key = d => `${String(d.datetime).slice(0,4)}:${Number(d.numero)}`;
-  for (const d of current) {
-    if (!valid(d)) throw new Error(`Invalid existing record; refusing overwrite: ${JSON.stringify(d)}`);
-    const id = key(d), prev = byNumber.get(id);
-    if (prev && JSON.stringify(prev) !== JSON.stringify(d)) throw new Error(`Conflicting existing records for draw ${id}`);
-    byNumber.set(id, d);
+  const errors = [];
+  let scraped = [];
+  try { scraped = parseOfficial(await fetchText(OFFICIAL_URL)); }
+  catch (e) { errors.push(`official source: ${e.message}`); }
+  if (!scraped.length) {
+    try { scraped = parseFallback(await fetchText(FALLBACK_URL)); }
+    catch (e) { errors.push(`fallback source: ${e.message}`); }
   }
-  let added = 0, unchanged = 0;
+  if (!scraped.length) throw new Error(`No valid draws parsed. ${errors.join(' | ')}`);
+
+  const current = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : [];
+  if (!Array.isArray(current) || current.some(d => !valid(d))) {
+    throw new Error('Existing dataset is invalid; refusing to overwrite or repair it automatically.');
+  }
+  const key = d => `${String(d.datetime).slice(0,4)}:${Number(d.numero)}`;
+  const byNumber = new Map();
+  for (const d of current) {
+    const id=key(d), prev=byNumber.get(id);
+    if (prev && JSON.stringify(prev)!==JSON.stringify(d)) throw new Error(`Conflicting existing records for ${id}`);
+    byNumber.set(id,d);
+  }
+  let added=0, unchanged=0;
   for (const d of scraped) {
-    const id = key(d), prev = byNumber.get(id);
+    const id=key(d), prev=byNumber.get(id);
     if (prev) {
-      if (JSON.stringify(prev.numbers.map(Number)) !== JSON.stringify(d.numbers) || Number(prev.numerone)!==d.numerone || prev.datetime!==d.datetime) {
-        throw new Error(`Source conflict for draw ${id}; preserved existing dataset and stopped.`);
+      if (prev.datetime!==d.datetime || Number(prev.numerone)!==d.numerone ||
+          JSON.stringify(prev.numbers.map(Number).sort((a,b)=>a-b))!==JSON.stringify(d.numbers)) {
+        throw new Error(`Official source conflicts with stored draw ${id}; no data written.`);
       }
       unchanged++;
-    } else { byNumber.set(id, d); added++; }
+    } else { byNumber.set(id,d); added++; }
   }
-  const merged = [...byNumber.values()].sort((a,b)=>a.datetime.localeCompare(b.datetime));
-  // Immutable dated snapshot before every write. The existing file is never replaced with a smaller set.
-  fs.mkdirSync(BACKUP_DIR, {recursive:true});
-  const snapshot = `${BACKUP_DIR}/winforlife_draws_${new Date().toISOString().slice(0,10)}.json`;
-  if (fs.existsSync(DATA_FILE) && !fs.existsSync(snapshot)) fs.copyFileSync(DATA_FILE, snapshot);
+  const merged=[...byNumber.values()].sort((a,b)=>a.datetime.localeCompare(b.datetime)||a.numero-b.numero);
   if (merged.length < current.length) throw new Error('Merge would reduce history; refusing write.');
-  fs.writeFileSync(DATA_FILE, JSON.stringify(merged, null, 2) + '\n');
+
+  const latest=merged.at(-1);
+  const expected=latestExpectedSlot();
+  if (latest.datetime < expected) {
+    throw new Error(`Official archive is stale: latest stored draw ${latest.datetime}, expected at least ${expected}. No sync marked successful and no write performed.`);
+  }
+  if (latest.datetime > expected) {
+    // A future-dated result is suspicious; don't silently accept it.
+    const delta = Date.parse(latest.datetime) - Date.parse(expected);
+    if (delta > 60*60*1000) throw new Error(`Unexpected future draw ${latest.datetime} versus expected slot ${expected}; write blocked.`);
+  }
+
+  fs.mkdirSync(BACKUP_DIR,{recursive:true});
+  const snapshot=`${BACKUP_DIR}/winforlife_draws_${new Date().toISOString().slice(0,10)}.json`;
+  if (fs.existsSync(DATA_FILE) && !fs.existsSync(snapshot)) fs.copyFileSync(DATA_FILE,snapshot);
+  fs.writeFileSync(DATA_FILE,JSON.stringify(merged,null,2)+'\n');
   console.log(JSON.stringify({
-    sourceDraws:scraped.length, added, unchanged, before:current.length, after:merged.length,
-    first:merged[0]?.datetime, last:merged.at(-1)?.datetime, snapshot
-  }, null, 2));
+    source:'WinForLife.it official archive',
+    sourceDraws:scraped.length,added,unchanged,before:current.length,after:merged.length,
+    expectedLatest:expected,latest:latest.datetime,latestContest:latest.numero,
+    first:merged[0]?.datetime,snapshot,errors
+  },null,2));
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
