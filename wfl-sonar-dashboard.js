@@ -24,7 +24,7 @@ function positionTrajectory(ds,proposal){
  for(let p=0;p<10;p++){
   const points=rows.map((d,i)=>x(i).toFixed(2)+','+y(d.numbers[p]).toFixed(2)).join(' ');
   series+='<polyline points="'+points+'" fill="none" stroke="'+colors[p]+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-  rows.forEach((d,i)=>{const val=Number(d.numbers[p]);series+='<circle cx="'+x(i)+'" cy="'+y(val)+'" r="2.8" fill="'+colors[p]+'"><title>'+esc(d.datetime.replace('T',' '))+' · Pos. '+(p+1)+': '+val+'</title></circle>';});
+  rows.forEach((d,i)=>{const val=Number(d.numbers[p]);series+='<circle cx="'+x(i)+'" cy="'+y(val)+'" r="2.8" fill="'+colors[p]+'"><title>'+esc(d.datetime.replace('T',' '))+' · Pos. '+(p+1)+': '+val+'</title></circle><text x="'+x(i)+'" y="'+(y(val)-5-(p%2)*2)+'" text-anchor="middle" fill="'+colors[p]+'" font-size="9" font-weight="650">'+val+'</text>';});
   const lastVal=Number(rows[rows.length-1].numbers[p]);
   series+='<text x="'+(x(rows.length-1)+5)+'" y="'+(y(lastVal)+(p%2?11:-5))+'" fill="'+colors[p]+'" font-size="12" font-weight="700" stroke="var(--surface)" stroke-width="2.5" paint-order="stroke">'+lastVal+'</text>';
   if(proposed){const px=x(rows.length),last=rows.length-1;series+='<line x1="'+x(last)+'" y1="'+y(rows[last].numbers[p])+'" x2="'+px+'" y2="'+y(proposed[p])+'" stroke="'+colors[p]+'" stroke-width="2" stroke-dasharray="5 4"/><circle cx="'+px+'" cy="'+y(proposed[p])+'" r="4.5" fill="'+colors[p]+'" stroke="#ffffff" stroke-width="1.5"><title>Proposta · posizione '+(p+1)+': '+proposed[p]+'</title></circle><text x="'+(px+4)+'" y="'+(y(proposed[p])-4)+'" fill="'+colors[p]+'" font-size="12" font-weight="700">'+proposed[p]+'</text>';}
