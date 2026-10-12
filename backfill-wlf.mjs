@@ -38,7 +38,31 @@ async function fetchDay(iso){
 }
 async function main(){
  fs.mkdirSync(BACKUP_DIR,{recursive:true});
- const current=fs.existsSync(DATA_FILE)?JSON.parse(fs.readFileSync(DATA_FILE,'utf8')):[];
+ function parseArchiveFile(raw){
+  const text=String(raw).replace(/^\\uFEFF/,'');
+  const arrays=[];let i=0;
+  while(i<text.length){
+   while(i<text.length&&/\\s/.test(text[i]))i++;
+   if(i>=text.length)break;
+   if(text[i]!=='[')throw new Error(`Unexpected non-whitespace archive content at byte/character ${i} (\\${JSON.stringify(text.slice(i,i+80))}); refusing to discard history.`);
+   const start=i;let depth=0,inString=false,escaped=false,end=-1;
+   for(;i<text.length;i++){
+    const c=text[i];
+    if(inString){if(escaped)escaped=false;else if(c==='\\\\')escaped=true;else if(c==='"')inString=false;continue;}
+    if(c==='"'){inString=true;continue;}
+    if(c==='['||c==='{')depth++;
+    else if(c===']'||c==='}'){depth--;if(depth===0){end=i+1;break;}if(depth<0)throw new Error('Unbalanced archive JSON; refusing to write.');}
+   }
+   if(end<0)throw new Error(`Incomplete JSON array beginning at ${start}; refusing to write.`);
+   const value=JSON.parse(text.slice(start,end));
+   if(!Array.isArray(value))throw new Error('Archive segment is not an array; refusing to write.');
+   arrays.push(value);i=end;
+  }
+  if(!arrays.length)throw new Error('No JSON arrays found in archive; refusing to write.');
+  return arrays.flat();
+ }
+ const rawCurrent=fs.existsSync(DATA_FILE)?fs.readFileSync(DATA_FILE,'utf8'):'[]';
+ const current=parseArchiveFile(rawCurrent);
  if(!Array.isArray(current)||current.some(d=>!valid(d)))throw new Error('Dataset esistente non valido: backfill bloccato senza modificare lo storico.');
  const state=fs.existsSync(STATE_FILE)?JSON.parse(fs.readFileSync(STATE_FILE,'utf8')):{nextDate:MIN_DATE,completedDays:0,updatedAt:null};
  let next=state.nextDate||MIN_DATE;
