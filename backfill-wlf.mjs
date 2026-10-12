@@ -48,7 +48,7 @@ async function main(){
    const start=i;let depth=0,inString=false,escaped=false,end=-1;
    for(;i<text.length;i++){
     const c=text[i];
-    if(inString){if(escaped)escaped=false;else if(c==='\\\\')escaped=true;else if(c==='"')inString=false;continue;}
+    if(inString){if(escaped)escaped=false;else if(c==='\\')escaped=true;else if(c==='"')inString=false;continue;}
     if(c==='"'){inString=true;continue;}
     if(c==='['||c==='{')depth++;
     else if(c===']'||c==='}'){depth--;if(depth===0){end=i+1;break;}if(depth<0)throw new Error('Unbalanced archive JSON; refusing to write.');}
