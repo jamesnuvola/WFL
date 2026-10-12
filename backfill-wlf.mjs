@@ -39,7 +39,7 @@ async function fetchDay(iso){
 async function main(){
  fs.mkdirSync(BACKUP_DIR,{recursive:true});
  function parseArchiveFile(raw){
-  const text=String(raw).replace(/^\uFEFF/,'');
+  const text=String(raw).replace(/^\\uFEFF/,'').replace(/\\\\n\\s*$/,'');
   const arrays=[];let i=0;
   while(i<text.length){
    while(i<text.length&&/\s/.test(text[i]))i++;
