@@ -44,6 +44,7 @@ async function main(){
  const state=fs.existsSync(STATE_FILE)?JSON.parse(fs.readFileSync(STATE_FILE,'utf8')):{nextDate:START,completedDates:0,updatedAt:null};
  const report=fs.existsSync(REPORT_FILE)?JSON.parse(fs.readFileSync(REPORT_FILE,'utf8')):{source:'WinForLife.it official daily archive',range:{from:START,to:END},startedAt:new Date().toISOString(),completedDates:0,checkedDays:0,findings:[],totals:{officialDraws:0,storedDraws:0,missingRecords:0,extraRecords:0,conflicts:0,emptyOfficialPages:0,fetchErrors:0}};
  let date=state.nextDate||START,done=0;
+ if(date>END){console.log('Audit pre-2026 already complete; no files changed.');return;}
  while(date<=END&&done<DAYS_PER_RUN){
   let official=[],fetchError=null;
   try{official=await fetchDay(date);}catch(e){fetchError=String(e.message||e);}
