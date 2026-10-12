@@ -23,5 +23,5 @@ for(const old of baseline){
 }
 const html=fs.readFileSync('index.html','utf8');
 for(const file of ['wfl-sonar-theme.css','wfl-sonar-dashboard.js','wfl-sonar-engine.js','wfl-sonar-app.js'])assert(html.includes(file),'index missing '+file);
-assert(html.includes('Concorsi mancanti')===false,'coverage KPI belongs in app render, not static HTML');
+const app=fs.readFileSync('wfl-sonar-app.js','utf8');\nassert(app.includes('Concorsi mancanti'),'missing-contest KPI must be visible');\nassert(html.includes('Statistical Lab'),'new SONAR lab page is not active in branch');
 console.log(JSON.stringify({status:'PASS',datasetRecords:data.length,baselineRecords:baseline.length,baselinePreserved:true,uniqueContestIds:ids.size,first:data[0].datetime,last:data.at(-1).datetime,missingContestIds:Math.max(...ids)-Math.min(...ids)+1-ids.size},null,2));
