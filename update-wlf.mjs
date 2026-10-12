@@ -45,15 +45,16 @@ async function main() {
   const current = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : [];
   if (!Array.isArray(current)) throw new Error('Existing dataset is not an array; refusing overwrite.');
   const byNumber = new Map();
+  const key = d => `${String(d.datetime).slice(0,4)}:${Number(d.numero)}`;
   for (const d of current) {
     if (!valid(d)) throw new Error(`Invalid existing record; refusing overwrite: ${JSON.stringify(d)}`);
-    const id = Number(d.numero), prev = byNumber.get(id);
+    const id = key(d), prev = byNumber.get(id);
     if (prev && JSON.stringify(prev) !== JSON.stringify(d)) throw new Error(`Conflicting existing records for draw ${id}`);
     byNumber.set(id, d);
   }
   let added = 0, unchanged = 0;
   for (const d of scraped) {
-    const id = Number(d.numero), prev = byNumber.get(id);
+    const id = key(d), prev = byNumber.get(id);
     if (prev) {
       if (JSON.stringify(prev.numbers.map(Number)) !== JSON.stringify(d.numbers) || Number(prev.numerone)!==d.numerone || prev.datetime!==d.datetime) {
         throw new Error(`Source conflict for draw ${id}; preserved existing dataset and stopped.`);
