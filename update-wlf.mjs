@@ -155,9 +155,32 @@ async function main() {
   for (const set of sourceSets) scraped = dedupe([...scraped, ...set.draws]);
 
   const rawCurrent = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : '[]';
-  // Recover the previous writer's literal backslash-n suffix without discarding any records.
-  const cleanCurrent = rawCurrent.replace(/\\\\n\\s*$/, '').trim();
-  const current = JSON.parse(cleanCurrent);
+  // Read one or more concatenated JSON arrays without losing historical records.
+  function parseArchiveFile(raw) {
+    const text = String(raw).replace(/^\\uFEFF/, '').replace(/\\\\n\\s*$/, '');
+    const arrays = []; let i = 0;
+    while (i < text.length) {
+      while (i < text.length && /\\s/.test(text[i])) i++;
+      if (i >= text.length) break;
+      if (text[i] !== '[') throw new Error('Unexpected archive content at character ' + i + ': ' + JSON.stringify(text.slice(i, i + 80)) + '; refusing to discard history.');
+      const start = i; let depth = 0, inString = false, escaped = false, end = -1;
+      for (; i < text.length; i++) {
+        const ch = text[i];
+        if (inString) { if (escaped) escaped = false; else if (ch === '\\\\') escaped = true; else if (ch === '"') inString = false; continue; }
+        if (ch === '"') { inString = true; continue; }
+        if (ch === '[' || ch === '{') depth++;
+        else if (ch === ']' || ch === '}') { depth--; if (depth === 0) { end = i + 1; break; } if (depth < 0) throw new Error('Unbalanced archive JSON; refusing to write.'); }
+      }
+      if (end < 0) throw new Error('Incomplete JSON array at character ' + start + '; refusing to write.');
+      const part = JSON.parse(text.slice(start, end));
+      if (!Array.isArray(part)) throw new Error('Archive segment is not an array; refusing to write.');
+      arrays.push(part); i = end;
+    }
+    if (!arrays.length) throw new Error('No JSON arrays found in archive; refusing to write.');
+    return arrays.flat();
+  }
+  const rawCurrent = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : '[]';
+  const current = parseArchiveFile(rawCurrent);
   if (!Array.isArray(current) || current.some(d => !valid(d))) {
     throw new Error('Existing dataset is invalid; refusing to overwrite or repair it automatically.');
   }
