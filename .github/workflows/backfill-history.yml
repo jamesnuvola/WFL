@@ -1,10 +1,11 @@
 name: WFL SONAR full-history backfill
 on:
   schedule:
-    - cron: '20 8 * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: wfl-history-backfill
   cancel-in-progress: false
@@ -19,6 +20,18 @@ jobs:
           node-version: '20'
       - name: Fetch next historical date chunk
         run: node backfill-wlf.mjs
+      - name: Disable backfill workflow when archive coverage is complete
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEXT_DATE=$(node -p "JSON.parse(require('fs').readFileSync('data/archive/backfill-state.json','utf8')).nextDate")
+          TODAY=$(date -u +%F)
+          if [[ "$NEXT_DATE" > "$TODAY" ]]; then
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/backfill-history.yml/disable"
+            echo "Backfill reached current date; workflow disabled."
+          else
+            echo "Backfill continues from $NEXT_DATE."
+          fi
       - name: Commit merged history and checkpoint
         run: |
           git config user.name 'github-actions[bot]'
