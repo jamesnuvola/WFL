@@ -154,7 +154,6 @@ async function main() {
   let scraped = [];
   for (const set of sourceSets) scraped = dedupe([...scraped, ...set.draws]);
 
-  const rawCurrent = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : '[]';
   // Read one or more concatenated JSON arrays without losing historical records.
   function parseArchiveFile(raw) {
     const text = String(raw).replace(/^\\uFEFF/, '').replace(/\\\\n\\s*$/, '');
