@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 const D='winforlife_draws.json', A='data/archive', C=A+'/.wfl-sonar-cache.json';
 const R1=A+'/wfl-sonar-audit-phase1-last12months.json', R2=A+'/wfl-sonar-audit-phase2-full-history.json';
-const M=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre';
+const M=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const stamp=()=>new Date().toISOString().replace(/[:.]/g,'-');
 function today(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).reduce((o,x)=>(o[x.type]=x.value,o),{});return p.year+'-'+p.month+'-'+p.day;}
