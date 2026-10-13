@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wfl-sonar-lab-v10';
+const CACHE_NAME = 'wfl-sonar-lab-v11';
 const STATIC_URLS = [
   './', 'index.html', 'manifest.json', 'wfl-sonar-theme.css',
   'wfl-sonar-dashboard.js', 'wfl-sonar-engine.js', 'wfl-sonar-app.js'
