@@ -20,7 +20,7 @@ function valid(d) {
 }
 function decode(s) {
   return s.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/gi, '&')
-    .replace(/&deg;/gi, '°').replace(/&#(?:186|xba);/gi, 'º')
+    .replace(/&deg;/gi, '°').replace(/&ordm;/gi, 'º').replace(/&#(?:186|xba);/gi, 'º')
     .replace(/&egrave;/gi, 'è').replace(/&agrave;/gi, 'à')
     .replace(/&igrave;/gi, 'ì').replace(/&ograve;/gi, 'ò').replace(/&ugrave;/gi, 'ù')
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
