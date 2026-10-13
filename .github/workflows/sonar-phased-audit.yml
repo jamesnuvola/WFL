@@ -29,8 +29,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/archive/wfl-sonar-audit-phase1-last12months.json data/archive/wfl-sonar-audit-phase2-full-history.json data/archive/audit-wfl-sonar-phased.mjs.pre-fix-20261013.bak
-          git add data/archive/winforlife_draws_pre_sonar_audit_*.json data/archive/wfl-sonar-audit-phase1-last12months.json.pre-*.bak data/archive/wfl-sonar-audit-phase2-full-history.json.pre-*.bak data/archive/.wfl-sonar-cache.json.pre-*.bak winforlife_draws.json
+          git add -A data/archive winforlife_draws.json
           if ! git diff --staged --quiet; then
             git commit -m "Run phased official WFL SONAR archive audit"
             git pull --rebase origin main
