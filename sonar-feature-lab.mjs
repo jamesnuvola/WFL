@@ -27,7 +27,7 @@ function rankTransition(past){return cached(past,'transition',()=>{const scores=
 function analogScores(past,threshold){return cached(past,'analog:'+threshold,()=>{const s=Array(N).fill(0),w=Array(N).fill(0),prev=past.at(-1).numbers;for(let i=0;i<past.length-1;i++){const ov=overlap(prev,past[i].numbers);if(ov>=threshold){for(const n of past[i+1].numbers){s[n-1]+=ov/10;w[n-1]++;}}}return s.map((v,i)=>(v+0.5)/(w[i]+10));});}
 function predictSet(id,past,engine,target){
  const all=cached(past,'freq:all',()=>freq(past)),last=past.at(-1),prev=past.at(-2),rec=w=>cached(past,'freq:'+w,()=>freq(past.slice(-Math.min(w,past.length))));
- if(id==='statusquo')return engine.makeCombination(past,{window:10,pool:14,seed:past.length*7919+104729}).numbers;
+ if(id==='statusquo')return engine.makeCombination(past,{strategy:'hourrecent',hourWindow:200,targetHour:hr(target),window:10,pool:14,seed:past.length*7919+104729}).numbers;
  if(id==='global')return top(all);
  const m=id.match(/^recent(\d+)$/);if(m)return top(rec(+m[1]));
  if(id==='globalRecent50')return top(all.map((v,i)=>v+0.5*rec(50)[i]));
