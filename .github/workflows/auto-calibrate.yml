@@ -5,6 +5,7 @@ on:
       - 'sonar-research-cycle.mjs'
       - 'sonar-temporal-lab.mjs'
       - 'sonar-feature-lab.mjs'
+      - 'sonar-position-lab.mjs'
       - 'wfl-sonar-engine.js'
       - '.github/workflows/auto-calibrate.yml'
   schedule:
@@ -25,18 +26,20 @@ jobs:
         with:
           node-version: '20'
       - name: Syntax-check all research and engine modules
-        run: node --check sonar-research-cycle.mjs && node --check sonar-temporal-lab.mjs && node --check sonar-feature-lab.mjs && node --check wfl-sonar-engine.js
+        run: node --check sonar-research-cycle.mjs && node --check sonar-temporal-lab.mjs && node --check sonar-feature-lab.mjs && node --check sonar-position-lab.mjs && node --check wfl-sonar-engine.js
       - name: Validate history and run walk-forward strategy comparison
         run: node sonar-research-cycle.mjs
       - name: Run temporal, intraday and repeated-sequence research
         run: node sonar-temporal-lab.mjs
       - name: Run WFL cross-game feature ablation
         run: node sonar-feature-lab.mjs
+      - name: Run WFL sorted-position research
+        run: node sonar-position-lab.mjs
       - name: Persist research logs
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/sonar-research-log.json data/sonar-temporal-log.json data/sonar-feature-log.json
+          git add data/sonar-research-log.json data/sonar-temporal-log.json data/sonar-feature-log.json data/sonar-position-log.json
           if ! git diff --staged --quiet; then
             git commit -m "Record WFL SONAR walk-forward, temporal and feature research"
             git pull --rebase origin main
