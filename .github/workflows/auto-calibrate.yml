@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Syntax-check all research and engine modules
+        run: node --check sonar-research-cycle.mjs && node --check sonar-temporal-lab.mjs && node --check sonar-feature-lab.mjs && node --check wfl-sonar-engine.js
       - name: Validate history and run walk-forward strategy comparison
         run: node sonar-research-cycle.mjs
       - name: Run temporal, intraday and repeated-sequence research
