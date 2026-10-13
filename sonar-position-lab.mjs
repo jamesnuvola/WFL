@@ -26,7 +26,7 @@ function positionPrediction(past,windowSize){
  return out;
 }
 function enginePrediction(past,targetHour,engine){return engine.makeCombination(past,{strategy:'hourrecent',hourWindow:200,targetHour}).numbers;}
-async function main(){
+async async function main(){
  const raw=JSON.parse(readFileSync(DATA,'utf8'));if(!Array.isArray(raw)||raw.some(d=>!valid(d)))throw new Error('Dataset non valido; nessun report scritto.');
  const ds=raw.map(d=>({...d,numbers:d.numbers.map(Number).sort((a,b)=>a-b),numerone:Number(d.numerone),numero:Number(d.numero)})).sort((a,b)=>a.datetime.localeCompare(b.datetime));
  if(new Set(ds.map(d=>d.datetime)).size!==ds.length)throw new Error('Timestamp duplicati; test interrotto.');
@@ -57,5 +57,4 @@ async function main(){
  const record={runAt:new Date().toISOString(),dataset:{count:ds.length,first:ds[0].datetime,last:ds.at(-1).datetime},methodology:{name:'sorted-rank positional lab',positions:10,positionMeaning:'rank after ascending sort in the official winning combination, NOT physical order of draw',sourceNote:'Official archive presents the 10-number winning combination sorted ascending; stored archive parser sorts it too. This lab cannot infer physical extraction order.',walkForward:{testTargets:TEST,developmentTargets:TEST-HOLDOUT,holdoutTargets:HOLDOUT,minTraining:MIN_TRAIN,allPredictionsUseOnlyPriorHistory:true,score:'exact intersection hits among the 10-number set; theoretical expectation 5'},positionPrior:'Exact order-statistic distribution for a uniformly random 10-of-20 set; empirical rank frequencies shrink toward this prior (alpha='+PRIOR+').',numerone:'Kept separate; not used in positional model.'},positionDiagnostics,results,challengerRanking:ranked,decision:'EXPLORATORY_ONLY_NO_PROMOTION'};
  mkdirSync('data',{recursive:true});let log=[];if(existsSync(LOG)){try{log=JSON.parse(readFileSync(LOG,'utf8'));if(!Array.isArray(log))log=[];}catch{log=[];}}log.push(record);writeFileSync(LOG,JSON.stringify(log,null,2)+'\n');console.log(JSON.stringify(record,null,2));
 }
-function awaitImportShim(){return {createRequire:(...args)=>{const {createRequire}=globalThis.__createRequireShim||{};if(createRequire)return createRequire(...args);throw new Error('createRequire shim unavailable');}}}
-main();
+main().catch(e=>{console.error(e);process.exitCode=1;});
