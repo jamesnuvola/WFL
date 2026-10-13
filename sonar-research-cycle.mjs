@@ -9,10 +9,10 @@ const TEST_COUNT = 1200;
 const HOLDOUT_COUNT = 500;
 const RANDOM_REPLICATES = 20;
 const ENGINE_CONFIGS = [
-  { window: 10, pool: 14 }, { window: 20, pool: 14 },
-  { window: 50, pool: 12 }, { window: 50, pool: 14 },
-  { window: 50, pool: 16 }, { window: 50, pool: 20 },
-  { window: 100, pool: 14 }
+  { window: 10, pool: 14, strategy: 'legacy' }, { window: 20, pool: 14, strategy: 'legacy' },
+  { window: 50, pool: 12, strategy: 'legacy' }, { window: 50, pool: 14, strategy: 'legacy' },
+  { window: 50, pool: 16, strategy: 'legacy' }, { window: 50, pool: 20, strategy: 'legacy' },
+  { window: 100, pool: 14, strategy: 'legacy' }
 ];
 
 function valid(d) {
@@ -108,6 +108,11 @@ function run() {
     { id: 'recent100', label: 'Frequenza ultime 100', predict: past => top10(freq(past, 'main', 100)) },
     { id: 'global_recent', label: 'Globale + 0,5× recent50', predict: past => top10(freq(past, 'main').map((v,i)=>v+0.5*freq(past,'main',50)[i])) }
   ];
+  strategies.push({
+    id: 'engine_hourrecent', label: 'SONAR nuovo motore: frequenza recente dello stesso orario',
+    config: { strategy: 'hourrecent', hourWindow: 200 },
+    predict: past => engine.makeCombination(past, { strategy: 'hourrecent', hourWindow: 200 })
+  });
   for (const cfg of ENGINE_CONFIGS) {
     strategies.push({
       id: `engine_w${cfg.window}_p${cfg.pool}`, label: `SONAR finestra ${cfg.window}, pool ${cfg.pool}`, config: cfg,
