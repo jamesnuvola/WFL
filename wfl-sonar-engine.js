@@ -34,7 +34,7 @@
     return values.map(v => sd > 1e-9 ? (v-mean)/sd : 0);
   }
   function rankNumbers(hist, opts) {
-    const cfg = Object.assign({window:50, recentWeight:0.35, delayWeight:0.15, transitionWeight:0.15, pairWeight:0.1}, opts || {});
+    const cfg = Object.assign({window:10, recentWeight:0.35, delayWeight:0.15, transitionWeight:0.15, pairWeight:0.1}, opts || {});
     const recent = hist.slice(-Math.max(1, Math.min(100, cfg.window)));
     const medium = hist.slice(-Math.min(50, hist.length));
     const long = hist.slice(-Math.min(100, hist.length));
@@ -82,7 +82,7 @@
   function makeCombination(history, opts) {
     const hist = cleanHistory(history);
     if(hist.length < 10) return {error:"Servono almeno 10 estrazioni valide."};
-    const cfg = Object.assign({window:50, pool:14, diversity:true, seed:null}, opts || {});
+    const cfg = Object.assign({window:10, pool:14, diversity:true, seed:null}, opts || {});
     const ranked = rankNumbers(hist, cfg);
     const poolSize = Math.max(10, Math.min(20, Number(cfg.pool)||14));
     const pool = ranked.slice(0,poolSize);
@@ -104,8 +104,7 @@
     }
     selected.sort((a,b)=>a-b);
     // Numerone is independent: analyze its own history, never reuse main-number counts.
-    const numHist = hist.map(d=>({numbers:Array.from({length:10},(_,i)=>i+1), numerone:d.numerone}));
-    const nr = counts(numHist,"numerone");
+    const nr = counts(hist,"numerone");
     const nrZ = zScores(nr);
     const lastN = Array(N).fill(-1);
     hist.forEach((d,i)=>{lastN[d.numerone-1]=i;});
@@ -113,7 +112,7 @@
     numScores.sort((a,b)=>b.score-a.score || a.number-b.number);
     return {
       numbers:selected, numerone:numScores[0].number,
-      ranked:rankNumbers(hist,cfg), mainScores:rankNumbers(hist,cfg),
+      ranked, mainScores:ranked,
       numeroneScores:numScores, poolSize:cfg.pool,
       note:"Punteggi esplorativi: non rappresentano probabilità reali né garantiscono vantaggi sul caso."
     };
