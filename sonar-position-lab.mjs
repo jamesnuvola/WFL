@@ -26,7 +26,7 @@ function positionPrediction(past,windowSize){
  return out;
 }
 function enginePrediction(past,targetHour,engine){return engine.makeCombination(past,{strategy:'hourrecent',hourWindow:200,targetHour}).numbers;}
-async async function main(){
+async function main(){
  const raw=JSON.parse(readFileSync(DATA,'utf8'));if(!Array.isArray(raw)||raw.some(d=>!valid(d)))throw new Error('Dataset non valido; nessun report scritto.');
  const ds=raw.map(d=>({...d,numbers:d.numbers.map(Number).sort((a,b)=>a-b),numerone:Number(d.numerone),numero:Number(d.numero)})).sort((a,b)=>a.datetime.localeCompare(b.datetime));
  if(new Set(ds.map(d=>d.datetime)).size!==ds.length)throw new Error('Timestamp duplicati; test interrotto.');
