@@ -99,8 +99,7 @@ function run() {
   const start = ds.length - TEST_COUNT;
   const holdoutStart = ds.length - HOLDOUT_COUNT;
   const strategyValues = new Map();
-  const numeroneValues = new Map();
-  const randomValues = [];
+  const randomValues = { all: [], development: [], holdout: [] };
   const randomNumerone = { dev: 0, holdout: 0, all: 0 };
   const strategies = [
     { id: 'global', label: 'Frequenza globale', predict: past => top10(freq(past, 'main')) },
@@ -136,7 +135,9 @@ function run() {
       perTarget.push(h);
       if (actual.numerone === Math.floor(seeded((t * 13007 + k * 8191 + 23) >>> 0)() * N) + 1) randomNumerone.all++;
     }
-    randomValues.push(perTarget.reduce((a,b)=>a+b,0)/RANDOM_REPLICATES);
+    const randomSplit = isHoldout ? 'holdout' : 'development';
+    randomValues.all.push(...perTarget);
+    randomValues[randomSplit].push(...perTarget);
     if (isHoldout) {
       for (let k = 0; k < RANDOM_REPLICATES; k++) {
         if (actual.numerone === Math.floor(seeded((t * 13007 + k * 8191 + 23) >>> 0)() * N) + 1) randomNumerone.holdout++;
@@ -161,10 +162,10 @@ function run() {
       }
     };
   }
-  const randomSplit = {
-    all: summarize(randomValues),
-    development: summarize(randomValues.slice(0, TEST_COUNT - HOLDOUT_COUNT)),
-    holdout: summarize(randomValues.slice(TEST_COUNT - HOLDOUT_COUNT))
+  const randomMain = {
+    all: summarize(randomValues.all),
+    development: summarize(randomValues.development),
+    holdout: summarize(randomValues.holdout)
   };
   const numeroneRandom = {
     all: summarizeNumerone(randomNumerone.all, TEST_COUNT * RANDOM_REPLICATES),
@@ -186,7 +187,7 @@ function run() {
         'Random controls are seeded for reproducibility; theoretical expectation remains 5 main hits and 5% Numerone.',
         'No automatic generator weights are changed by this job.']
     },
-    randomControl: { main:randomSplit, numerone:numeroneRandom },
+    randomControl: { main:randomMain, targets:TEST_COUNT, replicatesPerTarget:RANDOM_REPLICATES, numerone:numeroneRandom },
     results,
     exploratoryRankingByDevelopmentDelta: sorted.map((r,i)=>({rank:i+1,id:r.id,developmentDelta:r.development.delta,holdoutDelta:r.holdout.delta})),
     decision:'EXPLORATORY_ONLY'
