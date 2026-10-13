@@ -9,6 +9,8 @@ function valid(d){return d&&Number.isInteger(Number(d.numero))&&/^\d{4}-\d{2}-\d
 function top(scores,k=10){return scores.map((v,i)=>({n:i+1,v})).sort((a,b)=>b.v-a.v||a.n-b.n).slice(0,k).map(x=>x.n);}
 function z(a){const m=a.reduce((s,x)=>s+x,0)/Math.max(1,a.length),v=a.reduce((s,x)=>s+(x-m)**2,0)/Math.max(1,a.length),sd=Math.sqrt(v);return a.map(x=>sd>1e-9?(x-m)/sd:0);}
 function freq(ds){const c=Array(N).fill(0);for(const d of ds)for(const n of d.numbers)c[n-1]++;return c;}
+const memo=new WeakMap();
+function cached(past,key,fn){let m=memo.get(past);if(!m){m=new Map();memo.set(past,m);}if(!m.has(key))m.set(key,fn());return m.get(key);}
 function overlap(a,b){const s=new Set(a);return b.reduce((n,x)=>n+(s.has(x)?1:0),0);}
 function hits(p,a){const s=new Set(a.numbers);return p.reduce((n,x)=>n+(s.has(x)?1:0),0);}
 function rand(seed){let x=seed>>>0;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
@@ -20,10 +22,10 @@ function date(d){return d.datetime.slice(0,10);}
 function timeMs(d){return Date.parse(d.datetime+':00Z');}
 function summarize(a){const n=a.length;if(!n)return{targets:0,meanHits:null,delta:null,ci95:null};const m=a.reduce((s,x)=>s+x,0)/n,v=a.reduce((s,x)=>s+(x-m)**2,0)/Math.max(1,n-1),se=Math.sqrt(v/n);return{targets:n,meanHits:+m.toFixed(5),expected:5,delta:+(m-5).toFixed(5),se:+se.toFixed(5),ci95:[+(m-1.96*se).toFixed(5),+(m+1.96*se).toFixed(5)]};}
 function paired(a,b){const d=a.map((x,i)=>x-b[i]),n=d.length,m=d.reduce((s,x)=>s+x,0)/n,v=d.reduce((s,x)=>s+(x-m)**2,0)/Math.max(1,n-1),se=Math.sqrt(v/n);return{meanDelta:+m.toFixed(5),se:+se.toFixed(5),ci95:[+(m-1.96*se).toFixed(5),+(m+1.96*se).toFixed(5)],positiveTargets:d.filter(x=>x>0).length,negativeTargets:d.filter(x=>x<0).length,tiedTargets:d.filter(x=>x===0).length};}
-function rankTransition(past){const scores=Array(N).fill(0),totals=Array(N).fill(0),prev=past.at(-1).numbers;for(let i=0;i<past.length-1;i++){const ov=overlap(prev,past[i].numbers);if(ov===0)continue;for(const n of past[i+1].numbers){scores[n-1]+=ov/10;totals[n-1]++;}}return scores.map((v,i)=>(v+0.5)/(totals[i]+10));}
-function analogScores(past,threshold){const s=Array(N).fill(0),w=Array(N).fill(0),prev=past.at(-1).numbers;for(let i=0;i<past.length-1;i++){const ov=overlap(prev,past[i].numbers);if(ov>=threshold){for(const n of past[i+1].numbers){s[n-1]+=ov/10;w[n-1]++;}}}return s.map((v,i)=>(v+0.5)/(w[i]+10));}
+function rankTransition(past){return cached(past,'transition',()=>{const scores=Array(N).fill(0),totals=Array(N).fill(0),prev=past.at(-1).numbers;for(let i=0;i<past.length-1;i++){const ov=overlap(prev,past[i].numbers);if(ov===0)continue;for(const n of past[i+1].numbers){scores[n-1]+=ov/10;totals[n-1]++;}}return scores.map((v,i)=>(v+0.5)/(totals[i]+10));});}
+function analogScores(past,threshold){return cached(past,'analog:'+threshold,()=>{const s=Array(N).fill(0),w=Array(N).fill(0),prev=past.at(-1).numbers;for(let i=0;i<past.length-1;i++){const ov=overlap(prev,past[i].numbers);if(ov>=threshold){for(const n of past[i+1].numbers){s[n-1]+=ov/10;w[n-1]++;}}}return s.map((v,i)=>(v+0.5)/(w[i]+10));});}
 function predictSet(id,past,engine,target){
- const all=freq(past),last=past.at(-1),prev=past.at(-2),rec=w=>freq(past.slice(-Math.min(w,past.length)));
+ const all=cached(past,'freq:all',()=>freq(past)),last=past.at(-1),prev=past.at(-2),rec=w=>cached(past,'freq:'+w,()=>freq(past.slice(-Math.min(w,past.length))));
  if(id==='statusquo')return engine.makeCombination(past,{window:10,pool:14,seed:past.length*7919+104729}).numbers;
  if(id==='global')return top(all);
  const m=id.match(/^recent(\d+)$/);if(m)return top(rec(+m[1]));
