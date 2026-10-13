@@ -30,7 +30,7 @@ function predictSet(id,past,engine,target){
  if(id==='globalRecent50')return top(all.map((v,i)=>v+0.5*rec(50)[i]));
  if(id==='coldGlobal')return top(all.map(v=>-v));
  if(id==='trendUp20'||id==='trendDown20'){const recent=rec(20),older=freq(past.slice(-40,-20));return top(recent.map((v,i)=>id==='trendUp20'?v-older[i]:older[i]-v));}
- if(id==='streak'||id==='antiStreak'){const s=Array(N).fill(0);for(let i=past.length-1;i>=0;i--){for(let n=1;n<=N;n++){if(past[i].numbers.includes(n))s[n-1]++;else break;}}return top(id==='streak'?s:s.map(v=>-v));}
+ if(id==='streak'||id==='antiStreak'){const s=Array(N).fill(0);for(let n=1;n<=N;n++){for(let i=past.length-1;i>=0;i--){if(past[i].numbers.includes(n))s[n-1]++;else break;}}return top(id==='streak'?s:s.map(v=>-v));}
  if(id==='delayOverdue'||id==='delayRecent'){const seen=Array(N).fill(-1);past.forEach((d,i)=>d.numbers.forEach(n=>seen[n-1]=i));const gap=seen.map(i=>i<0?past.length:past.length-1-i);return top(id==='delayOverdue'?gap:gap.map(x=>-x));}
  if(id==='delayVsExpected'){const seen=Array(N).fill(-1),gaps=Array.from({length:N},()=>[]);past.forEach((d,i)=>{d.numbers.forEach(n=>{if(seen[n-1]>=0)gaps[n-1].push(i-seen[n-1]);seen[n-1]=i;});});const now=seen.map(i=>i<0?past.length:past.length-1-i);return top(now.map((x,i)=>x/(gaps[i].length?gaps[i].reduce((a,b)=>a+b,0)/gaps[i].length:2)));}
  if(id==='repeat2'||id==='repeat4'||id==='repeat6'||id==='repeat8'||id==='repeat10'){const k=+id.slice(6),prevNums=last.numbers.slice().sort((a,b)=>all[b-1]-all[a-1]||a-b).slice(0,k),rest=top(all,20).filter(n=>!prevNums.includes(n));return [...prevNums,...rest.slice(0,10-k)].sort((a,b)=>a-b);}
