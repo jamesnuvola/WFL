@@ -8,12 +8,12 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: wfl-data-maintenance
-  cancel-in-progress: false
+  group: wfl-sonar-audit
+  cancel-in-progress: true
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
