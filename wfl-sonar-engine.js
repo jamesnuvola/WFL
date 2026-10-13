@@ -79,11 +79,35 @@
     }));
     return scores.sort((a,b)=>b.score-a.score || a.number-b.number);
   }
+  function nextTargetHour(hist) {
+    const last = hist.at(-1);
+    if (!last || !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(last.datetime || "")) return null;
+    const h = Number(last.datetime.slice(11,13));
+    return h >= 23 || h < 7 ? 7 : h + 1;
+  }
+  function rankNumbersByHour(hist, opts) {
+    const cfg = Object.assign({ targetHour: null, hourWindow: 200 }, opts || {});
+    const targetHour = cfg.targetHour != null && Number.isInteger(Number(cfg.targetHour))
+      ? Number(cfg.targetHour) : nextTargetHour(hist);
+    if (targetHour == null) return rankNumbers(hist, opts);
+    const sameHour = hist.filter(d => Number(String(d.datetime).slice(11,13)) === targetHour)
+      .slice(-Math.max(1, Math.min(500, Number(cfg.hourWindow) || 200)));
+    if (sameHour.length < 80) return rankNumbers(hist, opts);
+    const f = counts(sameHour, "main"), z = zScores(f);
+    const lastSeen = Array(N).fill(-1);
+    hist.forEach((d,i)=>d.numbers.forEach(n=>{lastSeen[n-1]=i;}));
+    const delay = lastSeen.map(i=>i < 0 ? hist.length : hist.length-1-i);
+    return Array.from({length:N},(_,i)=>({
+      number:i+1, score:z[i], longFreq:f[i], recentFreq:f[i],
+      delay:delay[i], hourConditioned:true, targetHour, sampleSize:sameHour.length
+    })).sort((a,b)=>b.score-a.score||a.number-b.number);
+  }
+
   function makeCombination(history, opts) {
     const hist = cleanHistory(history);
     if(hist.length < 10) return {error:"Servono almeno 10 estrazioni valide."};
-    const cfg = Object.assign({window:10, pool:14, diversity:true, seed:null}, opts || {});
-    const ranked = rankNumbers(hist, cfg);
+    const cfg = Object.assign({window:10, pool:14, diversity:true, seed:null, strategy:'hourrecent'}, opts || {});
+    const ranked = cfg.strategy === 'hourrecent' ? rankNumbersByHour(hist, cfg) : rankNumbers(hist, cfg);
     const poolSize = Math.max(10, Math.min(20, Number(cfg.pool)||14));
     const pool = ranked.slice(0,poolSize);
     // Diversify by weighted sampling without replacement; no position assumption.
@@ -97,6 +121,7 @@
       return items[items.length-1];
     };
     const selected=[];
+    if (cfg.strategy === 'hourrecent' && ranked[0]?.hourConditioned) selected.push(...ranked.slice(0,10).map(x=>x.number));
     while(selected.length<10 && pool.length) {
       const picked=weightedPick(pool);
       selected.push(picked.number);
@@ -113,8 +138,11 @@
     return {
       numbers:selected, numerone:numScores[0].number,
       ranked, mainScores:ranked,
-      numeroneScores:numScores, poolSize:cfg.pool,
-      note:"Punteggi esplorativi: non rappresentano probabilità reali né garantiscono vantaggi sul caso."
+      numeroneScores:numScores, poolSize:cfg.pool, strategy:cfg.strategy,
+      targetHour:ranked[0]?.targetHour ?? null,
+      note:cfg.strategy === 'hourrecent' && ranked[0]?.hourConditioned
+        ? 'Nuovo motore sperimentale: frequenze delle ultime 200 estrazioni dello stesso orario; vantaggio osservato nel walk-forward, non garanzia futura.'
+        : 'Punteggi esplorativi: non rappresentano probabilità reali né garantiscono vantaggi sul caso.'
     };
   }
   function scorePrediction(pred, actual) {
@@ -161,5 +189,5 @@
         avgHitsRandom:5, sumMean:ds.length?ds.reduce((s,d)=>s+d.numbers.reduce((a,n)=>a+n,0),0)/ds.length:0};
     });
   }
-  root.WFLSonarEngine = {validDraw, cleanHistory, rankNumbers, makeCombination, backtest, diagnostics};
+  root.WFLSonarEngine = {validDraw, cleanHistory, rankNumbers, rankNumbersByHour, makeCombination, backtest, diagnostics};
 })(window);
