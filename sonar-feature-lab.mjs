@@ -80,7 +80,6 @@ function main(){
      if(id==='statusquo'){const predNum=engine.makeCombination(past,{window:10,pool:14,seed:past.length*7919+104729}).numerone;if(predNum===actual.numerone){v.numAll++;if(hold)v.numHoldout++;else v.numDev++;}}
    }
    for(const id of numIds){const pred=predictNumerone(id,past,actual,engine),v=numValues[id];v.all.push(pred===actual.numerone?1:0);v[hold?'holdout':'dev'].push(pred===actual.numerone?1:0);}
-   }
  }
  const results={};for(const id of ids){const v=values[id];results[id]={label:id,all:summarize(v.all),development:summarize(v.dev),holdout:summarize(v.holdout),vsStatusQuo:{all:paired(v.all,values.statusquo.all),development:paired(v.dev,values.statusquo.dev),holdout:paired(v.holdout,values.statusquo.holdout)},numerone:id==='statusquo'?{all:v.numAll,development:v.numDev,holdout:v.numHoldout,expectedRate:.05}:null};}
  const numeroneResults={};for(const id of numIds){const v=numValues[id];numeroneResults[id]={all:summarize(v.all),development:summarize(v.dev),holdout:summarize(v.holdout),rateInterpretation:'Binary Numerone hit rate; theoretical reference 5%'};}
