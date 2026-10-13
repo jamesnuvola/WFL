@@ -37,6 +37,7 @@ function hour(d) { return Number(d.datetime.slice(11,13)); }
 function weekday(d) { return new Date(d.datetime + ':00').getUTCDay(); }
 function month(d) { return d.datetime.slice(0,7); }
 function day(d) { return d.datetime.slice(0,10); }
+function epoch(d) { return Date.parse(d.datetime + ':00Z'); }
 function bucketKey(d, kind) {
   if (kind === 'hour') return String(hour(d));
   if (kind === 'weekday') return String(weekday(d));
@@ -65,6 +66,7 @@ function run() {
   add('intraday3','Micro-trend: ultime 3 estrazioni della stessa giornata');
   add('intraday5','Micro-trend: ultime 5 estrazioni della stessa giornata');
   add('intraday10','Micro-trend: ultime 10 estrazioni della stessa giornata');
+  for (const w of [6,24,72,168,720]) add('rolling'+w+'h','Frequenza mobile ultime '+w+' ore');
   add('analog_exact','Sequenza analoga: successore storico di estrazione precedente identica');
   add('analog_near8','Sequenza analoga: successore storico della precedente più simile (overlap >= 8/10)');
 
@@ -89,6 +91,11 @@ function run() {
     }
     const sameDay=past.filter(d=>day(d)===day(actual));
     for (const w of [3,5,10]) if (sameDay.length>=w) candidates.push(['intraday'+w,top10(counts(sameDay.slice(-w)))]);
+    const targetTime=epoch(actual);
+    for (const w of [6,24,72,168,720]) {
+      const recent=past.filter(d=>targetTime-epoch(d)<=w*60*60*1000);
+      if (recent.length>=10) candidates.push(['rolling'+w+'h',top10(counts(recent))]);
+    }
     // Analogue search: only prior occurrences whose successor is strictly before the target.
     const prev=ds[t-1];
     let exactJ=-1, bestJ=-1, bestOverlap=0, exactN=0, nearN=0;
