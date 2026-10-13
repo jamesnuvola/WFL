@@ -21,6 +21,8 @@ jobs:
           node-version: '20'
       - name: Validate audit script syntax
         run: node --check audit-wfl-sonar-phased.mjs
+      - name: Diagnostic - validate official source parser on a known complete day
+        run: node audit-wfl-sonar-phased.mjs diagnostic
       - name: Phase 1 - audit last 12 months
         run: node audit-wfl-sonar-phased.mjs recent
       - name: Phase 2 - audit and safely repair verified full history
