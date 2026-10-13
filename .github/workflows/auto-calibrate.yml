@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'sonar-research-cycle.mjs'
+      - 'sonar-temporal-lab.mjs'
       - 'wfl-sonar-engine.js'
       - '.github/workflows/auto-calibrate.yml'
   schedule:
@@ -24,13 +25,15 @@ jobs:
           node-version: '20'
       - name: Validate history and run walk-forward strategy comparison
         run: node sonar-research-cycle.mjs
-      - name: Persist research log
+      - name: Run temporal, intraday and repeated-sequence research
+        run: node sonar-temporal-lab.mjs
+      - name: Persist research logs
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/sonar-research-log.json
+          git add data/sonar-research-log.json data/sonar-temporal-log.json
           if ! git diff --staged --quiet; then
-            git commit -m "Record WFL SONAR walk-forward research"
+            git commit -m "Record WFL SONAR walk-forward and temporal research"
             git pull --rebase origin main
             git push
           fi
