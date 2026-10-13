@@ -1,5 +1,11 @@
 name: WFL SONAR continuous research
 on:
+  push:
+    paths:
+      - 'sonar-research-cycle.mjs'
+      - 'wfl-sonar-engine.js'
+      - 'winforlife_draws.json'
+      - '.github/workflows/auto-calibrate.yml'
   schedule:
     - cron: '0 9 * * *'
   workflow_dispatch:
@@ -11,6 +17,7 @@ concurrency:
 jobs:
   research:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
