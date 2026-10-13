@@ -20,7 +20,7 @@ function positionPrediction(past,windowSize){
  // Dynamic programming: choose one strictly increasing number for each sorted rank.
  const dp=Array.from({length:PICK},()=>Array(N).fill(-Infinity)),prev=Array.from({length:PICK},()=>Array(N).fill(-1));
  for(let n=0;n<N;n++)dp[0][n]=scores[0][n];
- for(let j=1;j<PICK;j++)for(let n=j;n<N-(PICK-j);n++)for(let k=j-1;k<n;k++){const v=dp[j-1][k]+scores[j][n];if(v>dp[j][n]){dp[j][n]=v;prev[j][n]=k;}}
+ for(let j=1;j<PICK;j++)for(let n=j;n<=N-PICK+j;n++)for(let k=j-1;k<n;k++){const v=dp[j-1][k]+scores[j][n];if(v>dp[j][n]){dp[j][n]=v;prev[j][n]=k;}}
  let n=Array.from({length:N},(_,i)=>i).sort((a,b)=>dp[PICK-1][b]-dp[PICK-1][a])[0],out=Array(PICK);
  for(let j=PICK-1;j>=0;j--){out[j]=n+1;n=prev[j][n];}
  return out;
