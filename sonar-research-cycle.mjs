@@ -17,7 +17,7 @@ const ENGINE_CONFIGS = [
 
 function valid(d) {
   return d && Number.isInteger(Number(d.numero)) &&
-    /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(d.datetime || '') &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime || '') &&
     Array.isArray(d.numbers) && d.numbers.length === PICK &&
     d.numbers.every(n => Number.isInteger(Number(n)) && Number(n) >= 1 && Number(n) <= N) &&
     new Set(d.numbers.map(Number)).size === PICK &&
