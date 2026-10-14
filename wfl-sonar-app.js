@@ -76,7 +76,7 @@ function renderResearch(ds){
 function expectedLatestSlot(){
  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).reduce((o,x)=>(o[x.type]=x.value,o),{});
  let y=Number(p.year),m=Number(p.month),d=Number(p.day),h=Number(p.hour),minute=Number(p.minute);
- if(h>=7&&h<=23&&minute<45)h--;
+ if(h>=7&&h<=23&&minute<20)h--;
  if(h<7){const prev=new Date(Date.UTC(y,m-1,d));prev.setUTCDate(prev.getUTCDate()-1);y=prev.getUTCFullYear();m=prev.getUTCMonth()+1;d=prev.getUTCDate();h=23;}
  return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')+'T'+String(h).padStart(2,'0')+':00';
 }
