@@ -111,8 +111,8 @@ function latestExpectedSlot(now = new Date()) {
   }).formatToParts(now).reduce((o,p) => (o[p.type]=p.value,o), {});
   let y=Number(parts.year), m=Number(parts.month), d=Number(parts.day), h=Number(parts.hour);
   const minute=Number(parts.minute);
-  // Allow the previous slot for the first 25 minutes after the scheduled draw.
-  if (h >= 7 && h <= 23 && minute < 25) h--;
+  // Treat a draw as late after 20 minutes; still ingest any newer contests already published.
+  if (h >= 7 && h <= 23 && minute < 20) h--;
   if (h > 23) h=23;
   if (h < 7) {
     const previous = new Date(Date.UTC(y,m-1,d));
@@ -207,8 +207,9 @@ async function main() {
 
   const latest=merged.at(-1);
   const expected=latestExpectedSlot();
-  if (latest.datetime < expected) {
-    throw new Error(`Official/secondary archives are stale: latest stored draw ${latest.datetime}, expected at least ${expected}. No sync marked successful and no write performed. Sources: ${sourceSets.map(s=>s.label+':'+s.draws.at(-1)?.datetime).join(', ')}. ${errors.join(' | ')}`);
+  const stale = latest.datetime < expected;
+  if (stale) {
+    console.warn(`STALE SOURCE: latest available draw is ${latest.datetime}, expected at least ${expected}. Newly available historical rows will still be saved; source freshness remains unverified. Sources: ${sourceSets.map(s=>s.label+':'+s.draws.at(-1)?.datetime).join(', ')}. ${errors.join(' | ')}`);
   }
   if (latest.datetime > expected) {
     const delta = Date.parse(latest.datetime) - Date.parse(expected);
@@ -222,7 +223,7 @@ async function main() {
   console.log(JSON.stringify({
     sources:sourceSets.map(s=>({name:s.label,count:s.draws.length,latest:s.draws.at(-1)?.datetime,contest:s.draws.at(-1)?.numero})),
     added,unchanged,before:current.length,after:merged.length,
-    expectedLatest:expected,latest:latest.datetime,latestContest:latest.numero,
+    expectedLatest:expected,latest:latest.datetime,latestContest:latest.numero,stale,
     first:merged[0]?.datetime,snapshot,errors
   },null,2));
 }
