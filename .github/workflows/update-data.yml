@@ -5,7 +5,7 @@ on:
       - 'update-wlf.mjs'
       - '.github/workflows/update-data.yml'
   schedule:
-    # Keep five-minute cadence, offset from the busiest minute marks.
+    # The runner itself polls every five minutes, so one missed cron does not stop refreshes.
     - cron: '1-59/5 * * * *'
   workflow_dispatch:
 permissions:
@@ -16,37 +16,48 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Fetch latest draws with bounded retries
+      - name: Poll sources and refresh throughout the hour
         shell: bash
         run: |
-          set -euo pipefail
-          for attempt in 1 2 3; do
-            echo "WFL data sync attempt ${attempt}/3"
-            if node update-wlf.mjs; then
-              exit 0
-            fi
-            if [ "${attempt}" -lt 3 ]; then
-              echo "Source not ready or transient failure; retrying in 60 seconds."
-              sleep 60
-            fi
-          done
-          echo "WFL data sync failed after three attempts."
-          exit 1
-      - name: Commit data and immutable snapshots
-        run: |
+          set -uo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add winforlife_draws.json debug-wlf.html data/archive
-          if ! git diff --staged --quiet; then
-            git commit -m "Update WFL history without data loss"
-            git pull --rebase origin main
-            git push
-          else
-            echo "No archive changes to commit."
-          fi
+
+          for attempt in $(seq 1 11); do
+            echo "WFL refresh cycle ${attempt}/11 at $(date -u +%FT%TZ)"
+
+            # Pick up any upstream changes and retry a previously committed but unpushed update.
+            git pull --rebase origin main || echo "WARN: pull/rebase failed; keeping local archive and retrying."
+            git push || echo "INFO: nothing pending to push, or push will be retried."
+
+            if node update-wlf.mjs; then
+              git add winforlife_draws.json debug-wlf.html data/archive
+              if ! git diff --staged --quiet; then
+                if git commit -m "Update WFL history without data loss"; then
+                  if git pull --rebase origin main && git push; then
+                    echo "Published updated WFL history."
+                  else
+                    echo "WARN: publication failed; the next polling cycle will retry."
+                  fi
+                else
+                  echo "WARN: commit failed; the next polling cycle will retry."
+                fi
+              else
+                echo "Archive already current; no commit needed."
+              fi
+            else
+              echo "WARN: source is not ready, is stale, or validation failed. No data was overwritten; retrying in five minutes."
+            fi
+
+            if [ "${attempt}" -lt 11 ]; then
+              sleep 300
+            fi
+          done
+
+          echo "Polling window complete; the scheduled workflow should start/queue the next window."
