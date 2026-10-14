@@ -37,7 +37,7 @@ function parseOfficial(html) {
   const blocks = text.split(/(?=N\s*[º°]\s*\d+\s+del\s+)/i).slice(1);
   const out = [];
   for (const block of blocks) {
-    const head = block.match(/^N\s*[º°]\s*(\d+)\s+del\s+(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\s+(\d{4})\s+([01]\d|2[0-3]):([0-5]\d)/i);
+    const head = block.match(/^N\s*[º°]\s*(\d+)\s+del\s+(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\s+(\d{4})\s*\|?\s*([01]\d|2[0-3]):([0-5]\d)/i);
     if (!head) continue;
     const month = MONTHS[head[3].toLocaleLowerCase('it')];
     if (!month) continue;
