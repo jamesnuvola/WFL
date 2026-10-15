@@ -2,8 +2,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 
 const DATA='winforlife_draws.json', LOG='data/sonar-regime-position-log.json';
 const N=20, PICK=10, TEST=1200, HOLDOUT=500, MIN_TRAIN=1000, PRIOR=80;
-const WINDOWS=[50,100,300];
-function valid(d){return d&&/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===PICK&&d.numbers.every(x=>Number.isInteger(Number(x))&&Number(x)>=1&&Number(x)<=N)&&new Set(d.numbers.map(Number)).size===PICK&&Number.isInteger(Number(d.numerone))&&Number(d.numerone)>=1&&Number(d.numerone)<=N;}
+function valid(d){return d&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===PICK&&d.numbers.every(x=>Number.isInteger(Number(x))&&Number(x)>=1&&Number(x)<=N)&&new Set(d.numbers.map(Number)).size===PICK&&Number.isInteger(Number(d.numerone))&&Number(d.numerone)>=1&&Number(d.numerone)<=N;}
 function choose(n,k){if(k<0||k>n)return 0;k=Math.min(k,n-k);let x=1;for(let i=1;i<=k;i++)x=x*(n-k+i)/i;return x;}
 const DEN=choose(N,PICK);
 function priorPos(){return Array.from({length:PICK},(_,j)=>Array.from({length:N},(_,i)=>choose(i+1-1,j)*choose(N-(i+1),PICK-(j+1))/DEN));}
