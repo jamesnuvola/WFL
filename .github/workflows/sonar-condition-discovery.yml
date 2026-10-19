@@ -1,7 +1,7 @@
 name: WFL SONAR condition discovery
 on:
   schedule:
-    - cron: '15 12 * * *'
+    - cron: '35 * * * *'
   workflow_dispatch:
   push:
     paths:
@@ -21,6 +21,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Refresh official WFL archive before freezing candidates
+        run: |
+          node --check update-wlf.mjs
+          node --check wfl-source-policy.mjs
+          node tests/test-source-policy.mjs
+          node update-wlf.mjs
       - name: Syntax-check condition miner
         run: node --check sonar-condition-miner.mjs
       - name: Mine broad conditions and preserve every 3+ hit event
@@ -29,7 +35,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/sonar-condition-log-*.json data/sonar-condition-events-*.json
+          git add winforlife_draws.json debug-wlf.html data/archive data/sonar-condition-log-*.json data/sonar-condition-events-*.json
           if ! git diff --staged --quiet; then
             git commit -m "Persist WFL SONAR condition discovery results"
             git pull --rebase origin main
