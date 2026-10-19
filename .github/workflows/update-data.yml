@@ -22,6 +22,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Validate source policy before polling
+        run: |
+          node --check update-wlf.mjs
+          node --check wfl-source-policy.mjs
+          node tests/test-source-policy.mjs
       - name: Poll sources and refresh throughout the hour
         shell: bash
         run: |
