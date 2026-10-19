@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { latestExpectedSlot, isOfficiallyConfirmed } from './wfl-source-policy.mjs';
 
 const OFFICIAL_URL = 'https://www.winforlife.it/archivio-estrazioni-classico';
 const FALLBACK_URL = 'https://www.estrazionelotto.it/archivio-winforlife';
@@ -104,25 +105,7 @@ async function fetchText(url) {
   if (!response.ok) throw new Error(`HTTP ${response.status} from ${url} `);
   return response.text();
 }
-function latestExpectedSlot(now = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Rome', year:'numeric', month:'2-digit', day:'2-digit',
-    hour:'2-digit', minute:'2-digit', hourCycle:'h23'
-  }).formatToParts(now).reduce((o,p) => (o[p.type]=p.value,o), {});
-  let y=Number(parts.year), m=Number(parts.month), d=Number(parts.day), h=Number(parts.hour);
-  const minute=Number(parts.minute);
-  // Treat a draw as late after 20 minutes; still ingest any newer contests already published.
-  if (h >= 7 && h <= 23 && minute < 20) h--;
-  if (h > 23) h=23;
-  if (h < 7) {
-    const previous = new Date(Date.UTC(y,m-1,d));
-    previous.setUTCDate(previous.getUTCDate()-1);
-    y=previous.getUTCFullYear(); m=previous.getUTCMonth()+1; d=previous.getUTCDate(); h=23;
-  }
-  if (h > 23) h=23;
-  if (h < 7) h=23;
-  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(h).padStart(2,'0')}:00`;
-}
+
 async function main() {
   const errors = [];
   const sourceSets = [];
@@ -153,6 +136,14 @@ async function main() {
   if (!sourceSets.length) throw new Error(`No valid draws parsed. ${errors.join(' | ')}`);
   let scraped = [];
   for (const set of sourceSets) scraped = dedupe([...scraped, ...set.draws]);
+  // Secondary sources may fill historical gaps, but may not move the published
+  // latest draw beyond the newest draw independently confirmed by an official page.
+  const officialDraws = sourceSets.filter(s => s.label.startsWith('official-')).flatMap(s => s.draws);
+  if (officialDraws.length) {
+    const compareDraw = (a, b) => a.datetime.localeCompare(b.datetime) || Number(a.numero) - Number(b.numero);
+    const officialLatest = [...officialDraws].sort(compareDraw).at(-1);
+    scraped = scraped.filter(d => compareDraw(d, officialLatest) <= 0);
+  }
 
   // Read one or more concatenated JSON arrays without losing historical records.
   function parseArchiveFile(raw) {
@@ -211,9 +202,9 @@ async function main() {
   if (stale) {
     console.warn(`STALE SOURCE: latest available draw is ${latest.datetime}, expected at least ${expected}. Newly available historical rows will still be saved; source freshness remains unverified. Sources: ${sourceSets.map(s=>s.label+':'+s.draws.at(-1)?.datetime).join(', ')}. ${errors.join(' | ')}`);
   }
-  if (latest.datetime > expected) {
+  if (latest.datetime > expected && !isOfficiallyConfirmed(latest, sourceSets)) {
     const delta = Date.parse(latest.datetime) - Date.parse(expected);
-    if (delta > 60*60*1000) throw new Error(`Unexpected future draw ${latest.datetime} versus expected slot ${expected}; write blocked.`);
+    if (delta > 60*60*1000) throw new Error(`Unexpected future draw ${latest.datetime} versus expected slot ${expected}; no official source confirms it, write blocked.`);
   }
 
   fs.mkdirSync(BACKUP_DIR,{recursive:true});
