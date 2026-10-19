@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [redesign/vincicasa-style]
+    branches: [main, redesign/vincicasa-style]
 permissions:
   contents: read
 jobs:
@@ -20,8 +20,12 @@ jobs:
           node --check wfl-sonar-engine.js
           node --check wfl-sonar-app.js
           node --check update-wlf.mjs
+          node --check wfl-source-policy.mjs
+          node --check tests/test-source-policy.mjs
           node --check backfill-wlf.mjs
           node --check sonar-research-cycle.mjs
           node --check tests/validate-wfl.mjs
+      - name: Test official-source freshness policy
+        run: node tests/test-source-policy.mjs
       - name: Verify archive and immutable baseline
         run: node tests/validate-wfl.mjs
