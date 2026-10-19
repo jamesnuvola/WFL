@@ -32,3 +32,13 @@ Count a historical analog only if its successor occurs strictly before the targe
 ## Interpretation
 
 The theoretical expectation for a fixed set of 10 main numbers is 5 hits out of 10. Apparent short-run gains can arise by chance, especially across many windows and thresholds. A result can remain historically valid for a specific regime without being a universal prediction. Report when the regime is absent, too rare, or too weakly supported; do not turn a small retrospective sample into a claim of predictive advantage.
+
+## Broad condition discovery and three-hit events
+
+The discovery stage must not impose a high hit threshold. Every evaluated condition instance scoring at least 3/10 is retained as an event, including weak, rare, intermittent and exclusion-based cases. For exclusion candidates, the score is the count of predicted exclusions that were actually absent from the draw (10 minus overlap), not the number of excluded numbers that appeared.
+
+Explore multiple short and long windows, calendar conditions, sorted-position patterns, number-to-position signals, transitions and historical analogues. Keep each condition's identity, signature, selected/excluded set, target, training cutoff, development/holdout split and observed score. The event archive is append/upsert-only by target and condition identity.
+
+For the upcoming draw, generate candidate conditions from the latest available history and rank them only using outcomes that occurred before that draw. Do not use the upcoming target's outcome or retrospective score to rank its candidates. This is a candidate shortlist, not a claim that any lottery outcome is predictable with certainty. The next draw must later be scored against the frozen candidates.
+
+The goal is to recognize recurring feature combinations: do not discard a condition just because it only yields three hits or appears in a narrow regime. Use the prior performance, recurrence, similarity to historical signatures, and complementarity among active conditions to decide which hypotheses deserve attention.
