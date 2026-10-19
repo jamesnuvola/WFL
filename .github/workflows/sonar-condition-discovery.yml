@@ -1,0 +1,39 @@
+name: WFL SONAR condition discovery
+on:
+  schedule:
+    - cron: '15 12 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'sonar-condition-miner.mjs'
+      - '.github/workflows/sonar-condition-discovery.yml'
+permissions:
+  contents: write
+concurrency:
+  group: wfl-sonar-condition-discovery
+  cancel-in-progress: false
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax-check condition miner
+        run: node --check sonar-condition-miner.mjs
+      - name: Mine broad conditions and preserve every 3+ hit event
+        run: node sonar-condition-miner.mjs
+      - name: Commit condition results and event archive
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/sonar-condition-log.json data/sonar-condition-events.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Persist WFL SONAR condition discovery results"
+            git pull --rebase origin main
+            git push
+          else
+            echo "Condition logs already current."
+          fi
