@@ -1,7 +1,7 @@
 import {readFileSync,writeFileSync,existsSync,mkdirSync} from 'node:fs';
 const DATA='winforlife_draws.json',LOG='data/sonar-condition-log.json',EVENTS='data/sonar-condition-events.json';
 const N=20,K=10,TEST=1200,HOLD=500,WINDOWS=[3,5,10,15,20,30,50,75,100,150,200,300,500,1000];
-function valid(d){return d&&Number.isInteger(+d.numero)&&/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===K&&d.numbers.every(n=>Number.isInteger(+n)&&+n>=1&&+n<=N)&&new Set(d.numbers.map(Number)).size===K&&Number.isInteger(+d.numerone)&&+d.numerone>=1&&+d.numerone<=N;}
+function valid(d){return d&&Number.isInteger(+d.numero)&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime||'')&&Array.isArray(d.numbers)&&d.numbers.length===K&&d.numbers.every(n=>Number.isInteger(+n)&&+n>=1&&+n<=N)&&new Set(d.numbers.map(Number)).size===K&&Number.isInteger(+d.numerone)&&+d.numerone>=1&&+d.numerone<=N;}
 function top(c,k=K,desc=true){return c.map((v,i)=>({n:i+1,v})).sort((a,b)=>(desc?b.v-a.v:a.v-b.v)||a.n-b.n).slice(0,k).map(x=>x.n).sort((a,b)=>a-b);}
 function counts(ds){const c=Array(N).fill(0);for(const d of ds)for(const n of d.numbers)c[n-1]++;return c;}
 function posCounts(ds){const c=Array.from({length:K},()=>Array(N).fill(0));for(const d of ds)for(let j=0;j<K;j++)c[j][d.numbers[j]-1]++;return c;}
