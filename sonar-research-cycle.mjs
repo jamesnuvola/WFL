@@ -1,3 +1,4 @@
+// WFL SONAR: full-history walk-forward comparison rerun after 2026-10-23 archive refresh.
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
