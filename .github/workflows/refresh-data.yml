@@ -30,7 +30,7 @@ jobs:
           const seen = new Map();
           let previous = '';
           for (const d of ds) {
-            if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(d.datetime) ||
+            if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(d.datetime) ||
                 !Number.isInteger(Number(d.numero)) ||
                 !Array.isArray(d.numbers) || d.numbers.length !== 10 ||
                 new Set(d.numbers.map(Number)).size !== 10 ||
