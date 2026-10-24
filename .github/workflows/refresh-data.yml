@@ -1,0 +1,62 @@
+name: WFL SONAR manual archive refresh
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: wfl-data-maintenance
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate source policy and refresh from official plus fallback sources
+        run: |
+          node --check update-wlf.mjs
+          node --check wfl-source-policy.mjs
+          node tests/test-source-policy.mjs
+          node update-wlf.mjs
+      - name: Verify archive remains valid and history was not reduced
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const ds = JSON.parse(fs.readFileSync('winforlife_draws.json','utf8'));
+          if (!Array.isArray(ds) || !ds.length) throw new Error('Archive missing or empty');
+          const seen = new Map();
+          let previous = '';
+          for (const d of ds) {
+            if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(d.datetime) ||
+                !Number.isInteger(Number(d.numero)) ||
+                !Array.isArray(d.numbers) || d.numbers.length !== 10 ||
+                new Set(d.numbers.map(Number)).size !== 10 ||
+                d.numbers.some(n => !Number.isInteger(Number(n)) || n < 1 || n > 20) ||
+                !Number.isInteger(Number(d.numerone)) || d.numerone < 1 || d.numerone > 20) {
+              throw new Error('Invalid draw record: ' + JSON.stringify(d));
+            }
+            const key = d.datetime.slice(0,4) + ':' + d.numero;
+            const fingerprint = JSON.stringify({datetime:d.datetime,numbers:d.numbers.map(Number).sort((a,b)=>a-b),numerone:Number(d.numerone)});
+            if (seen.has(key) && seen.get(key) !== fingerprint) throw new Error('Conflicting duplicate: ' + key);
+            seen.set(key, fingerprint);
+            const order = d.datetime + ':' + String(d.numero).padStart(8,'0');
+            if (order < previous) throw new Error('Archive is not chronological at ' + key);
+            previous = order;
+          }
+          console.log(JSON.stringify({status:'PASS',count:ds.length,first:ds[0].datetime,last:ds.at(-1).datetime,latestContest:ds.at(-1).numero,uniqueDrawKeys:seen.size},null,2));
+          NODE
+      - name: Persist recovered contests and backup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add winforlife_draws.json data/archive
+          if ! git diff --staged --quiet; then
+            git commit -m "Manually recover missing WFL draws"
+            git pull --rebase origin main
+            git push
+          else
+            echo "Archive already current; no missing contests to commit."
+          fi
