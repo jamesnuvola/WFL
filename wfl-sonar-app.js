@@ -124,6 +124,15 @@ function init(){
  }
  let initialTab='draws';try{initialTab=localStorage.getItem('wfl_sonar_active_tab')||'draws';}catch(e){}activateTab(initialTab);
  $('generateNumbers').addEventListener('click',()=>renderGenerator(generatorHistory()));
+ const recoverButton=$('recoverMissingDraws');
+ if(recoverButton)recoverButton.addEventListener('click',()=>{
+  setStatus('Apro la procedura GitHub Actions: accedi e premi “Run workflow” per avviare il recupero ufficiale.','');
+  const url='https://github.com/jamesnuvola/WFL/actions/workflows/refresh-data.yml';
+  const opened=window.open(url,'_blank','noopener');
+  if(!opened)window.location.href=url;
+ });
+ const checkButton=$('checkPublishedArchive');
+ if(checkButton)checkButton.addEventListener('click',()=>refresh());
  $('copyProposal').addEventListener('click',()=>{const t=$('generatorResult')?.dataset.proposal;if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>setStatus('Proposta copiata.','success')).catch(()=>setStatus('Copia non riuscita.','error'));});
 
  try{const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'[]');draws=merge(cached).draws;}catch(e){draws=[];}
