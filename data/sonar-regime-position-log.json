@@ -22670,5 +22670,1422 @@
       }
     },
     "decision": "EXPLORATORY_ONLY_NO_PROMOTION"
+  },
+  {
+    "runAt": "2026-10-29T15:56:20.196Z",
+    "dataset": {
+      "count": 29554,
+      "first": "2022-01-25T07:00",
+      "last": "2026-10-29T14:00"
+    },
+    "methodology": {
+      "name": "bidirectional position-number and regime walk-forward lab",
+      "positions": "ascending rank in sorted winning set, not physical draw order",
+      "evaluationTargets": 1200,
+      "developmentTargets": 700,
+      "holdoutTargets": 500,
+      "minTraining": 1000,
+      "allPredictionsUseOnlyPriorHistory": true,
+      "theoreticalMeanHits": 5,
+      "positionPrior": "Exact order-statistic probability for uniformly random 10-of-20 combinations; shrinkage PRIOR=80",
+      "regimeRule": "PRE-TARGET drift in mean sorted rank: mean absolute difference between last 30 draws and preceding 170 draws >=0.8 means POSITION_DRIFT_HIGH; otherwise POSITION_DRIFT_LOW.",
+      "limitations": [
+        "Regimes are exploratory and must be detectable before target draw; labels are not evidence of causal predictability.",
+        "Many comparisons imply multiple-testing risk; intervals are unadjusted descriptive intervals.",
+        "Number-to-position maximum-likelihood ranking is a challenger, not a promoted strategy.",
+        "No production weights or engine settings are changed."
+      ]
+    },
+    "regimeCounts": {
+      "POSITION_DRIFT_LOW": 1198,
+      "POSITION_DRIFT_HIGH": 2
+    },
+    "positionDiagnostics": [
+      {
+        "position": 1,
+        "topObservedNumbers": [
+          {
+            "number": 1,
+            "count": 14610,
+            "rate": 0.49434932665629017,
+            "expectedRate": 0.5
+          },
+          {
+            "number": 2,
+            "count": 7936,
+            "rate": 0.268525411111863,
+            "expectedRate": 0.2631578947368421
+          },
+          {
+            "number": 3,
+            "count": 3944,
+            "rate": 0.13345063274006902,
+            "expectedRate": 0.13157894736842105
+          },
+          {
+            "number": 4,
+            "count": 1777,
+            "rate": 0.06012722474115179,
+            "expectedRate": 0.06191950464396285
+          },
+          {
+            "number": 5,
+            "count": 786,
+            "rate": 0.026595384719496514,
+            "expectedRate": 0.027089783281733747
+          }
+        ]
+      },
+      {
+        "position": 2,
+        "topObservedNumbers": [
+          {
+            "number": 3,
+            "count": 7756,
+            "rate": 0.26243486499289437,
+            "expectedRate": 0.2631578947368421
+          },
+          {
+            "number": 2,
+            "count": 6929,
+            "rate": 0.2344521892129661,
+            "expectedRate": 0.23684210526315788
+          },
+          {
+            "number": 4,
+            "count": 6197,
+            "rate": 0.20968396832916017,
+            "expectedRate": 0.2089783281733746
+          },
+          {
+            "number": 5,
+            "count": 4210,
+            "rate": 0.1424511064492116,
+            "expectedRate": 0.1393188854489164
+          },
+          {
+            "number": 6,
+            "count": 2428,
+            "rate": 0.08215469987142181,
+            "expectedRate": 0.08126934984520123
+          }
+        ]
+      },
+      {
+        "position": 3,
+        "topObservedNumbers": [
+          {
+            "number": 5,
+            "count": 6132,
+            "rate": 0.20748460445286593,
+            "expectedRate": 0.2089783281733746
+          },
+          {
+            "number": 6,
+            "count": 5522,
+            "rate": 0.18684442038302768,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 4,
+            "count": 5488,
+            "rate": 0.18569398389388916,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 7,
+            "count": 4256,
+            "rate": 0.1440075793462814,
+            "expectedRate": 0.1393188854489164
+          },
+          {
+            "number": 3,
+            "count": 3041,
+            "rate": 0.10289639304324288,
+            "expectedRate": 0.10526315789473684
+          }
+        ]
+      },
+      {
+        "position": 4,
+        "topObservedNumbers": [
+          {
+            "number": 7,
+            "count": 5477,
+            "rate": 0.18532178385328552,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 8,
+            "count": 5128,
+            "rate": 0.17351289165595182,
+            "expectedRate": 0.1750416765896642
+          },
+          {
+            "number": 6,
+            "count": 4810,
+            "rate": 0.16275292684577383,
+            "expectedRate": 0.16253869969040247
+          },
+          {
+            "number": 9,
+            "count": 4181,
+            "rate": 0.1414698517967111,
+            "expectedRate": 0.14003334127173137
+          },
+          {
+            "number": 5,
+            "count": 3139,
+            "rate": 0.10621235704134804,
+            "expectedRate": 0.10835913312693499
+          }
+        ]
+      },
+      {
+        "position": 5,
+        "topObservedNumbers": [
+          {
+            "number": 9,
+            "count": 5177,
+            "rate": 0.1751708736550044,
+            "expectedRate": 0.1750416765896642
+          },
+          {
+            "number": 10,
+            "count": 5015,
+            "rate": 0.1696893821479326,
+            "expectedRate": 0.17185910065167032
+          },
+          {
+            "number": 8,
+            "count": 4443,
+            "rate": 0.15033498003654328,
+            "expectedRate": 0.15003572279114075
+          },
+          {
+            "number": 11,
+            "count": 4277,
+            "rate": 0.14471814306016106,
+            "expectedRate": 0.14321591720972526
+          },
+          {
+            "number": 12,
+            "count": 3054,
+            "rate": 0.10333626581850172,
+            "expectedRate": 0.10002381519409383
+          }
+        ]
+      },
+      {
+        "position": 6,
+        "topObservedNumbers": [
+          {
+            "number": 11,
+            "count": 5125,
+            "rate": 0.173411382553969,
+            "expectedRate": 0.17185910065167032
+          },
+          {
+            "number": 12,
+            "count": 5115,
+            "rate": 0.17307301888069296,
+            "expectedRate": 0.1750416765896642
+          },
+          {
+            "number": 13,
+            "count": 4484,
+            "rate": 0.15172227109697503,
+            "expectedRate": 0.15003572279114075
+          },
+          {
+            "number": 10,
+            "count": 4247,
+            "rate": 0.14370305204033296,
+            "expectedRate": 0.14321591720972526
+          },
+          {
+            "number": 14,
+            "count": 3095,
+            "rate": 0.10472355687893348,
+            "expectedRate": 0.1044891640866873
+          }
+        ]
+      },
+      {
+        "position": 7,
+        "topObservedNumbers": [
+          {
+            "number": 14,
+            "count": 5377,
+            "rate": 0.18193814712052514,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 13,
+            "count": 5184,
+            "rate": 0.17540772822629763,
+            "expectedRate": 0.1750416765896642
+          },
+          {
+            "number": 15,
+            "count": 4788,
+            "rate": 0.16200852676456656,
+            "expectedRate": 0.16253869969040247
+          },
+          {
+            "number": 12,
+            "count": 4249,
+            "rate": 0.14377072477498815,
+            "expectedRate": 0.14003334127173137
+          },
+          {
+            "number": 16,
+            "count": 3235,
+            "rate": 0.109460648304798,
+            "expectedRate": 0.10835913312693499
+          }
+        ]
+      },
+      {
+        "position": 8,
+        "topObservedNumbers": [
+          {
+            "number": 16,
+            "count": 6025,
+            "rate": 0.20386411314881234,
+            "expectedRate": 0.2089783281733746
+          },
+          {
+            "number": 17,
+            "count": 5504,
+            "rate": 0.1862353657711308,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 15,
+            "count": 5484,
+            "rate": 0.18555863842457873,
+            "expectedRate": 0.18575851393188855
+          },
+          {
+            "number": 14,
+            "count": 4185,
+            "rate": 0.14160519726602153,
+            "expectedRate": 0.1393188854489164
+          },
+          {
+            "number": 18,
+            "count": 3163,
+            "rate": 0.10702442985721053,
+            "expectedRate": 0.10526315789473684
+          }
+        ]
+      },
+      {
+        "position": 9,
+        "topObservedNumbers": [
+          {
+            "number": 18,
+            "count": 7805,
+            "rate": 0.26409284699194696,
+            "expectedRate": 0.2631578947368421
+          },
+          {
+            "number": 19,
+            "count": 6838,
+            "rate": 0.23137307978615415,
+            "expectedRate": 0.23684210526315788
+          },
+          {
+            "number": 17,
+            "count": 6155,
+            "rate": 0.20826284090140082,
+            "expectedRate": 0.2089783281733746
+          },
+          {
+            "number": 16,
+            "count": 4202,
+            "rate": 0.1421804155105908,
+            "expectedRate": 0.1393188854489164
+          },
+          {
+            "number": 15,
+            "count": 2506,
+            "rate": 0.0847939365229749,
+            "expectedRate": 0.08126934984520123
+          }
+        ]
+      },
+      {
+        "position": 10,
+        "topObservedNumbers": [
+          {
+            "number": 20,
+            "count": 14697,
+            "rate": 0.4972930906137917,
+            "expectedRate": 0.5
+          },
+          {
+            "number": 19,
+            "count": 7706,
+            "rate": 0.26074304662651415,
+            "expectedRate": 0.2631578947368421
+          },
+          {
+            "number": 18,
+            "count": 3961,
+            "rate": 0.1340258509846383,
+            "expectedRate": 0.13157894736842105
+          },
+          {
+            "number": 17,
+            "count": 1900,
+            "rate": 0.06428909792244705,
+            "expectedRate": 0.06191950464396285
+          },
+          {
+            "number": 16,
+            "count": 814,
+            "rate": 0.02754280300466942,
+            "expectedRate": 0.027089783281733747
+          }
+        ]
+      }
+    ],
+    "results": {
+      "positionGlobal": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.995,
+          "expected": 5,
+          "delta": -0.005,
+          "ci95": [
+            4.92823,
+            5.06177
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01,
+          "expected": 5,
+          "delta": 0.01,
+          "ci95": [
+            4.92423,
+            5.09577
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.974,
+          "expected": 5,
+          "delta": -0.026,
+          "ci95": [
+            4.86779,
+            5.08021
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 1200
+          },
+          "development": {
+            "meanDelta": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 700
+          },
+          "holdout": {
+            "meanDelta": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 500
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 4.99416,
+              "expected": 5,
+              "delta": -0.00584,
+              "ci95": [
+                4.92729,
+                5.06102
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.01,
+              "expected": 5,
+              "delta": 0.01,
+              "ci95": [
+                4.92423,
+                5.09577
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.97189,
+              "expected": 5,
+              "delta": -0.02811,
+              "ci95": [
+                4.86533,
+                5.07845
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "positionRecent50": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01583,
+          "expected": 5,
+          "delta": 0.01583,
+          "ci95": [
+            4.9505,
+            5.08117
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00714,
+          "expected": 5,
+          "delta": 0.00714,
+          "ci95": [
+            4.92202,
+            5.09227
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.028,
+          "expected": 5,
+          "delta": 0.028,
+          "ci95": [
+            4.92601,
+            5.12999
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0.02083,
+            "ci95": [
+              -0.0548,
+              0.09647
+            ],
+            "positive": 435,
+            "negative": 421,
+            "tied": 344
+          },
+          "development": {
+            "meanDelta": -0.00286,
+            "ci95": [
+              -0.10334,
+              0.09762
+            ],
+            "positive": 258,
+            "negative": 259,
+            "tied": 183
+          },
+          "holdout": {
+            "meanDelta": 0.054,
+            "ci95": [
+              -0.06077,
+              0.16877
+            ],
+            "positive": 177,
+            "negative": 162,
+            "tied": 161
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 5.01669,
+              "expected": 5,
+              "delta": 0.01669,
+              "ci95": [
+                4.95127,
+                5.08212
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.00714,
+              "expected": 5,
+              "delta": 0.00714,
+              "ci95": [
+                4.92202,
+                5.09227
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 5.03012,
+              "expected": 5,
+              "delta": 0.03012,
+              "ci95": [
+                4.9278,
+                5.13244
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 4.5,
+              "expected": 5,
+              "delta": -0.5,
+              "ci95": [
+                3.52,
+                5.48
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 4.5,
+              "expected": 5,
+              "delta": -0.5,
+              "ci95": [
+                3.52,
+                5.48
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "positionRecent100": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98583,
+          "expected": 5,
+          "delta": -0.01417,
+          "ci95": [
+            4.92249,
+            5.04918
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01429,
+          "expected": 5,
+          "delta": 0.01429,
+          "ci95": [
+            4.93033,
+            5.09825
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.946,
+          "expected": 5,
+          "delta": -0.054,
+          "ci95": [
+            4.8496,
+            5.0424
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": -0.00917,
+            "ci95": [
+              -0.08356,
+              0.06523
+            ],
+            "positive": 405,
+            "negative": 407,
+            "tied": 388
+          },
+          "development": {
+            "meanDelta": 0.00429,
+            "ci95": [
+              -0.09394,
+              0.10252
+            ],
+            "positive": 244,
+            "negative": 242,
+            "tied": 214
+          },
+          "holdout": {
+            "meanDelta": -0.028,
+            "ci95": [
+              -0.14197,
+              0.08597
+            ],
+            "positive": 161,
+            "negative": 165,
+            "tied": 174
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 4.98581,
+              "expected": 5,
+              "delta": -0.01419,
+              "ci95": [
+                4.9224,
+                5.04922
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.01429,
+              "expected": 5,
+              "delta": 0.01429,
+              "ci95": [
+                4.93033,
+                5.09825
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.94578,
+              "expected": 5,
+              "delta": -0.05422,
+              "ci95": [
+                4.84916,
+                5.04241
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "positionRecent300": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01167,
+          "expected": 5,
+          "delta": 0.01167,
+          "ci95": [
+            4.94668,
+            5.07666
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03286,
+          "expected": 5,
+          "delta": 0.03286,
+          "ci95": [
+            4.9463,
+            5.11941
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.982,
+          "expected": 5,
+          "delta": -0.018,
+          "ci95": [
+            4.88376,
+            5.08024
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0.01667,
+            "ci95": [
+              -0.05742,
+              0.09075
+            ],
+            "positive": 424,
+            "negative": 403,
+            "tied": 373
+          },
+          "development": {
+            "meanDelta": 0.02286,
+            "ci95": [
+              -0.07651,
+              0.12222
+            ],
+            "positive": 253,
+            "negative": 237,
+            "tied": 210
+          },
+          "holdout": {
+            "meanDelta": 0.008,
+            "ci95": [
+              -0.10284,
+              0.11884
+            ],
+            "positive": 171,
+            "negative": 166,
+            "tied": 163
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 5.01085,
+              "expected": 5,
+              "delta": 0.01085,
+              "ci95": [
+                4.94577,
+                5.07593
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.03286,
+              "expected": 5,
+              "delta": 0.03286,
+              "ci95": [
+                4.9463,
+                5.11941
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.97992,
+              "expected": 5,
+              "delta": -0.02008,
+              "ci95": [
+                4.88136,
+                5.07848
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "numberToPositionGlobal": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.03083,
+          "expected": 5,
+          "delta": 0.03083,
+          "ci95": [
+            4.96663,
+            5.09504
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.05,
+          "expected": 5,
+          "delta": 0.05,
+          "ci95": [
+            4.96477,
+            5.13523
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.004,
+          "expected": 5,
+          "delta": 0.004,
+          "ci95": [
+            4.90645,
+            5.10155
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0.03583,
+            "ci95": [
+              -0.06467,
+              0.13634
+            ],
+            "positive": 476,
+            "negative": 453,
+            "tied": 271
+          },
+          "development": {
+            "meanDelta": 0.04,
+            "ci95": [
+              -0.09067,
+              0.17067
+            ],
+            "positive": 282,
+            "negative": 262,
+            "tied": 156
+          },
+          "holdout": {
+            "meanDelta": 0.03,
+            "ci95": [
+              -0.12738,
+              0.18738
+            ],
+            "positive": 194,
+            "negative": 191,
+            "tied": 115
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 5.03005,
+              "expected": 5,
+              "delta": 0.03005,
+              "ci95": [
+                4.96576,
+                5.09434
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.05,
+              "expected": 5,
+              "delta": 0.05,
+              "ci95": [
+                4.96477,
+                5.13523
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 5.00201,
+              "expected": 5,
+              "delta": 0.00201,
+              "ci95": [
+                4.90415,
+                5.09987
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5.5,
+              "expected": 5,
+              "delta": 0.5,
+              "ci95": [
+                4.52,
+                6.48
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "numberToPosition100": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.995,
+          "expected": 5,
+          "delta": -0.005,
+          "ci95": [
+            4.9303,
+            5.0597
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01571,
+          "expected": 5,
+          "delta": 0.01571,
+          "ci95": [
+            4.92959,
+            5.10184
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.966,
+          "expected": 5,
+          "delta": -0.034,
+          "ci95": [
+            4.8681,
+            5.0639
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0,
+            "ci95": [
+              -0.09664,
+              0.09664
+            ],
+            "positive": 463,
+            "negative": 455,
+            "tied": 282
+          },
+          "development": {
+            "meanDelta": 0.00571,
+            "ci95": [
+              -0.12028,
+              0.13171
+            ],
+            "positive": 274,
+            "negative": 260,
+            "tied": 166
+          },
+          "holdout": {
+            "meanDelta": -0.008,
+            "ci95": [
+              -0.15875,
+              0.14275
+            ],
+            "positive": 189,
+            "negative": 195,
+            "tied": 116
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 4.99499,
+              "expected": 5,
+              "delta": -0.00501,
+              "ci95": [
+                4.93022,
+                5.05976
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.01571,
+              "expected": 5,
+              "delta": 0.01571,
+              "ci95": [
+                4.92959,
+                5.10184
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.96586,
+              "expected": 5,
+              "delta": -0.03414,
+              "ci95": [
+                4.86773,
+                5.06399
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "numberToPosition300": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.03333,
+          "expected": 5,
+          "delta": 0.03333,
+          "ci95": [
+            4.96957,
+            5.09709
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.07857,
+          "expected": 5,
+          "delta": 0.07857,
+          "ci95": [
+            4.99514,
+            5.16201
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.97,
+          "expected": 5,
+          "delta": -0.03,
+          "ci95": [
+            4.87131,
+            5.06869
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": 0.03833,
+            "ci95": [
+              -0.05658,
+              0.13325
+            ],
+            "positive": 460,
+            "negative": 459,
+            "tied": 281
+          },
+          "development": {
+            "meanDelta": 0.06857,
+            "ci95": [
+              -0.05588,
+              0.19302
+            ],
+            "positive": 267,
+            "negative": 265,
+            "tied": 168
+          },
+          "holdout": {
+            "meanDelta": -0.004,
+            "ci95": [
+              -0.15082,
+              0.14282
+            ],
+            "positive": 193,
+            "negative": 194,
+            "tied": 113
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 5.03339,
+              "expected": 5,
+              "delta": 0.03339,
+              "ci95": [
+                4.96956,
+                5.09721
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.07857,
+              "expected": 5,
+              "delta": 0.07857,
+              "ci95": [
+                4.99514,
+                5.16201
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.96988,
+              "expected": 5,
+              "delta": -0.03012,
+              "ci95": [
+                4.87095,
+                5.06881
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      },
+      "numberTrajectory50vs200": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99,
+          "expected": 5,
+          "delta": -0.01,
+          "ci95": [
+            4.92588,
+            5.05412
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02571,
+          "expected": 5,
+          "delta": 0.02571,
+          "ci95": [
+            4.9413,
+            5.11013
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.94,
+          "expected": 5,
+          "delta": -0.06,
+          "ci95": [
+            4.84149,
+            5.03851
+          ]
+        },
+        "vsPositionGlobal": {
+          "all": {
+            "meanDelta": -0.005,
+            "ci95": [
+              -0.09775,
+              0.08775
+            ],
+            "positive": 460,
+            "negative": 463,
+            "tied": 277
+          },
+          "development": {
+            "meanDelta": 0.01571,
+            "ci95": [
+              -0.10246,
+              0.13389
+            ],
+            "positive": 268,
+            "negative": 267,
+            "tied": 165
+          },
+          "holdout": {
+            "meanDelta": -0.034,
+            "ci95": [
+              -0.18303,
+              0.11503
+            ],
+            "positive": 192,
+            "negative": 196,
+            "tied": 112
+          }
+        },
+        "byRegime": {
+          "POSITION_DRIFT_LOW": {
+            "all": {
+              "targets": 1198,
+              "meanHits": 4.98998,
+              "expected": 5,
+              "delta": -0.01002,
+              "ci95": [
+                4.9258,
+                5.05417
+              ]
+            },
+            "development": {
+              "targets": 700,
+              "meanHits": 5.02571,
+              "expected": 5,
+              "delta": 0.02571,
+              "ci95": [
+                4.9413,
+                5.11013
+              ]
+            },
+            "holdout": {
+              "targets": 498,
+              "meanHits": 4.93976,
+              "expected": 5,
+              "delta": -0.06024,
+              "ci95": [
+                4.84102,
+                5.0385
+              ]
+            },
+            "nHoldout": 498
+          },
+          "POSITION_DRIFT_HIGH": {
+            "all": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "development": {
+              "targets": 0,
+              "meanHits": null,
+              "expected": 5,
+              "delta": null,
+              "ci95": null
+            },
+            "holdout": {
+              "targets": 2,
+              "meanHits": 5,
+              "expected": 5,
+              "delta": 0,
+              "ci95": [
+                3.04,
+                6.96
+              ]
+            },
+            "nHoldout": 2
+          }
+        }
+      }
+    },
+    "decision": "EXPLORATORY_ONLY_NO_PROMOTION"
   }
 ]
