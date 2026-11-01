@@ -103078,5 +103078,5159 @@
       "developmentDeltaVsStatusQuo": 0.012859999999999996
     },
     "decision": "EXPLORATORY_CHALLENGER_ONLY"
+  },
+  {
+    "runAt": "2026-11-01T15:46:40.878Z",
+    "dataset": {
+      "count": 29605,
+      "first": "2022-01-25T07:00",
+      "last": "2026-11-01T14:00"
+    },
+    "protocol": {
+      "type": "walk-forward feature ablation and cross-game rule transfer, WFL Classico adapted",
+      "testTargets": 1200,
+      "developmentTargets": 700,
+      "holdoutTargets": 500,
+      "minTraining": 1000,
+      "gameRules": {
+        "main": "10 distinct numbers from 1..20; score exact intersection size, expectation 5",
+        "numerone": "separate 1..20 draw; not blended with main hits",
+        "time": "calendar keys use recorded draw timestamp; all predictions use history strictly before target"
+      },
+      "promotionPolicy": "Rank by raw holdout mean hits versus status quo; an observed positive difference is an exploratory challenger. Do not interpret a single holdout winner as statistically proven; confirm on next untouched rolling block before permanent promotion.",
+      "transferredRules": [
+        "global/recent frequency",
+        "gap and return lifecycle",
+        "transition to following draw",
+        "co-occurrence/pair association",
+        "repeat versus exclude prior-draw numbers",
+        "exact and near-sequence successor analogues",
+        "hour/day-of-week/month conditioning",
+        "intraday micro-trends",
+        "rolling 6h/24h/72h/7d/30d windows",
+        "odd/even and low/high balance"
+      ],
+      "excludedRules": [
+        "VinciCasa order-position transitions and P1-P5 rules do not apply because WFL numbers are an unordered set",
+        "SuperEnalotto six-of-90 combinatorics and 6/6,5/6,4/6 thresholds do not apply",
+        "Numerone remains an independent target"
+      ]
+    },
+    "results": {
+      "statusquo": {
+        "label": "statusquo",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.05167,
+          "expected": 5,
+          "delta": 0.05167,
+          "se": 0.03258,
+          "ci95": [
+            4.98782,
+            5.11551
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.05,
+          "expected": 5,
+          "delta": 0.05,
+          "se": 0.04325,
+          "ci95": [
+            4.96523,
+            5.13477
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.054,
+          "expected": 5,
+          "delta": 0.054,
+          "se": 0.04951,
+          "ci95": [
+            4.95696,
+            5.15104
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 1200
+          },
+          "development": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 700
+          },
+          "holdout": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 500
+          }
+        },
+        "numerone": {
+          "all": 61,
+          "development": 34,
+          "holdout": 27,
+          "expectedRate": 0.05
+        }
+      },
+      "global": {
+        "label": "global",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00833,
+          "expected": 5,
+          "delta": 0.00833,
+          "se": 0.03467,
+          "ci95": [
+            4.94037,
+            5.0763
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99,
+          "expected": 5,
+          "delta": -0.01,
+          "se": 0.0455,
+          "ci95": [
+            4.90082,
+            5.07918
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.034,
+          "expected": 5,
+          "delta": 0.034,
+          "se": 0.05359,
+          "ci95": [
+            4.92897,
+            5.13903
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04333,
+            "se": 0.04454,
+            "ci95": [
+              -0.13062,
+              0.04396
+            ],
+            "positiveTargets": 427,
+            "negativeTargets": 453,
+            "tiedTargets": 320
+          },
+          "development": {
+            "meanDelta": -0.06,
+            "se": 0.0589,
+            "ci95": [
+              -0.17544,
+              0.05544
+            ],
+            "positiveTargets": 243,
+            "negativeTargets": 262,
+            "tiedTargets": 195
+          },
+          "holdout": {
+            "meanDelta": -0.02,
+            "se": 0.06806,
+            "ci95": [
+              -0.1534,
+              0.1134
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 191,
+            "tiedTargets": 125
+          }
+        },
+        "numerone": null
+      },
+      "recent3": {
+        "label": "recent3",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.02917,
+          "expected": 5,
+          "delta": 0.02917,
+          "se": 0.03237,
+          "ci95": [
+            4.96571,
+            5.09262
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02,
+          "expected": 5,
+          "delta": 0.02,
+          "se": 0.04312,
+          "ci95": [
+            4.93549,
+            5.10451
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.042,
+          "expected": 5,
+          "delta": 0.042,
+          "se": 0.04896,
+          "ci95": [
+            4.94603,
+            5.13797
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0225,
+            "se": 0.04586,
+            "ci95": [
+              -0.11239,
+              0.06739
+            ],
+            "positiveTargets": 444,
+            "negativeTargets": 459,
+            "tiedTargets": 297
+          },
+          "development": {
+            "meanDelta": -0.03,
+            "se": 0.06103,
+            "ci95": [
+              -0.14962,
+              0.08962
+            ],
+            "positiveTargets": 258,
+            "negativeTargets": 266,
+            "tiedTargets": 176
+          },
+          "holdout": {
+            "meanDelta": -0.012,
+            "se": 0.06946,
+            "ci95": [
+              -0.14815,
+              0.12415
+            ],
+            "positiveTargets": 186,
+            "negativeTargets": 193,
+            "tiedTargets": 121
+          }
+        },
+        "numerone": null
+      },
+      "recent5": {
+        "label": "recent5",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.03333,
+          "expected": 5,
+          "delta": 0.03333,
+          "se": 0.03274,
+          "ci95": [
+            4.96915,
+            5.09751
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02,
+          "expected": 5,
+          "delta": 0.02,
+          "se": 0.04364,
+          "ci95": [
+            4.93447,
+            5.10553
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.052,
+          "expected": 5,
+          "delta": 0.052,
+          "se": 0.04947,
+          "ci95": [
+            4.95503,
+            5.14897
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.01833,
+            "se": 0.04534,
+            "ci95": [
+              -0.1072,
+              0.07053
+            ],
+            "positiveTargets": 445,
+            "negativeTargets": 459,
+            "tiedTargets": 296
+          },
+          "development": {
+            "meanDelta": -0.03,
+            "se": 0.06002,
+            "ci95": [
+              -0.14763,
+              0.08763
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 279,
+            "tiedTargets": 159
+          },
+          "holdout": {
+            "meanDelta": -0.002,
+            "se": 0.06921,
+            "ci95": [
+              -0.13765,
+              0.13365
+            ],
+            "positiveTargets": 183,
+            "negativeTargets": 180,
+            "tiedTargets": 137
+          }
+        },
+        "numerone": null
+      },
+      "recent10": {
+        "label": "recent10",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01917,
+          "expected": 5,
+          "delta": 0.01917,
+          "se": 0.03306,
+          "ci95": [
+            4.95437,
+            5.08396
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01714,
+          "expected": 5,
+          "delta": 0.01714,
+          "se": 0.0435,
+          "ci95": [
+            4.93189,
+            5.1024
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.022,
+          "expected": 5,
+          "delta": 0.022,
+          "se": 0.05091,
+          "ci95": [
+            4.92221,
+            5.12179
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0325,
+            "se": 0.04548,
+            "ci95": [
+              -0.12164,
+              0.05664
+            ],
+            "positiveTargets": 445,
+            "negativeTargets": 464,
+            "tiedTargets": 291
+          },
+          "development": {
+            "meanDelta": -0.03286,
+            "se": 0.06022,
+            "ci95": [
+              -0.15088,
+              0.08517
+            ],
+            "positiveTargets": 265,
+            "negativeTargets": 272,
+            "tiedTargets": 163
+          },
+          "holdout": {
+            "meanDelta": -0.032,
+            "se": 0.06939,
+            "ci95": [
+              -0.16801,
+              0.10401
+            ],
+            "positiveTargets": 180,
+            "negativeTargets": 192,
+            "tiedTargets": 128
+          }
+        },
+        "numerone": null
+      },
+      "recent20": {
+        "label": "recent20",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98667,
+          "expected": 5,
+          "delta": -0.01333,
+          "se": 0.03196,
+          "ci95": [
+            4.92402,
+            5.04931
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99143,
+          "expected": 5,
+          "delta": -0.00857,
+          "se": 0.04212,
+          "ci95": [
+            4.90888,
+            5.07398
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.98,
+          "expected": 5,
+          "delta": -0.02,
+          "se": 0.04911,
+          "ci95": [
+            4.88374,
+            5.07626
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.065,
+            "se": 0.04475,
+            "ci95": [
+              -0.1527,
+              0.0227
+            ],
+            "positiveTargets": 425,
+            "negativeTargets": 469,
+            "tiedTargets": 306
+          },
+          "development": {
+            "meanDelta": -0.05857,
+            "se": 0.05895,
+            "ci95": [
+              -0.17412,
+              0.05698
+            ],
+            "positiveTargets": 250,
+            "negativeTargets": 268,
+            "tiedTargets": 182
+          },
+          "holdout": {
+            "meanDelta": -0.074,
+            "se": 0.06878,
+            "ci95": [
+              -0.20881,
+              0.06081
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 201,
+            "tiedTargets": 124
+          }
+        },
+        "numerone": null
+      },
+      "recent50": {
+        "label": "recent50",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9725,
+          "expected": 5,
+          "delta": -0.0275,
+          "se": 0.03312,
+          "ci95": [
+            4.90759,
+            5.03741
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00571,
+          "expected": 5,
+          "delta": 0.00571,
+          "se": 0.04355,
+          "ci95": [
+            4.92036,
+            5.09107
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.926,
+          "expected": 5,
+          "delta": -0.074,
+          "se": 0.05097,
+          "ci95": [
+            4.82609,
+            5.02591
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.07917,
+            "se": 0.04529,
+            "ci95": [
+              -0.16794,
+              0.00961
+            ],
+            "positiveTargets": 423,
+            "negativeTargets": 465,
+            "tiedTargets": 312
+          },
+          "development": {
+            "meanDelta": -0.04429,
+            "se": 0.05952,
+            "ci95": [
+              -0.16095,
+              0.07238
+            ],
+            "positiveTargets": 257,
+            "negativeTargets": 262,
+            "tiedTargets": 181
+          },
+          "holdout": {
+            "meanDelta": -0.128,
+            "se": 0.06981,
+            "ci95": [
+              -0.26482,
+              0.00882
+            ],
+            "positiveTargets": 166,
+            "negativeTargets": 203,
+            "tiedTargets": 131
+          }
+        },
+        "numerone": null
+      },
+      "recent100": {
+        "label": "recent100",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00333,
+          "expected": 5,
+          "delta": 0.00333,
+          "se": 0.03388,
+          "ci95": [
+            4.93692,
+            5.06975
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00571,
+          "expected": 5,
+          "delta": 0.00571,
+          "se": 0.04503,
+          "ci95": [
+            4.91746,
+            5.09397
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5,
+          "expected": 5,
+          "delta": 0,
+          "se": 0.05143,
+          "ci95": [
+            4.89919,
+            5.10081
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04833,
+            "se": 0.04689,
+            "ci95": [
+              -0.14023,
+              0.04357
+            ],
+            "positiveTargets": 430,
+            "negativeTargets": 471,
+            "tiedTargets": 299
+          },
+          "development": {
+            "meanDelta": -0.04429,
+            "se": 0.06277,
+            "ci95": [
+              -0.16731,
+              0.07874
+            ],
+            "positiveTargets": 266,
+            "negativeTargets": 270,
+            "tiedTargets": 164
+          },
+          "holdout": {
+            "meanDelta": -0.054,
+            "se": 0.07037,
+            "ci95": [
+              -0.19193,
+              0.08393
+            ],
+            "positiveTargets": 164,
+            "negativeTargets": 201,
+            "tiedTargets": 135
+          }
+        },
+        "numerone": null
+      },
+      "recent200": {
+        "label": "recent200",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98417,
+          "expected": 5,
+          "delta": -0.01583,
+          "se": 0.03346,
+          "ci95": [
+            4.91859,
+            5.04975
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96857,
+          "expected": 5,
+          "delta": -0.03143,
+          "se": 0.04335,
+          "ci95": [
+            4.88361,
+            5.05353
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.006,
+          "expected": 5,
+          "delta": 0.006,
+          "se": 0.05263,
+          "ci95": [
+            4.90285,
+            5.10915
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0675,
+            "se": 0.04758,
+            "ci95": [
+              -0.16076,
+              0.02576
+            ],
+            "positiveTargets": 433,
+            "negativeTargets": 453,
+            "tiedTargets": 314
+          },
+          "development": {
+            "meanDelta": -0.08143,
+            "se": 0.06323,
+            "ci95": [
+              -0.20536,
+              0.04251
+            ],
+            "positiveTargets": 251,
+            "negativeTargets": 272,
+            "tiedTargets": 177
+          },
+          "holdout": {
+            "meanDelta": -0.048,
+            "se": 0.07221,
+            "ci95": [
+              -0.18953,
+              0.09353
+            ],
+            "positiveTargets": 182,
+            "negativeTargets": 181,
+            "tiedTargets": 137
+          }
+        },
+        "numerone": null
+      },
+      "recent500": {
+        "label": "recent500",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98917,
+          "expected": 5,
+          "delta": -0.01083,
+          "se": 0.03208,
+          "ci95": [
+            4.92629,
+            5.05205
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01571,
+          "expected": 5,
+          "delta": 0.01571,
+          "se": 0.04199,
+          "ci95": [
+            4.93341,
+            5.09802
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.952,
+          "expected": 5,
+          "delta": -0.048,
+          "se": 0.04972,
+          "ci95": [
+            4.85454,
+            5.04946
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0625,
+            "se": 0.04563,
+            "ci95": [
+              -0.15194,
+              0.02694
+            ],
+            "positiveTargets": 431,
+            "negativeTargets": 466,
+            "tiedTargets": 303
+          },
+          "development": {
+            "meanDelta": -0.03429,
+            "se": 0.06124,
+            "ci95": [
+              -0.15432,
+              0.08575
+            ],
+            "positiveTargets": 268,
+            "negativeTargets": 267,
+            "tiedTargets": 165
+          },
+          "holdout": {
+            "meanDelta": -0.102,
+            "se": 0.06818,
+            "ci95": [
+              -0.23563,
+              0.03163
+            ],
+            "positiveTargets": 163,
+            "negativeTargets": 199,
+            "tiedTargets": 138
+          }
+        },
+        "numerone": null
+      },
+      "globalRecent50": {
+        "label": "globalRecent50",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00417,
+          "expected": 5,
+          "delta": 0.00417,
+          "se": 0.03444,
+          "ci95": [
+            4.93666,
+            5.07168
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00286,
+          "expected": 5,
+          "delta": 0.00286,
+          "se": 0.04498,
+          "ci95": [
+            4.91469,
+            5.09102
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.006,
+          "expected": 5,
+          "delta": 0.006,
+          "se": 0.05361,
+          "ci95": [
+            4.90093,
+            5.11107
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0475,
+            "se": 0.04446,
+            "ci95": [
+              -0.13465,
+              0.03965
+            ],
+            "positiveTargets": 425,
+            "negativeTargets": 450,
+            "tiedTargets": 325
+          },
+          "development": {
+            "meanDelta": -0.04714,
+            "se": 0.05827,
+            "ci95": [
+              -0.16135,
+              0.06707
+            ],
+            "positiveTargets": 244,
+            "negativeTargets": 257,
+            "tiedTargets": 199
+          },
+          "holdout": {
+            "meanDelta": -0.048,
+            "se": 0.06885,
+            "ci95": [
+              -0.18295,
+              0.08695
+            ],
+            "positiveTargets": 181,
+            "negativeTargets": 193,
+            "tiedTargets": 126
+          }
+        },
+        "numerone": null
+      },
+      "delayOverdue": {
+        "label": "delayOverdue",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.0075,
+          "expected": 5,
+          "delta": 0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.94208,
+            5.07292
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03571,
+          "expected": 5,
+          "delta": 0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.94898,
+            5.12245
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.968,
+          "expected": 5,
+          "delta": -0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.86846,
+            5.06754
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04417,
+            "se": 0.04662,
+            "ci95": [
+              -0.13554,
+              0.0472
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 459,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": -0.01429,
+            "se": 0.06099,
+            "ci95": [
+              -0.13382,
+              0.10525
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 263,
+            "tiedTargets": 175
+          },
+          "holdout": {
+            "meanDelta": -0.086,
+            "se": 0.07233,
+            "ci95": [
+              -0.22777,
+              0.05577
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 196,
+            "tiedTargets": 129
+          }
+        },
+        "numerone": null
+      },
+      "delayRecent": {
+        "label": "delayRecent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9925,
+          "expected": 5,
+          "delta": -0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.92708,
+            5.05792
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96429,
+          "expected": 5,
+          "delta": -0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.87755,
+            5.05102
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.93246,
+            5.13154
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.05917,
+            "se": 0.04666,
+            "ci95": [
+              -0.15062,
+              0.03229
+            ],
+            "positiveTargets": 440,
+            "negativeTargets": 459,
+            "tiedTargets": 301
+          },
+          "development": {
+            "meanDelta": -0.08571,
+            "se": 0.06275,
+            "ci95": [
+              -0.20871,
+              0.03728
+            ],
+            "positiveTargets": 256,
+            "negativeTargets": 277,
+            "tiedTargets": 167
+          },
+          "holdout": {
+            "meanDelta": -0.022,
+            "se": 0.06949,
+            "ci95": [
+              -0.1582,
+              0.1142
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 182,
+            "tiedTargets": 134
+          }
+        },
+        "numerone": null
+      },
+      "delayVsExpected": {
+        "label": "delayVsExpected",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.0075,
+          "expected": 5,
+          "delta": 0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.94208,
+            5.07292
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03571,
+          "expected": 5,
+          "delta": 0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.94898,
+            5.12245
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.968,
+          "expected": 5,
+          "delta": -0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.86846,
+            5.06754
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04417,
+            "se": 0.04662,
+            "ci95": [
+              -0.13554,
+              0.0472
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 459,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": -0.01429,
+            "se": 0.06099,
+            "ci95": [
+              -0.13382,
+              0.10525
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 263,
+            "tiedTargets": 175
+          },
+          "holdout": {
+            "meanDelta": -0.086,
+            "se": 0.07233,
+            "ci95": [
+              -0.22777,
+              0.05577
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 196,
+            "tiedTargets": 129
+          }
+        },
+        "numerone": null
+      },
+      "coldGlobal": {
+        "label": "coldGlobal",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98833,
+          "expected": 5,
+          "delta": -0.01167,
+          "se": 0.03469,
+          "ci95": [
+            4.92033,
+            5.05633
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00571,
+          "expected": 5,
+          "delta": 0.00571,
+          "se": 0.0457,
+          "ci95": [
+            4.91614,
+            5.09529
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.964,
+          "expected": 5,
+          "delta": -0.036,
+          "se": 0.05332,
+          "ci95": [
+            4.85949,
+            5.06851
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.06333,
+            "se": 0.05047,
+            "ci95": [
+              -0.16226,
+              0.03559
+            ],
+            "positiveTargets": 439,
+            "negativeTargets": 473,
+            "tiedTargets": 288
+          },
+          "development": {
+            "meanDelta": -0.04429,
+            "se": 0.0668,
+            "ci95": [
+              -0.17522,
+              0.08665
+            ],
+            "positiveTargets": 257,
+            "negativeTargets": 271,
+            "tiedTargets": 172
+          },
+          "holdout": {
+            "meanDelta": -0.09,
+            "se": 0.07704,
+            "ci95": [
+              -0.241,
+              0.061
+            ],
+            "positiveTargets": 182,
+            "negativeTargets": 202,
+            "tiedTargets": 116
+          }
+        },
+        "numerone": null
+      },
+      "trendUp20": {
+        "label": "trendUp20",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99917,
+          "expected": 5,
+          "delta": -0.00083,
+          "se": 0.03247,
+          "ci95": [
+            4.93552,
+            5.06281
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.97857,
+          "expected": 5,
+          "delta": -0.02143,
+          "se": 0.0438,
+          "ci95": [
+            4.89272,
+            5.06442
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.028,
+          "expected": 5,
+          "delta": 0.028,
+          "se": 0.04812,
+          "ci95": [
+            4.93369,
+            5.12231
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0525,
+            "se": 0.04531,
+            "ci95": [
+              -0.14131,
+              0.03631
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 459,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": -0.07143,
+            "se": 0.0594,
+            "ci95": [
+              -0.18785,
+              0.045
+            ],
+            "positiveTargets": 253,
+            "negativeTargets": 267,
+            "tiedTargets": 180
+          },
+          "holdout": {
+            "meanDelta": -0.026,
+            "se": 0.07012,
+            "ci95": [
+              -0.16343,
+              0.11143
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 192,
+            "tiedTargets": 124
+          }
+        },
+        "numerone": null
+      },
+      "trendDown20": {
+        "label": "trendDown20",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9975,
+          "expected": 5,
+          "delta": -0.0025,
+          "se": 0.03325,
+          "ci95": [
+            4.93232,
+            5.06268
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00429,
+          "expected": 5,
+          "delta": 0.00429,
+          "se": 0.04422,
+          "ci95": [
+            4.91761,
+            5.09097
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.988,
+          "expected": 5,
+          "delta": -0.012,
+          "se": 0.05041,
+          "ci95": [
+            4.8892,
+            5.0868
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.05417,
+            "se": 0.04705,
+            "ci95": [
+              -0.14639,
+              0.03806
+            ],
+            "positiveTargets": 440,
+            "negativeTargets": 457,
+            "tiedTargets": 303
+          },
+          "development": {
+            "meanDelta": -0.04571,
+            "se": 0.06369,
+            "ci95": [
+              -0.17054,
+              0.07911
+            ],
+            "positiveTargets": 257,
+            "negativeTargets": 266,
+            "tiedTargets": 177
+          },
+          "holdout": {
+            "meanDelta": -0.066,
+            "se": 0.06938,
+            "ci95": [
+              -0.20198,
+              0.06998
+            ],
+            "positiveTargets": 183,
+            "negativeTargets": 191,
+            "tiedTargets": 126
+          }
+        },
+        "numerone": null
+      },
+      "streak": {
+        "label": "streak",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9925,
+          "expected": 5,
+          "delta": -0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.92708,
+            5.05792
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96429,
+          "expected": 5,
+          "delta": -0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.87755,
+            5.05102
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.93246,
+            5.13154
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.05917,
+            "se": 0.04666,
+            "ci95": [
+              -0.15062,
+              0.03229
+            ],
+            "positiveTargets": 440,
+            "negativeTargets": 459,
+            "tiedTargets": 301
+          },
+          "development": {
+            "meanDelta": -0.08571,
+            "se": 0.06275,
+            "ci95": [
+              -0.20871,
+              0.03728
+            ],
+            "positiveTargets": 256,
+            "negativeTargets": 277,
+            "tiedTargets": 167
+          },
+          "holdout": {
+            "meanDelta": -0.022,
+            "se": 0.06949,
+            "ci95": [
+              -0.1582,
+              0.1142
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 182,
+            "tiedTargets": 134
+          }
+        },
+        "numerone": null
+      },
+      "antiStreak": {
+        "label": "antiStreak",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.0075,
+          "expected": 5,
+          "delta": 0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.94208,
+            5.07292
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03571,
+          "expected": 5,
+          "delta": 0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.94898,
+            5.12245
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.968,
+          "expected": 5,
+          "delta": -0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.86846,
+            5.06754
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04417,
+            "se": 0.04662,
+            "ci95": [
+              -0.13554,
+              0.0472
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 459,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": -0.01429,
+            "se": 0.06099,
+            "ci95": [
+              -0.13382,
+              0.10525
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 263,
+            "tiedTargets": 175
+          },
+          "holdout": {
+            "meanDelta": -0.086,
+            "se": 0.07233,
+            "ci95": [
+              -0.22777,
+              0.05577
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 196,
+            "tiedTargets": 129
+          }
+        },
+        "numerone": null
+      },
+      "transition": {
+        "label": "transition",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.95667,
+          "expected": 5,
+          "delta": -0.04333,
+          "se": 0.03449,
+          "ci95": [
+            4.88906,
+            5.02427
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00143,
+          "expected": 5,
+          "delta": 0.00143,
+          "se": 0.04487,
+          "ci95": [
+            4.91349,
+            5.08937
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.894,
+          "expected": 5,
+          "delta": -0.106,
+          "se": 0.05385,
+          "ci95": [
+            4.78846,
+            4.99954
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.095,
+            "se": 0.04752,
+            "ci95": [
+              -0.18814,
+              -0.00186
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 482,
+            "tiedTargets": 281
+          },
+          "development": {
+            "meanDelta": -0.04857,
+            "se": 0.06229,
+            "ci95": [
+              -0.17065,
+              0.07351
+            ],
+            "positiveTargets": 266,
+            "negativeTargets": 284,
+            "tiedTargets": 150
+          },
+          "holdout": {
+            "meanDelta": -0.16,
+            "se": 0.07348,
+            "ci95": [
+              -0.30402,
+              -0.01598
+            ],
+            "positiveTargets": 171,
+            "negativeTargets": 198,
+            "tiedTargets": 131
+          }
+        },
+        "numerone": null
+      },
+      "pairGlobal": {
+        "label": "pairGlobal",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.05,
+          "expected": 5,
+          "delta": 0.05,
+          "se": 0.03346,
+          "ci95": [
+            4.98442,
+            5.11558
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.09857,
+          "expected": 5,
+          "delta": 0.09857,
+          "se": 0.04402,
+          "ci95": [
+            5.01229,
+            5.18485
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.982,
+          "expected": 5,
+          "delta": -0.018,
+          "se": 0.05139,
+          "ci95": [
+            4.88128,
+            5.08272
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.00167,
+            "se": 0.04694,
+            "ci95": [
+              -0.09367,
+              0.09033
+            ],
+            "positiveTargets": 454,
+            "negativeTargets": 461,
+            "tiedTargets": 285
+          },
+          "development": {
+            "meanDelta": 0.04857,
+            "se": 0.06179,
+            "ci95": [
+              -0.07254,
+              0.16969
+            ],
+            "positiveTargets": 275,
+            "negativeTargets": 261,
+            "tiedTargets": 164
+          },
+          "holdout": {
+            "meanDelta": -0.072,
+            "se": 0.07211,
+            "ci95": [
+              -0.21334,
+              0.06934
+            ],
+            "positiveTargets": 179,
+            "negativeTargets": 200,
+            "tiedTargets": 121
+          }
+        },
+        "numerone": null
+      },
+      "pairRecent": {
+        "label": "pairRecent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00833,
+          "expected": 5,
+          "delta": 0.00833,
+          "se": 0.03392,
+          "ci95": [
+            4.94184,
+            5.07483
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01143,
+          "expected": 5,
+          "delta": 0.01143,
+          "se": 0.0448,
+          "ci95": [
+            4.92363,
+            5.09923
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.004,
+          "expected": 5,
+          "delta": 0.004,
+          "se": 0.05197,
+          "ci95": [
+            4.90213,
+            5.10587
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04333,
+            "se": 0.04697,
+            "ci95": [
+              -0.13539,
+              0.04872
+            ],
+            "positiveTargets": 433,
+            "negativeTargets": 470,
+            "tiedTargets": 297
+          },
+          "development": {
+            "meanDelta": -0.03857,
+            "se": 0.06267,
+            "ci95": [
+              -0.16141,
+              0.08427
+            ],
+            "positiveTargets": 268,
+            "negativeTargets": 270,
+            "tiedTargets": 162
+          },
+          "holdout": {
+            "meanDelta": -0.05,
+            "se": 0.07083,
+            "ci95": [
+              -0.18883,
+              0.08883
+            ],
+            "positiveTargets": 165,
+            "negativeTargets": 200,
+            "tiedTargets": 135
+          }
+        },
+        "numerone": null
+      },
+      "analog8": {
+        "label": "analog8",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99083,
+          "expected": 5,
+          "delta": -0.00917,
+          "se": 0.03264,
+          "ci95": [
+            4.92686,
+            5.05481
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02143,
+          "expected": 5,
+          "delta": 0.02143,
+          "se": 0.04065,
+          "ci95": [
+            4.94175,
+            5.10111
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.948,
+          "expected": 5,
+          "delta": -0.052,
+          "se": 0.05382,
+          "ci95": [
+            4.84252,
+            5.05348
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.06083,
+            "se": 0.04713,
+            "ci95": [
+              -0.15322,
+              0.03155
+            ],
+            "positiveTargets": 431,
+            "negativeTargets": 463,
+            "tiedTargets": 306
+          },
+          "development": {
+            "meanDelta": -0.02857,
+            "se": 0.06054,
+            "ci95": [
+              -0.14723,
+              0.09009
+            ],
+            "positiveTargets": 260,
+            "negativeTargets": 257,
+            "tiedTargets": 183
+          },
+          "holdout": {
+            "meanDelta": -0.106,
+            "se": 0.07495,
+            "ci95": [
+              -0.25289,
+              0.04089
+            ],
+            "positiveTargets": 171,
+            "negativeTargets": 206,
+            "tiedTargets": 123
+          }
+        },
+        "numerone": null
+      },
+      "analog9": {
+        "label": "analog9",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01,
+          "expected": 5,
+          "delta": 0.01,
+          "se": 0.03322,
+          "ci95": [
+            4.94489,
+            5.07511
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03714,
+          "expected": 5,
+          "delta": 0.03714,
+          "se": 0.04205,
+          "ci95": [
+            4.95473,
+            5.11955
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.972,
+          "expected": 5,
+          "delta": -0.028,
+          "se": 0.05378,
+          "ci95": [
+            4.86659,
+            5.07741
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04167,
+            "se": 0.04649,
+            "ci95": [
+              -0.13279,
+              0.04946
+            ],
+            "positiveTargets": 456,
+            "negativeTargets": 458,
+            "tiedTargets": 286
+          },
+          "development": {
+            "meanDelta": -0.01286,
+            "se": 0.0609,
+            "ci95": [
+              -0.13223,
+              0.10651
+            ],
+            "positiveTargets": 272,
+            "negativeTargets": 258,
+            "tiedTargets": 170
+          },
+          "holdout": {
+            "meanDelta": -0.082,
+            "se": 0.07201,
+            "ci95": [
+              -0.22313,
+              0.05913
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 200,
+            "tiedTargets": 116
+          }
+        },
+        "numerone": null
+      },
+      "analog10": {
+        "label": "analog10",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.96167,
+          "expected": 5,
+          "delta": -0.03833,
+          "se": 0.03417,
+          "ci95": [
+            4.89469,
+            5.02865
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.97143,
+          "expected": 5,
+          "delta": -0.02857,
+          "se": 0.04582,
+          "ci95": [
+            4.88161,
+            5.06124
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.948,
+          "expected": 5,
+          "delta": -0.052,
+          "se": 0.05115,
+          "ci95": [
+            4.84776,
+            5.04824
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.09,
+            "se": 0.04738,
+            "ci95": [
+              -0.18287,
+              0.00287
+            ],
+            "positiveTargets": 428,
+            "negativeTargets": 463,
+            "tiedTargets": 309
+          },
+          "development": {
+            "meanDelta": -0.07857,
+            "se": 0.06362,
+            "ci95": [
+              -0.20327,
+              0.04613
+            ],
+            "positiveTargets": 257,
+            "negativeTargets": 272,
+            "tiedTargets": 171
+          },
+          "holdout": {
+            "meanDelta": -0.106,
+            "se": 0.07076,
+            "ci95": [
+              -0.2447,
+              0.0327
+            ],
+            "positiveTargets": 171,
+            "negativeTargets": 191,
+            "tiedTargets": 138
+          }
+        },
+        "numerone": null
+      },
+      "repeat2": {
+        "label": "repeat2",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00917,
+          "expected": 5,
+          "delta": 0.00917,
+          "se": 0.03468,
+          "ci95": [
+            4.94119,
+            5.07715
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99,
+          "expected": 5,
+          "delta": -0.01,
+          "se": 0.0455,
+          "ci95": [
+            4.90082,
+            5.07918
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.036,
+          "expected": 5,
+          "delta": 0.036,
+          "se": 0.05362,
+          "ci95": [
+            4.9309,
+            5.1411
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0425,
+            "se": 0.04458,
+            "ci95": [
+              -0.12987,
+              0.04487
+            ],
+            "positiveTargets": 427,
+            "negativeTargets": 453,
+            "tiedTargets": 320
+          },
+          "development": {
+            "meanDelta": -0.06,
+            "se": 0.0589,
+            "ci95": [
+              -0.17544,
+              0.05544
+            ],
+            "positiveTargets": 243,
+            "negativeTargets": 262,
+            "tiedTargets": 195
+          },
+          "holdout": {
+            "meanDelta": -0.018,
+            "se": 0.06821,
+            "ci95": [
+              -0.15169,
+              0.11569
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 191,
+            "tiedTargets": 125
+          }
+        },
+        "numerone": null
+      },
+      "repeat4": {
+        "label": "repeat4",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01833,
+          "expected": 5,
+          "delta": 0.01833,
+          "se": 0.03477,
+          "ci95": [
+            4.95018,
+            5.08649
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00714,
+          "expected": 5,
+          "delta": 0.00714,
+          "se": 0.04541,
+          "ci95": [
+            4.91814,
+            5.09615
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.034,
+          "expected": 5,
+          "delta": 0.034,
+          "se": 0.05411,
+          "ci95": [
+            4.92795,
+            5.14005
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.03333,
+            "se": 0.04461,
+            "ci95": [
+              -0.12076,
+              0.05409
+            ],
+            "positiveTargets": 430,
+            "negativeTargets": 452,
+            "tiedTargets": 318
+          },
+          "development": {
+            "meanDelta": -0.04286,
+            "se": 0.05861,
+            "ci95": [
+              -0.15773,
+              0.07202
+            ],
+            "positiveTargets": 247,
+            "negativeTargets": 260,
+            "tiedTargets": 193
+          },
+          "holdout": {
+            "meanDelta": -0.02,
+            "se": 0.06882,
+            "ci95": [
+              -0.15489,
+              0.11489
+            ],
+            "positiveTargets": 183,
+            "negativeTargets": 192,
+            "tiedTargets": 125
+          }
+        },
+        "numerone": null
+      },
+      "repeat6": {
+        "label": "repeat6",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.03917,
+          "expected": 5,
+          "delta": 0.03917,
+          "se": 0.03453,
+          "ci95": [
+            4.97149,
+            5.10684
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.04857,
+          "expected": 5,
+          "delta": 0.04857,
+          "se": 0.04553,
+          "ci95": [
+            4.95933,
+            5.13781
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.026,
+          "expected": 5,
+          "delta": 0.026,
+          "se": 0.05299,
+          "ci95": [
+            4.92213,
+            5.12987
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0125,
+            "se": 0.04447,
+            "ci95": [
+              -0.09965,
+              0.07465
+            ],
+            "positiveTargets": 434,
+            "negativeTargets": 439,
+            "tiedTargets": 327
+          },
+          "development": {
+            "meanDelta": -0.00143,
+            "se": 0.05927,
+            "ci95": [
+              -0.1176,
+              0.11474
+            ],
+            "positiveTargets": 258,
+            "negativeTargets": 254,
+            "tiedTargets": 188
+          },
+          "holdout": {
+            "meanDelta": -0.028,
+            "se": 0.06717,
+            "ci95": [
+              -0.15965,
+              0.10365
+            ],
+            "positiveTargets": 176,
+            "negativeTargets": 185,
+            "tiedTargets": 139
+          }
+        },
+        "numerone": null
+      },
+      "repeat8": {
+        "label": "repeat8",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.02,
+          "expected": 5,
+          "delta": 0.02,
+          "se": 0.03353,
+          "ci95": [
+            4.95428,
+            5.08572
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01143,
+          "expected": 5,
+          "delta": 0.01143,
+          "se": 0.04411,
+          "ci95": [
+            4.92498,
+            5.09788
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "se": 0.05165,
+          "ci95": [
+            4.93077,
+            5.13323
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.03167,
+            "se": 0.04567,
+            "ci95": [
+              -0.12118,
+              0.05784
+            ],
+            "positiveTargets": 441,
+            "negativeTargets": 450,
+            "tiedTargets": 309
+          },
+          "development": {
+            "meanDelta": -0.03857,
+            "se": 0.06035,
+            "ci95": [
+              -0.15685,
+              0.07971
+            ],
+            "positiveTargets": 253,
+            "negativeTargets": 265,
+            "tiedTargets": 182
+          },
+          "holdout": {
+            "meanDelta": -0.022,
+            "se": 0.06989,
+            "ci95": [
+              -0.15899,
+              0.11499
+            ],
+            "positiveTargets": 188,
+            "negativeTargets": 185,
+            "tiedTargets": 127
+          }
+        },
+        "numerone": null
+      },
+      "repeat10": {
+        "label": "repeat10",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9925,
+          "expected": 5,
+          "delta": -0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.92708,
+            5.05792
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96429,
+          "expected": 5,
+          "delta": -0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.87755,
+            5.05102
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.93246,
+            5.13154
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.05917,
+            "se": 0.04666,
+            "ci95": [
+              -0.15062,
+              0.03229
+            ],
+            "positiveTargets": 440,
+            "negativeTargets": 459,
+            "tiedTargets": 301
+          },
+          "development": {
+            "meanDelta": -0.08571,
+            "se": 0.06275,
+            "ci95": [
+              -0.20871,
+              0.03728
+            ],
+            "positiveTargets": 256,
+            "negativeTargets": 277,
+            "tiedTargets": 167
+          },
+          "holdout": {
+            "meanDelta": -0.022,
+            "se": 0.06949,
+            "ci95": [
+              -0.1582,
+              0.1142
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 182,
+            "tiedTargets": 134
+          }
+        },
+        "numerone": null
+      },
+      "exclude2": {
+        "label": "exclude2",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00917,
+          "expected": 5,
+          "delta": 0.00917,
+          "se": 0.03466,
+          "ci95": [
+            4.94122,
+            5.07711
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99143,
+          "expected": 5,
+          "delta": -0.00857,
+          "se": 0.04548,
+          "ci95": [
+            4.90229,
+            5.08056
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.034,
+          "expected": 5,
+          "delta": 0.034,
+          "se": 0.05359,
+          "ci95": [
+            4.92897,
+            5.13903
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0425,
+            "se": 0.0445,
+            "ci95": [
+              -0.12971,
+              0.04471
+            ],
+            "positiveTargets": 427,
+            "negativeTargets": 453,
+            "tiedTargets": 320
+          },
+          "development": {
+            "meanDelta": -0.05857,
+            "se": 0.05882,
+            "ci95": [
+              -0.17385,
+              0.05671
+            ],
+            "positiveTargets": 243,
+            "negativeTargets": 262,
+            "tiedTargets": 195
+          },
+          "holdout": {
+            "meanDelta": -0.02,
+            "se": 0.06806,
+            "ci95": [
+              -0.1534,
+              0.1134
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 191,
+            "tiedTargets": 125
+          }
+        },
+        "numerone": null
+      },
+      "exclude4": {
+        "label": "exclude4",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.02167,
+          "expected": 5,
+          "delta": 0.02167,
+          "se": 0.03429,
+          "ci95": [
+            4.95446,
+            5.08887
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00571,
+          "expected": 5,
+          "delta": 0.00571,
+          "se": 0.04494,
+          "ci95": [
+            4.91764,
+            5.09379
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.044,
+          "expected": 5,
+          "delta": 0.044,
+          "se": 0.05308,
+          "ci95": [
+            4.93996,
+            5.14804
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.03,
+            "se": 0.04431,
+            "ci95": [
+              -0.11685,
+              0.05685
+            ],
+            "positiveTargets": 435,
+            "negativeTargets": 448,
+            "tiedTargets": 317
+          },
+          "development": {
+            "meanDelta": -0.04429,
+            "se": 0.05848,
+            "ci95": [
+              -0.15892,
+              0.07034
+            ],
+            "positiveTargets": 249,
+            "negativeTargets": 256,
+            "tiedTargets": 195
+          },
+          "holdout": {
+            "meanDelta": -0.01,
+            "se": 0.06792,
+            "ci95": [
+              -0.14312,
+              0.12312
+            ],
+            "positiveTargets": 186,
+            "negativeTargets": 192,
+            "tiedTargets": 122
+          }
+        },
+        "numerone": null
+      },
+      "exclude6": {
+        "label": "exclude6",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.04083,
+          "expected": 5,
+          "delta": 0.04083,
+          "se": 0.03348,
+          "ci95": [
+            4.97521,
+            5.10646
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.04857,
+          "expected": 5,
+          "delta": 0.04857,
+          "se": 0.04458,
+          "ci95": [
+            4.9612,
+            5.13594
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.03,
+          "expected": 5,
+          "delta": 0.03,
+          "se": 0.05067,
+          "ci95": [
+            4.93069,
+            5.12931
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.01083,
+            "se": 0.04396,
+            "ci95": [
+              -0.097,
+              0.07533
+            ],
+            "positiveTargets": 433,
+            "negativeTargets": 440,
+            "tiedTargets": 327
+          },
+          "development": {
+            "meanDelta": -0.00143,
+            "se": 0.0584,
+            "ci95": [
+              -0.1159,
+              0.11304
+            ],
+            "positiveTargets": 255,
+            "negativeTargets": 248,
+            "tiedTargets": 197
+          },
+          "holdout": {
+            "meanDelta": -0.024,
+            "se": 0.06675,
+            "ci95": [
+              -0.15483,
+              0.10683
+            ],
+            "positiveTargets": 178,
+            "negativeTargets": 192,
+            "tiedTargets": 130
+          }
+        },
+        "numerone": null
+      },
+      "exclude8": {
+        "label": "exclude8",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.04917,
+          "expected": 5,
+          "delta": 0.04917,
+          "se": 0.03339,
+          "ci95": [
+            4.98372,
+            5.11461
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.09571,
+          "expected": 5,
+          "delta": 0.09571,
+          "se": 0.04412,
+          "ci95": [
+            5.00923,
+            5.1822
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.984,
+          "expected": 5,
+          "delta": -0.016,
+          "se": 0.05096,
+          "ci95": [
+            4.88412,
+            5.08388
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0025,
+            "se": 0.04518,
+            "ci95": [
+              -0.09105,
+              0.08605
+            ],
+            "positiveTargets": 458,
+            "negativeTargets": 438,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": 0.04571,
+            "se": 0.06053,
+            "ci95": [
+              -0.07292,
+              0.16435
+            ],
+            "positiveTargets": 274,
+            "negativeTargets": 245,
+            "tiedTargets": 181
+          },
+          "holdout": {
+            "meanDelta": -0.07,
+            "se": 0.06761,
+            "ci95": [
+              -0.20252,
+              0.06252
+            ],
+            "positiveTargets": 184,
+            "negativeTargets": 193,
+            "tiedTargets": 123
+          }
+        },
+        "numerone": null
+      },
+      "exclude10": {
+        "label": "exclude10",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.0075,
+          "expected": 5,
+          "delta": 0.0075,
+          "se": 0.03338,
+          "ci95": [
+            4.94208,
+            5.07292
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03571,
+          "expected": 5,
+          "delta": 0.03571,
+          "se": 0.04425,
+          "ci95": [
+            4.94898,
+            5.12245
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.968,
+          "expected": 5,
+          "delta": -0.032,
+          "se": 0.05078,
+          "ci95": [
+            4.86846,
+            5.06754
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04417,
+            "se": 0.04662,
+            "ci95": [
+              -0.13554,
+              0.0472
+            ],
+            "positiveTargets": 437,
+            "negativeTargets": 459,
+            "tiedTargets": 304
+          },
+          "development": {
+            "meanDelta": -0.01429,
+            "se": 0.06099,
+            "ci95": [
+              -0.13382,
+              0.10525
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 263,
+            "tiedTargets": 175
+          },
+          "holdout": {
+            "meanDelta": -0.086,
+            "se": 0.07233,
+            "ci95": [
+              -0.22777,
+              0.05577
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 196,
+            "tiedTargets": 129
+          }
+        },
+        "numerone": null
+      },
+      "lifecycle": {
+        "label": "lifecycle",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9775,
+          "expected": 5,
+          "delta": -0.0225,
+          "se": 0.03153,
+          "ci95": [
+            4.9157,
+            5.0393
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96714,
+          "expected": 5,
+          "delta": -0.03286,
+          "se": 0.04124,
+          "ci95": [
+            4.88631,
+            5.04798
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.992,
+          "expected": 5,
+          "delta": -0.008,
+          "se": 0.04896,
+          "ci95": [
+            4.89605,
+            5.08795
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.07417,
+            "se": 0.0444,
+            "ci95": [
+              -0.16119,
+              0.01286
+            ],
+            "positiveTargets": 423,
+            "negativeTargets": 454,
+            "tiedTargets": 323
+          },
+          "development": {
+            "meanDelta": -0.08286,
+            "se": 0.05813,
+            "ci95": [
+              -0.19679,
+              0.03107
+            ],
+            "positiveTargets": 250,
+            "negativeTargets": 259,
+            "tiedTargets": 191
+          },
+          "holdout": {
+            "meanDelta": -0.062,
+            "se": 0.06886,
+            "ci95": [
+              -0.19697,
+              0.07297
+            ],
+            "positiveTargets": 173,
+            "negativeTargets": 195,
+            "tiedTargets": 132
+          }
+        },
+        "numerone": null
+      },
+      "returnAfterAbsent": {
+        "label": "returnAfterAbsent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99083,
+          "expected": 5,
+          "delta": -0.00917,
+          "se": 0.03191,
+          "ci95": [
+            4.92829,
+            5.05337
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00286,
+          "expected": 5,
+          "delta": 0.00286,
+          "se": 0.04222,
+          "ci95": [
+            4.92012,
+            5.0856
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.974,
+          "expected": 5,
+          "delta": -0.026,
+          "se": 0.04874,
+          "ci95": [
+            4.87847,
+            5.06953
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.06083,
+            "se": 0.04418,
+            "ci95": [
+              -0.14743,
+              0.02576
+            ],
+            "positiveTargets": 430,
+            "negativeTargets": 458,
+            "tiedTargets": 312
+          },
+          "development": {
+            "meanDelta": -0.04714,
+            "se": 0.05827,
+            "ci95": [
+              -0.16135,
+              0.06707
+            ],
+            "positiveTargets": 253,
+            "negativeTargets": 262,
+            "tiedTargets": 185
+          },
+          "holdout": {
+            "meanDelta": -0.08,
+            "se": 0.0678,
+            "ci95": [
+              -0.21288,
+              0.05288
+            ],
+            "positiveTargets": 177,
+            "negativeTargets": 196,
+            "tiedTargets": 127
+          }
+        },
+        "numerone": null
+      },
+      "balancedOddEven": {
+        "label": "balancedOddEven",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.0475,
+          "expected": 5,
+          "delta": 0.0475,
+          "se": 0.03381,
+          "ci95": [
+            4.98124,
+            5.11376
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.04857,
+          "expected": 5,
+          "delta": 0.04857,
+          "se": 0.04402,
+          "ci95": [
+            4.96228,
+            5.13486
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.046,
+          "expected": 5,
+          "delta": 0.046,
+          "se": 0.05281,
+          "ci95": [
+            4.94248,
+            5.14952
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.00417,
+            "se": 0.04396,
+            "ci95": [
+              -0.09034,
+              0.082
+            ],
+            "positiveTargets": 424,
+            "negativeTargets": 435,
+            "tiedTargets": 341
+          },
+          "development": {
+            "meanDelta": -0.00143,
+            "se": 0.05802,
+            "ci95": [
+              -0.11514,
+              0.11229
+            ],
+            "positiveTargets": 250,
+            "negativeTargets": 250,
+            "tiedTargets": 200
+          },
+          "holdout": {
+            "meanDelta": -0.008,
+            "se": 0.06742,
+            "ci95": [
+              -0.14014,
+              0.12414
+            ],
+            "positiveTargets": 174,
+            "negativeTargets": 185,
+            "tiedTargets": 141
+          }
+        },
+        "numerone": null
+      },
+      "balancedLowHigh": {
+        "label": "balancedLowHigh",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01167,
+          "expected": 5,
+          "delta": 0.01167,
+          "se": 0.03433,
+          "ci95": [
+            4.94438,
+            5.07896
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02429,
+          "expected": 5,
+          "delta": 0.02429,
+          "se": 0.04458,
+          "ci95": [
+            4.9369,
+            5.11167
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.994,
+          "expected": 5,
+          "delta": -0.006,
+          "se": 0.05383,
+          "ci95": [
+            4.88849,
+            5.09951
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04,
+            "se": 0.04424,
+            "ci95": [
+              -0.12671,
+              0.04671
+            ],
+            "positiveTargets": 440,
+            "negativeTargets": 446,
+            "tiedTargets": 314
+          },
+          "development": {
+            "meanDelta": -0.02571,
+            "se": 0.05806,
+            "ci95": [
+              -0.13952,
+              0.08809
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 252,
+            "tiedTargets": 186
+          },
+          "holdout": {
+            "meanDelta": -0.06,
+            "se": 0.06837,
+            "ci95": [
+              -0.194,
+              0.074
+            ],
+            "positiveTargets": 178,
+            "negativeTargets": 194,
+            "tiedTargets": 128
+          }
+        },
+        "numerone": null
+      },
+      "hour": {
+        "label": "hour",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.97833,
+          "expected": 5,
+          "delta": -0.02167,
+          "se": 0.03265,
+          "ci95": [
+            4.91435,
+            5.04232
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.96714,
+          "expected": 5,
+          "delta": -0.03286,
+          "se": 0.04332,
+          "ci95": [
+            4.88224,
+            5.05205
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.994,
+          "expected": 5,
+          "delta": -0.006,
+          "se": 0.04965,
+          "ci95": [
+            4.89669,
+            5.09131
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.07333,
+            "se": 0.04041,
+            "ci95": [
+              -0.15254,
+              0.00587
+            ],
+            "positiveTargets": 409,
+            "negativeTargets": 464,
+            "tiedTargets": 327
+          },
+          "development": {
+            "meanDelta": -0.08286,
+            "se": 0.0529,
+            "ci95": [
+              -0.18654,
+              0.02082
+            ],
+            "positiveTargets": 236,
+            "negativeTargets": 278,
+            "tiedTargets": 186
+          },
+          "holdout": {
+            "meanDelta": -0.06,
+            "se": 0.06268,
+            "ci95": [
+              -0.18285,
+              0.06285
+            ],
+            "positiveTargets": 173,
+            "negativeTargets": 186,
+            "tiedTargets": 141
+          }
+        },
+        "numerone": null
+      },
+      "hourrecent": {
+        "label": "hourrecent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.05167,
+          "expected": 5,
+          "delta": 0.05167,
+          "se": 0.03258,
+          "ci95": [
+            4.98782,
+            5.11551
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.05,
+          "expected": 5,
+          "delta": 0.05,
+          "se": 0.04325,
+          "ci95": [
+            4.96523,
+            5.13477
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.054,
+          "expected": 5,
+          "delta": 0.054,
+          "se": 0.04951,
+          "ci95": [
+            4.95696,
+            5.15104
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 1200
+          },
+          "development": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 700
+          },
+          "holdout": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positiveTargets": 0,
+            "negativeTargets": 0,
+            "tiedTargets": 500
+          }
+        },
+        "numerone": null
+      },
+      "weekday": {
+        "label": "weekday",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00583,
+          "expected": 5,
+          "delta": 0.00583,
+          "se": 0.03296,
+          "ci95": [
+            4.94123,
+            5.07043
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03857,
+          "expected": 5,
+          "delta": 0.03857,
+          "se": 0.04183,
+          "ci95": [
+            4.95659,
+            5.12055
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.96,
+          "expected": 5,
+          "delta": -0.04,
+          "se": 0.05316,
+          "ci95": [
+            4.8558,
+            5.0642
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04583,
+            "se": 0.04476,
+            "ci95": [
+              -0.13356,
+              0.04189
+            ],
+            "positiveTargets": 438,
+            "negativeTargets": 459,
+            "tiedTargets": 303
+          },
+          "development": {
+            "meanDelta": -0.01143,
+            "se": 0.05915,
+            "ci95": [
+              -0.12736,
+              0.1045
+            ],
+            "positiveTargets": 267,
+            "negativeTargets": 258,
+            "tiedTargets": 175
+          },
+          "holdout": {
+            "meanDelta": -0.094,
+            "se": 0.06844,
+            "ci95": [
+              -0.22814,
+              0.04014
+            ],
+            "positiveTargets": 171,
+            "negativeTargets": 201,
+            "tiedTargets": 128
+          }
+        },
+        "numerone": null
+      },
+      "weekdayrecent": {
+        "label": "weekdayrecent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98417,
+          "expected": 5,
+          "delta": -0.01583,
+          "se": 0.03391,
+          "ci95": [
+            4.9177,
+            5.05064
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00143,
+          "expected": 5,
+          "delta": 0.00143,
+          "se": 0.04432,
+          "ci95": [
+            4.91457,
+            5.08829
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.96,
+          "expected": 5,
+          "delta": -0.04,
+          "se": 0.05271,
+          "ci95": [
+            4.85669,
+            5.06331
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0675,
+            "se": 0.04659,
+            "ci95": [
+              -0.15882,
+              0.02382
+            ],
+            "positiveTargets": 445,
+            "negativeTargets": 466,
+            "tiedTargets": 289
+          },
+          "development": {
+            "meanDelta": -0.04857,
+            "se": 0.06222,
+            "ci95": [
+              -0.17053,
+              0.07338
+            ],
+            "positiveTargets": 268,
+            "negativeTargets": 265,
+            "tiedTargets": 167
+          },
+          "holdout": {
+            "meanDelta": -0.094,
+            "se": 0.07017,
+            "ci95": [
+              -0.23154,
+              0.04354
+            ],
+            "positiveTargets": 177,
+            "negativeTargets": 201,
+            "tiedTargets": 122
+          }
+        },
+        "numerone": null
+      },
+      "month": {
+        "label": "month",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.95083,
+          "expected": 5,
+          "delta": -0.04917,
+          "se": 0.03263,
+          "ci95": [
+            4.88687,
+            5.01479
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.95,
+          "expected": 5,
+          "delta": -0.05,
+          "se": 0.04469,
+          "ci95": [
+            4.86241,
+            5.03759
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.952,
+          "expected": 5,
+          "delta": -0.048,
+          "se": 0.04716,
+          "ci95": [
+            4.85957,
+            5.04443
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.10083,
+            "se": 0.04753,
+            "ci95": [
+              -0.194,
+              -0.00767
+            ],
+            "positiveTargets": 406,
+            "negativeTargets": 485,
+            "tiedTargets": 309
+          },
+          "development": {
+            "meanDelta": -0.1,
+            "se": 0.06452,
+            "ci95": [
+              -0.22646,
+              0.02646
+            ],
+            "positiveTargets": 243,
+            "negativeTargets": 288,
+            "tiedTargets": 169
+          },
+          "holdout": {
+            "meanDelta": -0.102,
+            "se": 0.06975,
+            "ci95": [
+              -0.23871,
+              0.03471
+            ],
+            "positiveTargets": 163,
+            "negativeTargets": 197,
+            "tiedTargets": 140
+          }
+        },
+        "numerone": null
+      },
+      "monthrecent": {
+        "label": "monthrecent",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.97333,
+          "expected": 5,
+          "delta": -0.02667,
+          "se": 0.03359,
+          "ci95": [
+            4.9075,
+            5.03916
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.95143,
+          "expected": 5,
+          "delta": -0.04857,
+          "se": 0.04332,
+          "ci95": [
+            4.86652,
+            5.03634
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.004,
+          "expected": 5,
+          "delta": 0.004,
+          "se": 0.05312,
+          "ci95": [
+            4.89989,
+            5.10811
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.07833,
+            "se": 0.04801,
+            "ci95": [
+              -0.17244,
+              0.01577
+            ],
+            "positiveTargets": 431,
+            "negativeTargets": 456,
+            "tiedTargets": 313
+          },
+          "development": {
+            "meanDelta": -0.09857,
+            "se": 0.06313,
+            "ci95": [
+              -0.22231,
+              0.02517
+            ],
+            "positiveTargets": 250,
+            "negativeTargets": 272,
+            "tiedTargets": 178
+          },
+          "holdout": {
+            "meanDelta": -0.05,
+            "se": 0.07399,
+            "ci95": [
+              -0.19501,
+              0.09501
+            ],
+            "positiveTargets": 181,
+            "negativeTargets": 184,
+            "tiedTargets": 135
+          }
+        },
+        "numerone": null
+      },
+      "intraday3": {
+        "label": "intraday3",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00833,
+          "expected": 5,
+          "delta": 0.00833,
+          "se": 0.03242,
+          "ci95": [
+            4.9448,
+            5.07187
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00143,
+          "expected": 5,
+          "delta": 0.00143,
+          "se": 0.0431,
+          "ci95": [
+            4.91695,
+            5.08591
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.018,
+          "expected": 5,
+          "delta": 0.018,
+          "se": 0.04915,
+          "ci95": [
+            4.92166,
+            5.11434
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.04333,
+            "se": 0.04536,
+            "ci95": [
+              -0.13223,
+              0.04556
+            ],
+            "positiveTargets": 438,
+            "negativeTargets": 465,
+            "tiedTargets": 297
+          },
+          "development": {
+            "meanDelta": -0.04857,
+            "se": 0.05991,
+            "ci95": [
+              -0.166,
+              0.06886
+            ],
+            "positiveTargets": 255,
+            "negativeTargets": 271,
+            "tiedTargets": 174
+          },
+          "holdout": {
+            "meanDelta": -0.036,
+            "se": 0.06945,
+            "ci95": [
+              -0.17212,
+              0.10012
+            ],
+            "positiveTargets": 183,
+            "negativeTargets": 194,
+            "tiedTargets": 123
+          }
+        },
+        "numerone": null
+      },
+      "intraday5": {
+        "label": "intraday5",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.02833,
+          "expected": 5,
+          "delta": 0.02833,
+          "se": 0.0329,
+          "ci95": [
+            4.96386,
+            5.09281
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01143,
+          "expected": 5,
+          "delta": 0.01143,
+          "se": 0.04373,
+          "ci95": [
+            4.92571,
+            5.09715
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.052,
+          "expected": 5,
+          "delta": 0.052,
+          "se": 0.04988,
+          "ci95": [
+            4.95424,
+            5.14976
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.02333,
+            "se": 0.04515,
+            "ci95": [
+              -0.11183,
+              0.06517
+            ],
+            "positiveTargets": 451,
+            "negativeTargets": 451,
+            "tiedTargets": 298
+          },
+          "development": {
+            "meanDelta": -0.03857,
+            "se": 0.0596,
+            "ci95": [
+              -0.15538,
+              0.07824
+            ],
+            "positiveTargets": 262,
+            "negativeTargets": 274,
+            "tiedTargets": 164
+          },
+          "holdout": {
+            "meanDelta": -0.002,
+            "se": 0.06921,
+            "ci95": [
+              -0.13765,
+              0.13365
+            ],
+            "positiveTargets": 189,
+            "negativeTargets": 177,
+            "tiedTargets": 134
+          }
+        },
+        "numerone": null
+      },
+      "intraday10": {
+        "label": "intraday10",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00667,
+          "expected": 5,
+          "delta": 0.00667,
+          "se": 0.0338,
+          "ci95": [
+            4.94041,
+            5.07292
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99,
+          "expected": 5,
+          "delta": -0.01,
+          "se": 0.04404,
+          "ci95": [
+            4.90369,
+            5.07631
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.03,
+          "expected": 5,
+          "delta": 0.03,
+          "se": 0.05276,
+          "ci95": [
+            4.92659,
+            5.13341
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.045,
+            "se": 0.0464,
+            "ci95": [
+              -0.13594,
+              0.04594
+            ],
+            "positiveTargets": 444,
+            "negativeTargets": 453,
+            "tiedTargets": 303
+          },
+          "development": {
+            "meanDelta": -0.06,
+            "se": 0.06118,
+            "ci95": [
+              -0.17991,
+              0.05991
+            ],
+            "positiveTargets": 256,
+            "negativeTargets": 273,
+            "tiedTargets": 171
+          },
+          "holdout": {
+            "meanDelta": -0.024,
+            "se": 0.07122,
+            "ci95": [
+              -0.1636,
+              0.1156
+            ],
+            "positiveTargets": 188,
+            "negativeTargets": 180,
+            "tiedTargets": 132
+          }
+        },
+        "numerone": null
+      },
+      "rolling6": {
+        "label": "rolling6",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00083,
+          "expected": 5,
+          "delta": 0.00083,
+          "se": 0.03279,
+          "ci95": [
+            4.93656,
+            5.0651
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.98286,
+          "expected": 5,
+          "delta": -0.01714,
+          "se": 0.04378,
+          "ci95": [
+            4.89705,
+            5.06866
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.026,
+          "expected": 5,
+          "delta": 0.026,
+          "se": 0.04939,
+          "ci95": [
+            4.92919,
+            5.12281
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.05083,
+            "se": 0.04586,
+            "ci95": [
+              -0.14072,
+              0.03905
+            ],
+            "positiveTargets": 443,
+            "negativeTargets": 462,
+            "tiedTargets": 295
+          },
+          "development": {
+            "meanDelta": -0.06714,
+            "se": 0.06051,
+            "ci95": [
+              -0.18575,
+              0.05147
+            ],
+            "positiveTargets": 255,
+            "negativeTargets": 278,
+            "tiedTargets": 167
+          },
+          "holdout": {
+            "meanDelta": -0.028,
+            "se": 0.07032,
+            "ci95": [
+              -0.16582,
+              0.10982
+            ],
+            "positiveTargets": 188,
+            "negativeTargets": 184,
+            "tiedTargets": 128
+          }
+        },
+        "numerone": null
+      },
+      "rolling24": {
+        "label": "rolling24",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.02417,
+          "expected": 5,
+          "delta": 0.02417,
+          "se": 0.0324,
+          "ci95": [
+            4.96066,
+            5.08767
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01286,
+          "expected": 5,
+          "delta": 0.01286,
+          "se": 0.04146,
+          "ci95": [
+            4.9316,
+            5.09411
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.04,
+          "expected": 5,
+          "delta": 0.04,
+          "se": 0.05179,
+          "ci95": [
+            4.93849,
+            5.14151
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0275,
+            "se": 0.04455,
+            "ci95": [
+              -0.11483,
+              0.05983
+            ],
+            "positiveTargets": 433,
+            "negativeTargets": 461,
+            "tiedTargets": 306
+          },
+          "development": {
+            "meanDelta": -0.03714,
+            "se": 0.05692,
+            "ci95": [
+              -0.1487,
+              0.07441
+            ],
+            "positiveTargets": 252,
+            "negativeTargets": 266,
+            "tiedTargets": 182
+          },
+          "holdout": {
+            "meanDelta": -0.014,
+            "se": 0.07137,
+            "ci95": [
+              -0.15389,
+              0.12589
+            ],
+            "positiveTargets": 181,
+            "negativeTargets": 195,
+            "tiedTargets": 124
+          }
+        },
+        "numerone": null
+      },
+      "rolling72": {
+        "label": "rolling72",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98667,
+          "expected": 5,
+          "delta": -0.01333,
+          "se": 0.03382,
+          "ci95": [
+            4.92038,
+            5.05296
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01429,
+          "expected": 5,
+          "delta": 0.01429,
+          "se": 0.04484,
+          "ci95": [
+            4.9264,
+            5.10217
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.948,
+          "expected": 5,
+          "delta": -0.052,
+          "se": 0.05146,
+          "ci95": [
+            4.84714,
+            5.04886
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.065,
+            "se": 0.04609,
+            "ci95": [
+              -0.15534,
+              0.02534
+            ],
+            "positiveTargets": 430,
+            "negativeTargets": 480,
+            "tiedTargets": 290
+          },
+          "development": {
+            "meanDelta": -0.03571,
+            "se": 0.06119,
+            "ci95": [
+              -0.15565,
+              0.08422
+            ],
+            "positiveTargets": 259,
+            "negativeTargets": 277,
+            "tiedTargets": 164
+          },
+          "holdout": {
+            "meanDelta": -0.106,
+            "se": 0.07002,
+            "ci95": [
+              -0.24325,
+              0.03125
+            ],
+            "positiveTargets": 171,
+            "negativeTargets": 203,
+            "tiedTargets": 126
+          }
+        },
+        "numerone": null
+      },
+      "rolling168": {
+        "label": "rolling168",
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99917,
+          "expected": 5,
+          "delta": -0.00083,
+          "se": 0.03325,
+          "ci95": [
+            4.93399,
+            5.06434
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.01571,
+          "expected": 5,
+          "delta": 0.01571,
+          "se": 0.0439,
+          "ci95": [
+            4.92968,
+            5.10175
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.976,
+          "expected": 5,
+          "delta": -0.024,
+          "se": 0.05095,
+          "ci95": [
+            4.87614,
+            5.07586
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0525,
+            "se": 0.0464,
+            "ci95": [
+              -0.14344,
+              0.03844
+            ],
+            "positiveTargets": 429,
+            "negativeTargets": 471,
+            "tiedTargets": 300
+          },
+          "development": {
+            "meanDelta": -0.03429,
+            "se": 0.06104,
+            "ci95": [
+              -0.15393,
+              0.08536
+            ],
+            "positiveTargets": 256,
+            "negativeTargets": 270,
+            "tiedTargets": 174
+          },
+          "holdout": {
+            "meanDelta": -0.078,
+            "se": 0.07146,
+            "ci95": [
+              -0.21805,
+              0.06205
+            ],
+            "positiveTargets": 173,
+            "negativeTargets": 201,
+            "tiedTargets": 126
+          }
+        },
+        "numerone": null
+      },
+      "rolling720": {
+        "label": "rolling720",
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01417,
+          "expected": 5,
+          "delta": 0.01417,
+          "se": 0.03302,
+          "ci95": [
+            4.94945,
+            5.07889
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03429,
+          "expected": 5,
+          "delta": 0.03429,
+          "se": 0.04287,
+          "ci95": [
+            4.95026,
+            5.11831
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.986,
+          "expected": 5,
+          "delta": -0.014,
+          "se": 0.05178,
+          "ci95": [
+            4.88451,
+            5.08749
+          ]
+        },
+        "vsStatusQuo": {
+          "all": {
+            "meanDelta": -0.0375,
+            "se": 0.04616,
+            "ci95": [
+              -0.12797,
+              0.05297
+            ],
+            "positiveTargets": 447,
+            "negativeTargets": 458,
+            "tiedTargets": 295
+          },
+          "development": {
+            "meanDelta": -0.01571,
+            "se": 0.0614,
+            "ci95": [
+              -0.13606,
+              0.10464
+            ],
+            "positiveTargets": 272,
+            "negativeTargets": 260,
+            "tiedTargets": 168
+          },
+          "holdout": {
+            "meanDelta": -0.068,
+            "se": 0.06992,
+            "ci95": [
+              -0.20504,
+              0.06904
+            ],
+            "positiveTargets": 175,
+            "negativeTargets": 198,
+            "tiedTargets": 127
+          }
+        },
+        "numerone": null
+      }
+    },
+    "challengerRanking": [
+      {
+        "id": "hourrecent",
+        "holdoutMean": 5.054,
+        "holdoutDeltaVsStatusQuo": 0,
+        "developmentDeltaVsStatusQuo": 0,
+        "holdoutPairedCI": [
+          0,
+          0
+        ]
+      },
+      {
+        "id": "recent5",
+        "holdoutMean": 5.052,
+        "holdoutDeltaVsStatusQuo": -0.002,
+        "developmentDeltaVsStatusQuo": -0.03,
+        "holdoutPairedCI": [
+          -0.13765,
+          0.13365
+        ]
+      },
+      {
+        "id": "intraday5",
+        "holdoutMean": 5.052,
+        "holdoutDeltaVsStatusQuo": -0.002,
+        "developmentDeltaVsStatusQuo": -0.03857,
+        "holdoutPairedCI": [
+          -0.13765,
+          0.13365
+        ]
+      },
+      {
+        "id": "balancedOddEven",
+        "holdoutMean": 5.046,
+        "holdoutDeltaVsStatusQuo": -0.008,
+        "developmentDeltaVsStatusQuo": -0.00143,
+        "holdoutPairedCI": [
+          -0.14014,
+          0.12414
+        ]
+      },
+      {
+        "id": "exclude4",
+        "holdoutMean": 5.044,
+        "holdoutDeltaVsStatusQuo": -0.01,
+        "developmentDeltaVsStatusQuo": -0.04429,
+        "holdoutPairedCI": [
+          -0.14312,
+          0.12312
+        ]
+      },
+      {
+        "id": "recent3",
+        "holdoutMean": 5.042,
+        "holdoutDeltaVsStatusQuo": -0.012,
+        "developmentDeltaVsStatusQuo": -0.03,
+        "holdoutPairedCI": [
+          -0.14815,
+          0.12415
+        ]
+      },
+      {
+        "id": "rolling24",
+        "holdoutMean": 5.04,
+        "holdoutDeltaVsStatusQuo": -0.014,
+        "developmentDeltaVsStatusQuo": -0.03714,
+        "holdoutPairedCI": [
+          -0.15389,
+          0.12589
+        ]
+      },
+      {
+        "id": "repeat2",
+        "holdoutMean": 5.036,
+        "holdoutDeltaVsStatusQuo": -0.018,
+        "developmentDeltaVsStatusQuo": -0.06,
+        "holdoutPairedCI": [
+          -0.15169,
+          0.11569
+        ]
+      },
+      {
+        "id": "global",
+        "holdoutMean": 5.034,
+        "holdoutDeltaVsStatusQuo": -0.02,
+        "developmentDeltaVsStatusQuo": -0.06,
+        "holdoutPairedCI": [
+          -0.1534,
+          0.1134
+        ]
+      },
+      {
+        "id": "repeat4",
+        "holdoutMean": 5.034,
+        "holdoutDeltaVsStatusQuo": -0.02,
+        "developmentDeltaVsStatusQuo": -0.04286,
+        "holdoutPairedCI": [
+          -0.15489,
+          0.11489
+        ]
+      },
+      {
+        "id": "exclude2",
+        "holdoutMean": 5.034,
+        "holdoutDeltaVsStatusQuo": -0.02,
+        "developmentDeltaVsStatusQuo": -0.05857,
+        "holdoutPairedCI": [
+          -0.1534,
+          0.1134
+        ]
+      },
+      {
+        "id": "delayRecent",
+        "holdoutMean": 5.032,
+        "holdoutDeltaVsStatusQuo": -0.022,
+        "developmentDeltaVsStatusQuo": -0.08571,
+        "holdoutPairedCI": [
+          -0.1582,
+          0.1142
+        ]
+      },
+      {
+        "id": "streak",
+        "holdoutMean": 5.032,
+        "holdoutDeltaVsStatusQuo": -0.022,
+        "developmentDeltaVsStatusQuo": -0.08571,
+        "holdoutPairedCI": [
+          -0.1582,
+          0.1142
+        ]
+      },
+      {
+        "id": "repeat8",
+        "holdoutMean": 5.032,
+        "holdoutDeltaVsStatusQuo": -0.022,
+        "developmentDeltaVsStatusQuo": -0.03857,
+        "holdoutPairedCI": [
+          -0.15899,
+          0.11499
+        ]
+      },
+      {
+        "id": "repeat10",
+        "holdoutMean": 5.032,
+        "holdoutDeltaVsStatusQuo": -0.022,
+        "developmentDeltaVsStatusQuo": -0.08571,
+        "holdoutPairedCI": [
+          -0.1582,
+          0.1142
+        ]
+      },
+      {
+        "id": "exclude6",
+        "holdoutMean": 5.03,
+        "holdoutDeltaVsStatusQuo": -0.024,
+        "developmentDeltaVsStatusQuo": -0.00143,
+        "holdoutPairedCI": [
+          -0.15483,
+          0.10683
+        ]
+      },
+      {
+        "id": "intraday10",
+        "holdoutMean": 5.03,
+        "holdoutDeltaVsStatusQuo": -0.024,
+        "developmentDeltaVsStatusQuo": -0.06,
+        "holdoutPairedCI": [
+          -0.1636,
+          0.1156
+        ]
+      },
+      {
+        "id": "trendUp20",
+        "holdoutMean": 5.028,
+        "holdoutDeltaVsStatusQuo": -0.026,
+        "developmentDeltaVsStatusQuo": -0.07143,
+        "holdoutPairedCI": [
+          -0.16343,
+          0.11143
+        ]
+      },
+      {
+        "id": "repeat6",
+        "holdoutMean": 5.026,
+        "holdoutDeltaVsStatusQuo": -0.028,
+        "developmentDeltaVsStatusQuo": -0.00143,
+        "holdoutPairedCI": [
+          -0.15965,
+          0.10365
+        ]
+      },
+      {
+        "id": "rolling6",
+        "holdoutMean": 5.026,
+        "holdoutDeltaVsStatusQuo": -0.028,
+        "developmentDeltaVsStatusQuo": -0.06714,
+        "holdoutPairedCI": [
+          -0.16582,
+          0.10982
+        ]
+      },
+      {
+        "id": "recent10",
+        "holdoutMean": 5.022,
+        "holdoutDeltaVsStatusQuo": -0.032,
+        "developmentDeltaVsStatusQuo": -0.03286,
+        "holdoutPairedCI": [
+          -0.16801,
+          0.10401
+        ]
+      },
+      {
+        "id": "intraday3",
+        "holdoutMean": 5.018,
+        "holdoutDeltaVsStatusQuo": -0.036,
+        "developmentDeltaVsStatusQuo": -0.04857,
+        "holdoutPairedCI": [
+          -0.17212,
+          0.10012
+        ]
+      },
+      {
+        "id": "recent200",
+        "holdoutMean": 5.006,
+        "holdoutDeltaVsStatusQuo": -0.048,
+        "developmentDeltaVsStatusQuo": -0.08143,
+        "holdoutPairedCI": [
+          -0.18953,
+          0.09353
+        ]
+      },
+      {
+        "id": "globalRecent50",
+        "holdoutMean": 5.006,
+        "holdoutDeltaVsStatusQuo": -0.048,
+        "developmentDeltaVsStatusQuo": -0.04714,
+        "holdoutPairedCI": [
+          -0.18295,
+          0.08695
+        ]
+      },
+      {
+        "id": "pairRecent",
+        "holdoutMean": 5.004,
+        "holdoutDeltaVsStatusQuo": -0.05,
+        "developmentDeltaVsStatusQuo": -0.03857,
+        "holdoutPairedCI": [
+          -0.18883,
+          0.08883
+        ]
+      },
+      {
+        "id": "monthrecent",
+        "holdoutMean": 5.004,
+        "holdoutDeltaVsStatusQuo": -0.05,
+        "developmentDeltaVsStatusQuo": -0.09857,
+        "holdoutPairedCI": [
+          -0.19501,
+          0.09501
+        ]
+      },
+      {
+        "id": "recent100",
+        "holdoutMean": 5,
+        "holdoutDeltaVsStatusQuo": -0.054,
+        "developmentDeltaVsStatusQuo": -0.04429,
+        "holdoutPairedCI": [
+          -0.19193,
+          0.08393
+        ]
+      },
+      {
+        "id": "balancedLowHigh",
+        "holdoutMean": 4.994,
+        "holdoutDeltaVsStatusQuo": -0.06,
+        "developmentDeltaVsStatusQuo": -0.02571,
+        "holdoutPairedCI": [
+          -0.194,
+          0.074
+        ]
+      },
+      {
+        "id": "hour",
+        "holdoutMean": 4.994,
+        "holdoutDeltaVsStatusQuo": -0.06,
+        "developmentDeltaVsStatusQuo": -0.08286,
+        "holdoutPairedCI": [
+          -0.18285,
+          0.06285
+        ]
+      },
+      {
+        "id": "lifecycle",
+        "holdoutMean": 4.992,
+        "holdoutDeltaVsStatusQuo": -0.062,
+        "developmentDeltaVsStatusQuo": -0.08286,
+        "holdoutPairedCI": [
+          -0.19697,
+          0.07297
+        ]
+      },
+      {
+        "id": "trendDown20",
+        "holdoutMean": 4.988,
+        "holdoutDeltaVsStatusQuo": -0.066,
+        "developmentDeltaVsStatusQuo": -0.04571,
+        "holdoutPairedCI": [
+          -0.20198,
+          0.06998
+        ]
+      },
+      {
+        "id": "rolling720",
+        "holdoutMean": 4.986,
+        "holdoutDeltaVsStatusQuo": -0.068,
+        "developmentDeltaVsStatusQuo": -0.01571,
+        "holdoutPairedCI": [
+          -0.20504,
+          0.06904
+        ]
+      },
+      {
+        "id": "exclude8",
+        "holdoutMean": 4.984,
+        "holdoutDeltaVsStatusQuo": -0.07,
+        "developmentDeltaVsStatusQuo": 0.04571,
+        "holdoutPairedCI": [
+          -0.20252,
+          0.06252
+        ]
+      },
+      {
+        "id": "pairGlobal",
+        "holdoutMean": 4.982,
+        "holdoutDeltaVsStatusQuo": -0.072,
+        "developmentDeltaVsStatusQuo": 0.04857,
+        "holdoutPairedCI": [
+          -0.21334,
+          0.06934
+        ]
+      },
+      {
+        "id": "recent20",
+        "holdoutMean": 4.98,
+        "holdoutDeltaVsStatusQuo": -0.074,
+        "developmentDeltaVsStatusQuo": -0.05857,
+        "holdoutPairedCI": [
+          -0.20881,
+          0.06081
+        ]
+      },
+      {
+        "id": "rolling168",
+        "holdoutMean": 4.976,
+        "holdoutDeltaVsStatusQuo": -0.078,
+        "developmentDeltaVsStatusQuo": -0.03429,
+        "holdoutPairedCI": [
+          -0.21805,
+          0.06205
+        ]
+      },
+      {
+        "id": "returnAfterAbsent",
+        "holdoutMean": 4.974,
+        "holdoutDeltaVsStatusQuo": -0.08,
+        "developmentDeltaVsStatusQuo": -0.04714,
+        "holdoutPairedCI": [
+          -0.21288,
+          0.05288
+        ]
+      },
+      {
+        "id": "analog9",
+        "holdoutMean": 4.972,
+        "holdoutDeltaVsStatusQuo": -0.082,
+        "developmentDeltaVsStatusQuo": -0.01286,
+        "holdoutPairedCI": [
+          -0.22313,
+          0.05913
+        ]
+      },
+      {
+        "id": "delayOverdue",
+        "holdoutMean": 4.968,
+        "holdoutDeltaVsStatusQuo": -0.086,
+        "developmentDeltaVsStatusQuo": -0.01429,
+        "holdoutPairedCI": [
+          -0.22777,
+          0.05577
+        ]
+      },
+      {
+        "id": "delayVsExpected",
+        "holdoutMean": 4.968,
+        "holdoutDeltaVsStatusQuo": -0.086,
+        "developmentDeltaVsStatusQuo": -0.01429,
+        "holdoutPairedCI": [
+          -0.22777,
+          0.05577
+        ]
+      },
+      {
+        "id": "antiStreak",
+        "holdoutMean": 4.968,
+        "holdoutDeltaVsStatusQuo": -0.086,
+        "developmentDeltaVsStatusQuo": -0.01429,
+        "holdoutPairedCI": [
+          -0.22777,
+          0.05577
+        ]
+      },
+      {
+        "id": "exclude10",
+        "holdoutMean": 4.968,
+        "holdoutDeltaVsStatusQuo": -0.086,
+        "developmentDeltaVsStatusQuo": -0.01429,
+        "holdoutPairedCI": [
+          -0.22777,
+          0.05577
+        ]
+      },
+      {
+        "id": "coldGlobal",
+        "holdoutMean": 4.964,
+        "holdoutDeltaVsStatusQuo": -0.09,
+        "developmentDeltaVsStatusQuo": -0.04429,
+        "holdoutPairedCI": [
+          -0.241,
+          0.061
+        ]
+      },
+      {
+        "id": "weekday",
+        "holdoutMean": 4.96,
+        "holdoutDeltaVsStatusQuo": -0.094,
+        "developmentDeltaVsStatusQuo": -0.01143,
+        "holdoutPairedCI": [
+          -0.22814,
+          0.04014
+        ]
+      },
+      {
+        "id": "weekdayrecent",
+        "holdoutMean": 4.96,
+        "holdoutDeltaVsStatusQuo": -0.094,
+        "developmentDeltaVsStatusQuo": -0.04857,
+        "holdoutPairedCI": [
+          -0.23154,
+          0.04354
+        ]
+      },
+      {
+        "id": "recent500",
+        "holdoutMean": 4.952,
+        "holdoutDeltaVsStatusQuo": -0.102,
+        "developmentDeltaVsStatusQuo": -0.03429,
+        "holdoutPairedCI": [
+          -0.23563,
+          0.03163
+        ]
+      },
+      {
+        "id": "month",
+        "holdoutMean": 4.952,
+        "holdoutDeltaVsStatusQuo": -0.102,
+        "developmentDeltaVsStatusQuo": -0.1,
+        "holdoutPairedCI": [
+          -0.23871,
+          0.03471
+        ]
+      },
+      {
+        "id": "analog8",
+        "holdoutMean": 4.948,
+        "holdoutDeltaVsStatusQuo": -0.106,
+        "developmentDeltaVsStatusQuo": -0.02857,
+        "holdoutPairedCI": [
+          -0.25289,
+          0.04089
+        ]
+      },
+      {
+        "id": "analog10",
+        "holdoutMean": 4.948,
+        "holdoutDeltaVsStatusQuo": -0.106,
+        "developmentDeltaVsStatusQuo": -0.07857,
+        "holdoutPairedCI": [
+          -0.2447,
+          0.0327
+        ]
+      },
+      {
+        "id": "rolling72",
+        "holdoutMean": 4.948,
+        "holdoutDeltaVsStatusQuo": -0.106,
+        "developmentDeltaVsStatusQuo": -0.03571,
+        "holdoutPairedCI": [
+          -0.24325,
+          0.03125
+        ]
+      },
+      {
+        "id": "recent50",
+        "holdoutMean": 4.926,
+        "holdoutDeltaVsStatusQuo": -0.128,
+        "developmentDeltaVsStatusQuo": -0.04429,
+        "holdoutPairedCI": [
+          -0.26482,
+          0.00882
+        ]
+      },
+      {
+        "id": "transition",
+        "holdoutMean": 4.894,
+        "holdoutDeltaVsStatusQuo": -0.16,
+        "developmentDeltaVsStatusQuo": -0.04857,
+        "holdoutPairedCI": [
+          -0.30402,
+          -0.01598
+        ]
+      }
+    ],
+    "topObservedChallenger": {
+      "id": "hourrecent",
+      "holdoutMean": 5.054,
+      "holdoutDeltaVsStatusQuo": 0,
+      "developmentDeltaVsStatusQuo": 0,
+      "holdoutPairedCI": [
+        0,
+        0
+      ]
+    },
+    "numeroneResults": {
+      "engine": {
+        "all": {
+          "targets": 1200,
+          "hits": 61,
+          "rate": 0.05083,
+          "expectedRate": 0.05,
+          "delta": 0.00083,
+          "ci95": [
+            0.03978,
+            0.06476
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 34,
+          "rate": 0.04857,
+          "expectedRate": 0.05,
+          "delta": -0.00143,
+          "ci95": [
+            0.03496,
+            0.06711
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 27,
+          "rate": 0.054,
+          "expectedRate": 0.05,
+          "delta": 0.004,
+          "ci95": [
+            0.03737,
+            0.07743
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "global": {
+        "all": {
+          "targets": 1200,
+          "hits": 44,
+          "rate": 0.03667,
+          "expectedRate": 0.05,
+          "delta": -0.01333,
+          "ci95": [
+            0.02743,
+            0.04886
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 28,
+          "rate": 0.04,
+          "expectedRate": 0.05,
+          "delta": -0.01,
+          "ci95": [
+            0.02782,
+            0.0572
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 16,
+          "rate": 0.032,
+          "expectedRate": 0.05,
+          "delta": -0.018,
+          "ci95": [
+            0.01979,
+            0.05135
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent3": {
+        "all": {
+          "targets": 1200,
+          "hits": 61,
+          "rate": 0.05083,
+          "expectedRate": 0.05,
+          "delta": 0.00083,
+          "ci95": [
+            0.03978,
+            0.06476
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 38,
+          "rate": 0.05429,
+          "expectedRate": 0.05,
+          "delta": 0.00429,
+          "ci95": [
+            0.0398,
+            0.07363
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 23,
+          "rate": 0.046,
+          "expectedRate": 0.05,
+          "delta": -0.004,
+          "ci95": [
+            0.03084,
+            0.06808
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent5": {
+        "all": {
+          "targets": 1200,
+          "hits": 62,
+          "rate": 0.05167,
+          "expectedRate": 0.05,
+          "delta": 0.00167,
+          "ci95": [
+            0.04051,
+            0.06568
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 31,
+          "rate": 0.04429,
+          "expectedRate": 0.05,
+          "delta": -0.00571,
+          "ci95": [
+            0.03137,
+            0.06217
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 31,
+          "rate": 0.062,
+          "expectedRate": 0.05,
+          "delta": 0.012,
+          "ci95": [
+            0.04402,
+            0.08666
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent10": {
+        "all": {
+          "targets": 1200,
+          "hits": 54,
+          "rate": 0.045,
+          "expectedRate": 0.05,
+          "delta": -0.005,
+          "ci95": [
+            0.03465,
+            0.05825
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 27,
+          "rate": 0.03857,
+          "expectedRate": 0.05,
+          "delta": -0.01143,
+          "ci95": [
+            0.02664,
+            0.05554
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 27,
+          "rate": 0.054,
+          "expectedRate": 0.05,
+          "delta": 0.004,
+          "ci95": [
+            0.03737,
+            0.07743
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent20": {
+        "all": {
+          "targets": 1200,
+          "hits": 74,
+          "rate": 0.06167,
+          "expectedRate": 0.05,
+          "delta": 0.01167,
+          "ci95": [
+            0.04941,
+            0.07673
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 43,
+          "rate": 0.06143,
+          "expectedRate": 0.05,
+          "delta": 0.01143,
+          "ci95": [
+            0.04592,
+            0.08172
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 31,
+          "rate": 0.062,
+          "expectedRate": 0.05,
+          "delta": 0.012,
+          "ci95": [
+            0.04402,
+            0.08666
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent50": {
+        "all": {
+          "targets": 1200,
+          "hits": 56,
+          "rate": 0.04667,
+          "expectedRate": 0.05,
+          "delta": -0.00333,
+          "ci95": [
+            0.03611,
+            0.06012
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 34,
+          "rate": 0.04857,
+          "expectedRate": 0.05,
+          "delta": -0.00143,
+          "ci95": [
+            0.03496,
+            0.06711
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 22,
+          "rate": 0.044,
+          "expectedRate": 0.05,
+          "delta": -0.006,
+          "ci95": [
+            0.02923,
+            0.06572
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent100": {
+        "all": {
+          "targets": 1200,
+          "hits": 69,
+          "rate": 0.0575,
+          "expectedRate": 0.05,
+          "delta": 0.0075,
+          "ci95": [
+            0.04569,
+            0.07214
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 46,
+          "rate": 0.06571,
+          "expectedRate": 0.05,
+          "delta": 0.01571,
+          "ci95": [
+            0.04963,
+            0.08654
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 23,
+          "rate": 0.046,
+          "expectedRate": 0.05,
+          "delta": -0.004,
+          "ci95": [
+            0.03084,
+            0.06808
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent200": {
+        "all": {
+          "targets": 1200,
+          "hits": 67,
+          "rate": 0.05583,
+          "expectedRate": 0.05,
+          "delta": 0.00583,
+          "ci95": [
+            0.0442,
+            0.0703
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 41,
+          "rate": 0.05857,
+          "expectedRate": 0.05,
+          "delta": 0.00857,
+          "ci95": [
+            0.04347,
+            0.0785
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 26,
+          "rate": 0.052,
+          "expectedRate": 0.05,
+          "delta": 0.002,
+          "ci95": [
+            0.03573,
+            0.0751
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "recent500": {
+        "all": {
+          "targets": 1200,
+          "hits": 63,
+          "rate": 0.0525,
+          "expectedRate": 0.05,
+          "delta": 0.0025,
+          "ci95": [
+            0.04125,
+            0.06661
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 40,
+          "rate": 0.05714,
+          "expectedRate": 0.05,
+          "delta": 0.00714,
+          "ci95": [
+            0.04224,
+            0.07688
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 23,
+          "rate": 0.046,
+          "expectedRate": 0.05,
+          "delta": -0.004,
+          "ci95": [
+            0.03084,
+            0.06808
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "overdue": {
+        "all": {
+          "targets": 1200,
+          "hits": 68,
+          "rate": 0.05667,
+          "expectedRate": 0.05,
+          "delta": 0.00667,
+          "ci95": [
+            0.04494,
+            0.07122
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 38,
+          "rate": 0.05429,
+          "expectedRate": 0.05,
+          "delta": 0.00429,
+          "ci95": [
+            0.0398,
+            0.07363
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 30,
+          "rate": 0.06,
+          "expectedRate": 0.05,
+          "delta": 0.01,
+          "ci95": [
+            0.04235,
+            0.08436
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "mostRecent": {
+        "all": {
+          "targets": 1200,
+          "hits": 54,
+          "rate": 0.045,
+          "expectedRate": 0.05,
+          "delta": -0.005,
+          "ci95": [
+            0.03465,
+            0.05825
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 34,
+          "rate": 0.04857,
+          "expectedRate": 0.05,
+          "delta": -0.00143,
+          "ci95": [
+            0.03496,
+            0.06711
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 20,
+          "rate": 0.04,
+          "expectedRate": 0.05,
+          "delta": -0.01,
+          "ci95": [
+            0.02604,
+            0.06097
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "transition": {
+        "all": {
+          "targets": 1200,
+          "hits": 49,
+          "rate": 0.04083,
+          "expectedRate": 0.05,
+          "delta": -0.00917,
+          "ci95": [
+            0.03102,
+            0.05357
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 25,
+          "rate": 0.03571,
+          "expectedRate": 0.05,
+          "delta": -0.01429,
+          "ci95": [
+            0.02431,
+            0.05219
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 24,
+          "rate": 0.048,
+          "expectedRate": 0.05,
+          "delta": -0.002,
+          "ci95": [
+            0.03246,
+            0.07043
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "hourrecent": {
+        "all": {
+          "targets": 1200,
+          "hits": 73,
+          "rate": 0.06083,
+          "expectedRate": 0.05,
+          "delta": 0.01083,
+          "ci95": [
+            0.04866,
+            0.07581
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 48,
+          "rate": 0.06857,
+          "expectedRate": 0.05,
+          "delta": 0.01857,
+          "ci95": [
+            0.05211,
+            0.08974
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 25,
+          "rate": 0.05,
+          "expectedRate": 0.05,
+          "delta": 0,
+          "ci95": [
+            0.03409,
+            0.07277
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "weekdayrecent": {
+        "all": {
+          "targets": 1200,
+          "hits": 58,
+          "rate": 0.04833,
+          "expectedRate": 0.05,
+          "delta": -0.00167,
+          "ci95": [
+            0.03757,
+            0.06198
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 30,
+          "rate": 0.04286,
+          "expectedRate": 0.05,
+          "delta": -0.00714,
+          "ci95": [
+            0.03018,
+            0.06052
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 28,
+          "rate": 0.056,
+          "expectedRate": 0.05,
+          "delta": 0.006,
+          "ci95": [
+            0.03903,
+            0.07975
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "monthrecent": {
+        "all": {
+          "targets": 1200,
+          "hits": 66,
+          "rate": 0.055,
+          "expectedRate": 0.05,
+          "delta": 0.005,
+          "ci95": [
+            0.04346,
+            0.06938
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 40,
+          "rate": 0.05714,
+          "expectedRate": 0.05,
+          "delta": 0.00714,
+          "ci95": [
+            0.04224,
+            0.07688
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 26,
+          "rate": 0.052,
+          "expectedRate": 0.05,
+          "delta": 0.002,
+          "ci95": [
+            0.03573,
+            0.0751
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "analogExact": {
+        "all": {
+          "targets": 1200,
+          "hits": 55,
+          "rate": 0.04583,
+          "expectedRate": 0.05,
+          "delta": -0.00417,
+          "ci95": [
+            0.03538,
+            0.05918
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 22,
+          "rate": 0.03143,
+          "expectedRate": 0.05,
+          "delta": -0.01857,
+          "ci95": [
+            0.02084,
+            0.04713
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 33,
+          "rate": 0.066,
+          "expectedRate": 0.05,
+          "delta": 0.016,
+          "ci95": [
+            0.04738,
+            0.09124
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      },
+      "analogNear8": {
+        "all": {
+          "targets": 1200,
+          "hits": 61,
+          "rate": 0.05083,
+          "expectedRate": 0.05,
+          "delta": 0.00083,
+          "ci95": [
+            0.03978,
+            0.06476
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "hits": 29,
+          "rate": 0.04143,
+          "expectedRate": 0.05,
+          "delta": -0.00857,
+          "ci95": [
+            0.029,
+            0.05887
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "hits": 32,
+          "rate": 0.064,
+          "expectedRate": 0.05,
+          "delta": 0.014,
+          "ci95": [
+            0.0457,
+            0.08895
+          ]
+        },
+        "rateInterpretation": "Binary Numerone hit rate; theoretical reference 5%"
+      }
+    },
+    "numeroneChallengerRanking": [
+      {
+        "id": "analogExact",
+        "holdoutRate": 0.066,
+        "holdoutDeltaVsStatusQuo": 0.012000000000000004,
+        "developmentDeltaVsStatusQuo": -0.017140000000000002
+      },
+      {
+        "id": "analogNear8",
+        "holdoutRate": 0.064,
+        "holdoutDeltaVsStatusQuo": 0.010000000000000002,
+        "developmentDeltaVsStatusQuo": -0.0071400000000000005
+      },
+      {
+        "id": "recent5",
+        "holdoutRate": 0.062,
+        "holdoutDeltaVsStatusQuo": 0.008,
+        "developmentDeltaVsStatusQuo": -0.004279999999999999
+      },
+      {
+        "id": "recent20",
+        "holdoutRate": 0.062,
+        "holdoutDeltaVsStatusQuo": 0.008,
+        "developmentDeltaVsStatusQuo": 0.012859999999999996
+      },
+      {
+        "id": "overdue",
+        "holdoutRate": 0.06,
+        "holdoutDeltaVsStatusQuo": 0.005999999999999998,
+        "developmentDeltaVsStatusQuo": 0.005719999999999996
+      },
+      {
+        "id": "weekdayrecent",
+        "holdoutRate": 0.056,
+        "holdoutDeltaVsStatusQuo": 0.0020000000000000018,
+        "developmentDeltaVsStatusQuo": -0.00571
+      },
+      {
+        "id": "recent10",
+        "holdoutRate": 0.054,
+        "holdoutDeltaVsStatusQuo": 0,
+        "developmentDeltaVsStatusQuo": -0.010000000000000002
+      },
+      {
+        "id": "recent200",
+        "holdoutRate": 0.052,
+        "holdoutDeltaVsStatusQuo": -0.0020000000000000018,
+        "developmentDeltaVsStatusQuo": 0.009999999999999995
+      },
+      {
+        "id": "monthrecent",
+        "holdoutRate": 0.052,
+        "holdoutDeltaVsStatusQuo": -0.0020000000000000018,
+        "developmentDeltaVsStatusQuo": 0.008570000000000001
+      },
+      {
+        "id": "hourrecent",
+        "holdoutRate": 0.05,
+        "holdoutDeltaVsStatusQuo": -0.003999999999999997,
+        "developmentDeltaVsStatusQuo": 0.020000000000000004
+      },
+      {
+        "id": "transition",
+        "holdoutRate": 0.048,
+        "holdoutDeltaVsStatusQuo": -0.005999999999999998,
+        "developmentDeltaVsStatusQuo": -0.012860000000000003
+      },
+      {
+        "id": "recent3",
+        "holdoutRate": 0.046,
+        "holdoutDeltaVsStatusQuo": -0.008,
+        "developmentDeltaVsStatusQuo": 0.005719999999999996
+      },
+      {
+        "id": "recent100",
+        "holdoutRate": 0.046,
+        "holdoutDeltaVsStatusQuo": -0.008,
+        "developmentDeltaVsStatusQuo": 0.017140000000000002
+      },
+      {
+        "id": "recent500",
+        "holdoutRate": 0.046,
+        "holdoutDeltaVsStatusQuo": -0.008,
+        "developmentDeltaVsStatusQuo": 0.008570000000000001
+      },
+      {
+        "id": "recent50",
+        "holdoutRate": 0.044,
+        "holdoutDeltaVsStatusQuo": -0.010000000000000002,
+        "developmentDeltaVsStatusQuo": 0
+      },
+      {
+        "id": "mostRecent",
+        "holdoutRate": 0.04,
+        "holdoutDeltaVsStatusQuo": -0.013999999999999999,
+        "developmentDeltaVsStatusQuo": 0
+      },
+      {
+        "id": "global",
+        "holdoutRate": 0.032,
+        "holdoutDeltaVsStatusQuo": -0.022,
+        "developmentDeltaVsStatusQuo": -0.008570000000000001
+      }
+    ],
+    "topNumeroneChallenger": {
+      "id": "analogExact",
+      "holdoutRate": 0.066,
+      "holdoutDeltaVsStatusQuo": 0.012000000000000004,
+      "developmentDeltaVsStatusQuo": -0.017140000000000002
+    },
+    "decision": "EXPLORATORY_CHALLENGER_ONLY"
   }
 ]
