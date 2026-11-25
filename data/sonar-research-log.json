@@ -84126,5 +84126,1801 @@
       }
     ],
     "decision": "EXPLORATORY_ONLY"
+  },
+  {
+    "runAt": "2026-11-25T18:59:24.854Z",
+    "dataset": {
+      "count": 30014,
+      "first": "2022-01-25T07:00",
+      "last": "2026-11-25T15:00",
+      "uniqueConcorsi": 30014
+    },
+    "protocol": {
+      "type": "walk-forward with chronological development/holdout split",
+      "minTraining": 1000,
+      "testTargets": 1200,
+      "developmentTargets": 700,
+      "holdoutTargets": 500,
+      "randomReplicatesPerTarget": 20,
+      "selection": "All predictions use only records strictly preceding the target. The final 500 targets are reported as holdout; no weights are automatically promoted.",
+      "null": {
+        "mainMeanHits": 5,
+        "mainVariancePerDraw": 1.3157894736842104,
+        "numeroneRate": 0.05
+      },
+      "cautions": [
+        "Strategies and parameter variants are exploratory and multiple comparisons can create apparent winners by chance.",
+        "The holdout is a single chronological period; it is not proof of future advantage.",
+        "Random controls are seeded for reproducibility; theoretical expectation remains 5 main hits and 5% Numerone.",
+        "No automatic generator weights are changed by this job."
+      ]
+    },
+    "randomControl": {
+      "main": {
+        "all": {
+          "targets": 24000,
+          "meanHits": 5.00413,
+          "expected": 5,
+          "delta": 0.00413,
+          "sampleSD": 1.15715,
+          "standardError": 0.00747,
+          "ci95": [
+            4.98949,
+            5.01876
+          ],
+          "zApprox": 0.5523,
+          "hitDistribution": [
+            0,
+            8,
+            294,
+            1887,
+            5633,
+            8297,
+            5661,
+            1923,
+            275,
+            22,
+            0
+          ]
+        },
+        "development": {
+          "targets": 14000,
+          "meanHits": 5.001,
+          "expected": 5,
+          "delta": 0.001,
+          "sampleSD": 1.16175,
+          "standardError": 0.00982,
+          "ci95": [
+            4.98176,
+            5.02024
+          ],
+          "zApprox": 0.1018,
+          "hitDistribution": [
+            0,
+            7,
+            183,
+            1083,
+            3349,
+            4747,
+            3338,
+            1128,
+            148,
+            17,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 10000,
+          "meanHits": 5.0085,
+          "expected": 5,
+          "delta": 0.0085,
+          "sampleSD": 1.15072,
+          "standardError": 0.01151,
+          "ci95": [
+            4.98595,
+            5.03105
+          ],
+          "zApprox": 0.7387,
+          "hitDistribution": [
+            0,
+            1,
+            111,
+            804,
+            2284,
+            3550,
+            2323,
+            795,
+            127,
+            5,
+            0
+          ]
+        }
+      },
+      "targets": 1200,
+      "replicatesPerTarget": 20,
+      "numerone": {
+        "all": {
+          "targets": 24000,
+          "hits": 1186,
+          "rate": 0.04942,
+          "expectedRate": 0.05,
+          "delta": -0.00058,
+          "ci95": [
+            0.04675,
+            0.05223
+          ]
+        },
+        "development": {
+          "targets": 14000,
+          "hits": 691,
+          "rate": 0.04936,
+          "expectedRate": 0.05,
+          "delta": -0.00064,
+          "ci95": [
+            0.04589,
+            0.05307
+          ]
+        },
+        "holdout": {
+          "targets": 10000,
+          "hits": 495,
+          "rate": 0.0495,
+          "expectedRate": 0.05,
+          "delta": -0.0005,
+          "ci95": [
+            0.04542,
+            0.05393
+          ]
+        }
+      }
+    },
+    "results": {
+      "global": {
+        "id": "global",
+        "label": "Frequenza globale",
+        "config": null,
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.05667,
+          "expected": 5,
+          "delta": 0.05667,
+          "sampleSD": 1.16387,
+          "standardError": 0.0336,
+          "ci95": [
+            4.99081,
+            5.12252
+          ],
+          "zApprox": 1.6866,
+          "hitDistribution": [
+            0,
+            1,
+            11,
+            98,
+            262,
+            396,
+            317,
+            100,
+            14,
+            1,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.05,
+          "expected": 5,
+          "delta": 0.05,
+          "sampleSD": 1.17998,
+          "standardError": 0.0446,
+          "ci95": [
+            4.96259,
+            5.13741
+          ],
+          "zApprox": 1.1211,
+          "hitDistribution": [
+            0,
+            1,
+            6,
+            61,
+            151,
+            232,
+            177,
+            63,
+            9,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.066,
+          "expected": 5,
+          "delta": 0.066,
+          "sampleSD": 1.14204,
+          "standardError": 0.05107,
+          "ci95": [
+            4.9659,
+            5.1661
+          ],
+          "zApprox": 1.2923,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            37,
+            111,
+            164,
+            140,
+            37,
+            5,
+            1,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 52,
+            "rate": 0.04333,
+            "expectedRate": 0.05,
+            "delta": -0.00667,
+            "ci95": [
+              0.0332,
+              0.05638
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 20,
+            "rate": 0.02857,
+            "expectedRate": 0.05,
+            "delta": -0.02143,
+            "ci95": [
+              0.01857,
+              0.04372
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 32,
+            "rate": 0.064,
+            "expectedRate": 0.05,
+            "delta": 0.014,
+            "ci95": [
+              0.0457,
+              0.08895
+            ]
+          }
+        }
+      },
+      "recent20": {
+        "id": "recent20",
+        "label": "Frequenza ultime 20",
+        "config": null,
+        "all": {
+          "targets": 1200,
+          "meanHits": 5,
+          "expected": 5,
+          "delta": 0,
+          "sampleSD": 1.10726,
+          "standardError": 0.03196,
+          "ci95": [
+            4.93735,
+            5.06265
+          ],
+          "zApprox": 0,
+          "hitDistribution": [
+            0,
+            1,
+            9,
+            90,
+            283,
+            434,
+            279,
+            97,
+            7,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.97143,
+          "expected": 5,
+          "delta": -0.02857,
+          "sampleSD": 1.08668,
+          "standardError": 0.04107,
+          "ci95": [
+            4.89093,
+            5.05193
+          ],
+          "zApprox": -0.6956,
+          "hitDistribution": [
+            0,
+            1,
+            5,
+            51,
+            169,
+            262,
+            157,
+            52,
+            3,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.04,
+          "expected": 5,
+          "delta": 0.04,
+          "sampleSD": 1.13533,
+          "standardError": 0.05077,
+          "ci95": [
+            4.94048,
+            5.13952
+          ],
+          "zApprox": 0.7878,
+          "hitDistribution": [
+            0,
+            0,
+            4,
+            39,
+            114,
+            172,
+            122,
+            45,
+            4,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 52,
+            "rate": 0.04333,
+            "expectedRate": 0.05,
+            "delta": -0.00667,
+            "ci95": [
+              0.0332,
+              0.05638
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 20,
+            "rate": 0.02857,
+            "expectedRate": 0.05,
+            "delta": -0.02143,
+            "ci95": [
+              0.01857,
+              0.04372
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 32,
+            "rate": 0.064,
+            "expectedRate": 0.05,
+            "delta": 0.014,
+            "ci95": [
+              0.0457,
+              0.08895
+            ]
+          }
+        }
+      },
+      "recent50": {
+        "id": "recent50",
+        "label": "Frequenza ultime 50",
+        "config": null,
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9725,
+          "expected": 5,
+          "delta": -0.0275,
+          "sampleSD": 1.15738,
+          "standardError": 0.03341,
+          "ci95": [
+            4.90702,
+            5.03798
+          ],
+          "zApprox": -0.8231,
+          "hitDistribution": [
+            0,
+            0,
+            12,
+            95,
+            320,
+            387,
+            275,
+            95,
+            16,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.95286,
+          "expected": 5,
+          "delta": -0.04714,
+          "sampleSD": 1.15559,
+          "standardError": 0.04368,
+          "ci95": [
+            4.86725,
+            5.03846
+          ],
+          "zApprox": -1.0793,
+          "hitDistribution": [
+            0,
+            0,
+            6,
+            57,
+            193,
+            227,
+            151,
+            57,
+            9,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5,
+          "expected": 5,
+          "delta": 0,
+          "sampleSD": 1.16047,
+          "standardError": 0.0519,
+          "ci95": [
+            4.89828,
+            5.10172
+          ],
+          "zApprox": 0,
+          "hitDistribution": [
+            0,
+            0,
+            6,
+            38,
+            127,
+            160,
+            124,
+            38,
+            7,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 52,
+            "rate": 0.04333,
+            "expectedRate": 0.05,
+            "delta": -0.00667,
+            "ci95": [
+              0.0332,
+              0.05638
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 20,
+            "rate": 0.02857,
+            "expectedRate": 0.05,
+            "delta": -0.02143,
+            "ci95": [
+              0.01857,
+              0.04372
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 32,
+            "rate": 0.064,
+            "expectedRate": 0.05,
+            "delta": 0.014,
+            "ci95": [
+              0.0457,
+              0.08895
+            ]
+          }
+        }
+      },
+      "recent100": {
+        "id": "recent100",
+        "label": "Frequenza ultime 100",
+        "config": null,
+        "all": {
+          "targets": 1200,
+          "meanHits": 5,
+          "expected": 5,
+          "delta": 0,
+          "sampleSD": 1.15374,
+          "standardError": 0.03331,
+          "ci95": [
+            4.93472,
+            5.06528
+          ],
+          "zApprox": 0,
+          "hitDistribution": [
+            0,
+            0,
+            19,
+            85,
+            280,
+            442,
+            256,
+            104,
+            13,
+            1,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.98286,
+          "expected": 5,
+          "delta": -0.01714,
+          "sampleSD": 1.16321,
+          "standardError": 0.04397,
+          "ci95": [
+            4.89669,
+            5.06903
+          ],
+          "zApprox": -0.3899,
+          "hitDistribution": [
+            0,
+            0,
+            14,
+            43,
+            179,
+            247,
+            148,
+            60,
+            9,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.024,
+          "expected": 5,
+          "delta": 0.024,
+          "sampleSD": 1.14106,
+          "standardError": 0.05103,
+          "ci95": [
+            4.92398,
+            5.12402
+          ],
+          "zApprox": 0.4703,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            42,
+            101,
+            195,
+            108,
+            44,
+            4,
+            1,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 52,
+            "rate": 0.04333,
+            "expectedRate": 0.05,
+            "delta": -0.00667,
+            "ci95": [
+              0.0332,
+              0.05638
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 20,
+            "rate": 0.02857,
+            "expectedRate": 0.05,
+            "delta": -0.02143,
+            "ci95": [
+              0.01857,
+              0.04372
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 32,
+            "rate": 0.064,
+            "expectedRate": 0.05,
+            "delta": 0.014,
+            "ci95": [
+              0.0457,
+              0.08895
+            ]
+          }
+        }
+      },
+      "global_recent": {
+        "id": "global_recent",
+        "label": "Globale + 0,5× recent50",
+        "config": null,
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.04667,
+          "expected": 5,
+          "delta": 0.04667,
+          "sampleSD": 1.16574,
+          "standardError": 0.03365,
+          "ci95": [
+            4.98071,
+            5.11262
+          ],
+          "zApprox": 1.3867,
+          "hitDistribution": [
+            0,
+            1,
+            10,
+            102,
+            266,
+            389,
+            320,
+            98,
+            12,
+            2,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03429,
+          "expected": 5,
+          "delta": 0.03429,
+          "sampleSD": 1.18236,
+          "standardError": 0.04469,
+          "ci95": [
+            4.9467,
+            5.12188
+          ],
+          "zApprox": 0.7672,
+          "hitDistribution": [
+            0,
+            1,
+            5,
+            65,
+            154,
+            226,
+            180,
+            61,
+            7,
+            1,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.064,
+          "expected": 5,
+          "delta": 0.064,
+          "sampleSD": 1.14303,
+          "standardError": 0.05112,
+          "ci95": [
+            4.96381,
+            5.16419
+          ],
+          "zApprox": 1.252,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            37,
+            112,
+            163,
+            140,
+            37,
+            5,
+            1,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 52,
+            "rate": 0.04333,
+            "expectedRate": 0.05,
+            "delta": -0.00667,
+            "ci95": [
+              0.0332,
+              0.05638
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 20,
+            "rate": 0.02857,
+            "expectedRate": 0.05,
+            "delta": -0.02143,
+            "ci95": [
+              0.01857,
+              0.04372
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 32,
+            "rate": 0.064,
+            "expectedRate": 0.05,
+            "delta": 0.014,
+            "ci95": [
+              0.0457,
+              0.08895
+            ]
+          }
+        }
+      },
+      "engine_hourrecent": {
+        "id": "engine_hourrecent",
+        "label": "SONAR nuovo motore: frequenza recente dello stesso orario",
+        "config": {
+          "strategy": "hourrecent",
+          "hourWindow": 200
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00167,
+          "expected": 5,
+          "delta": 0.00167,
+          "sampleSD": 1.16238,
+          "standardError": 0.03355,
+          "ci95": [
+            4.9359,
+            5.06743
+          ],
+          "zApprox": 0.0497,
+          "hitDistribution": [
+            0,
+            1,
+            13,
+            97,
+            288,
+            401,
+            287,
+            100,
+            12,
+            1,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03,
+          "expected": 5,
+          "delta": 0.03,
+          "sampleSD": 1.17823,
+          "standardError": 0.04453,
+          "ci95": [
+            4.94272,
+            5.11728
+          ],
+          "zApprox": 0.6737,
+          "hitDistribution": [
+            0,
+            1,
+            9,
+            52,
+            162,
+            237,
+            173,
+            54,
+            11,
+            1,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.962,
+          "expected": 5,
+          "delta": -0.038,
+          "sampleSD": 1.1398,
+          "standardError": 0.05097,
+          "ci95": [
+            4.86209,
+            5.06191
+          ],
+          "zApprox": -0.7455,
+          "hitDistribution": [
+            0,
+            0,
+            4,
+            45,
+            126,
+            164,
+            114,
+            46,
+            1,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w10_p14": {
+        "id": "engine_w10_p14",
+        "label": "SONAR finestra 10, pool 14",
+        "config": {
+          "window": 10,
+          "pool": 14,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.00167,
+          "expected": 5,
+          "delta": 0.00167,
+          "sampleSD": 1.16238,
+          "standardError": 0.03355,
+          "ci95": [
+            4.9359,
+            5.06743
+          ],
+          "zApprox": 0.0497,
+          "hitDistribution": [
+            0,
+            1,
+            13,
+            97,
+            288,
+            401,
+            287,
+            100,
+            12,
+            1,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03,
+          "expected": 5,
+          "delta": 0.03,
+          "sampleSD": 1.17823,
+          "standardError": 0.04453,
+          "ci95": [
+            4.94272,
+            5.11728
+          ],
+          "zApprox": 0.6737,
+          "hitDistribution": [
+            0,
+            1,
+            9,
+            52,
+            162,
+            237,
+            173,
+            54,
+            11,
+            1,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.962,
+          "expected": 5,
+          "delta": -0.038,
+          "sampleSD": 1.1398,
+          "standardError": 0.05097,
+          "ci95": [
+            4.86209,
+            5.06191
+          ],
+          "zApprox": -0.7455,
+          "hitDistribution": [
+            0,
+            0,
+            4,
+            45,
+            126,
+            164,
+            114,
+            46,
+            1,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w20_p14": {
+        "id": "engine_w20_p14",
+        "label": "SONAR finestra 20, pool 14",
+        "config": {
+          "window": 20,
+          "pool": 14,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.98417,
+          "expected": 5,
+          "delta": -0.01583,
+          "sampleSD": 1.18255,
+          "standardError": 0.03414,
+          "ci95": [
+            4.91726,
+            5.05108
+          ],
+          "zApprox": -0.4638,
+          "hitDistribution": [
+            0,
+            1,
+            18,
+            95,
+            293,
+            407,
+            265,
+            107,
+            13,
+            1,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.94857,
+          "expected": 5,
+          "delta": -0.05143,
+          "sampleSD": 1.17445,
+          "standardError": 0.04439,
+          "ci95": [
+            4.86157,
+            5.03558
+          ],
+          "zApprox": -1.1586,
+          "hitDistribution": [
+            0,
+            0,
+            13,
+            54,
+            181,
+            235,
+            147,
+            65,
+            5,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.034,
+          "expected": 5,
+          "delta": 0.034,
+          "sampleSD": 1.19319,
+          "standardError": 0.05336,
+          "ci95": [
+            4.92941,
+            5.13859
+          ],
+          "zApprox": 0.6372,
+          "hitDistribution": [
+            0,
+            1,
+            5,
+            41,
+            112,
+            172,
+            118,
+            42,
+            8,
+            1,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w50_p12": {
+        "id": "engine_w50_p12",
+        "label": "SONAR finestra 50, pool 12",
+        "config": {
+          "window": 50,
+          "pool": 12,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.01333,
+          "expected": 5,
+          "delta": 0.01333,
+          "sampleSD": 1.16374,
+          "standardError": 0.03359,
+          "ci95": [
+            4.94749,
+            5.07918
+          ],
+          "zApprox": 0.3969,
+          "hitDistribution": [
+            0,
+            0,
+            14,
+            90,
+            294,
+            407,
+            277,
+            99,
+            19,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.99714,
+          "expected": 5,
+          "delta": -0.00286,
+          "sampleSD": 1.17313,
+          "standardError": 0.04434,
+          "ci95": [
+            4.91024,
+            5.08405
+          ],
+          "zApprox": -0.0644,
+          "hitDistribution": [
+            0,
+            0,
+            11,
+            51,
+            172,
+            240,
+            159,
+            55,
+            12,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.036,
+          "expected": 5,
+          "delta": 0.036,
+          "sampleSD": 1.15124,
+          "standardError": 0.05149,
+          "ci95": [
+            4.93509,
+            5.13691
+          ],
+          "zApprox": 0.6992,
+          "hitDistribution": [
+            0,
+            0,
+            3,
+            39,
+            122,
+            167,
+            118,
+            44,
+            7,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w50_p14": {
+        "id": "engine_w50_p14",
+        "label": "SONAR finestra 50, pool 14",
+        "config": {
+          "window": 50,
+          "pool": 14,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.99833,
+          "expected": 5,
+          "delta": -0.00167,
+          "sampleSD": 1.1631,
+          "standardError": 0.03358,
+          "ci95": [
+            4.93253,
+            5.06414
+          ],
+          "zApprox": -0.0496,
+          "hitDistribution": [
+            0,
+            2,
+            10,
+            104,
+            271,
+            430,
+            268,
+            98,
+            17,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.97429,
+          "expected": 5,
+          "delta": -0.02571,
+          "sampleSD": 1.17286,
+          "standardError": 0.04433,
+          "ci95": [
+            4.8874,
+            5.06117
+          ],
+          "zApprox": -0.5801,
+          "hitDistribution": [
+            0,
+            2,
+            5,
+            58,
+            175,
+            243,
+            150,
+            55,
+            12,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "sampleSD": 1.14962,
+          "standardError": 0.05141,
+          "ci95": [
+            4.93123,
+            5.13277
+          ],
+          "zApprox": 0.6224,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            46,
+            96,
+            187,
+            118,
+            43,
+            5,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w50_p16": {
+        "id": "engine_w50_p16",
+        "label": "SONAR finestra 50, pool 16",
+        "config": {
+          "window": 50,
+          "pool": 16,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.005,
+          "expected": 5,
+          "delta": 0.005,
+          "sampleSD": 1.16093,
+          "standardError": 0.03351,
+          "ci95": [
+            4.93931,
+            5.07069
+          ],
+          "zApprox": 0.1492,
+          "hitDistribution": [
+            0,
+            1,
+            13,
+            104,
+            269,
+            412,
+            287,
+            103,
+            11,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.98571,
+          "expected": 5,
+          "delta": -0.01429,
+          "sampleSD": 1.17913,
+          "standardError": 0.04457,
+          "ci95": [
+            4.89836,
+            5.07307
+          ],
+          "zApprox": -0.3205,
+          "hitDistribution": [
+            0,
+            1,
+            8,
+            65,
+            153,
+            251,
+            149,
+            67,
+            6,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "sampleSD": 1.13559,
+          "standardError": 0.05078,
+          "ci95": [
+            4.93246,
+            5.13154
+          ],
+          "zApprox": 0.6301,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            39,
+            116,
+            161,
+            138,
+            36,
+            5,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w50_p20": {
+        "id": "engine_w50_p20",
+        "label": "SONAR finestra 50, pool 20",
+        "config": {
+          "window": 50,
+          "pool": 20,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.9875,
+          "expected": 5,
+          "delta": -0.0125,
+          "sampleSD": 1.15331,
+          "standardError": 0.03329,
+          "ci95": [
+            4.92225,
+            5.05275
+          ],
+          "zApprox": -0.3755,
+          "hitDistribution": [
+            0,
+            0,
+            15,
+            91,
+            287,
+            433,
+            276,
+            74,
+            21,
+            3,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02143,
+          "expected": 5,
+          "delta": 0.02143,
+          "sampleSD": 1.12754,
+          "standardError": 0.04262,
+          "ci95": [
+            4.9379,
+            5.10496
+          ],
+          "zApprox": 0.5028,
+          "hitDistribution": [
+            0,
+            0,
+            6,
+            49,
+            162,
+            265,
+            159,
+            44,
+            14,
+            1,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.94,
+          "expected": 5,
+          "delta": -0.06,
+          "sampleSD": 1.18795,
+          "standardError": 0.05313,
+          "ci95": [
+            4.83587,
+            5.04413
+          ],
+          "zApprox": -1.1294,
+          "hitDistribution": [
+            0,
+            0,
+            9,
+            42,
+            125,
+            168,
+            117,
+            30,
+            7,
+            2,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      },
+      "engine_w100_p14": {
+        "id": "engine_w100_p14",
+        "label": "SONAR finestra 100, pool 14",
+        "config": {
+          "window": 100,
+          "pool": 14,
+          "strategy": "legacy"
+        },
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.015,
+          "expected": 5,
+          "delta": 0.015,
+          "sampleSD": 1.13836,
+          "standardError": 0.03286,
+          "ci95": [
+            4.95059,
+            5.07941
+          ],
+          "zApprox": 0.4565,
+          "hitDistribution": [
+            0,
+            1,
+            10,
+            89,
+            294,
+            406,
+            289,
+            98,
+            13,
+            0,
+            0
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.03429,
+          "expected": 5,
+          "delta": 0.03429,
+          "sampleSD": 1.14922,
+          "standardError": 0.04344,
+          "ci95": [
+            4.94915,
+            5.11942
+          ],
+          "zApprox": 0.7893,
+          "hitDistribution": [
+            0,
+            1,
+            5,
+            50,
+            174,
+            233,
+            163,
+            68,
+            6,
+            0,
+            0
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.988,
+          "expected": 5,
+          "delta": -0.012,
+          "sampleSD": 1.12356,
+          "standardError": 0.05025,
+          "ci95": [
+            4.88952,
+            5.08648
+          ],
+          "zApprox": -0.2388,
+          "hitDistribution": [
+            0,
+            0,
+            5,
+            39,
+            120,
+            173,
+            126,
+            30,
+            7,
+            0,
+            0
+          ]
+        },
+        "numerone": {
+          "all": {
+            "targets": 1200,
+            "hits": 68,
+            "rate": 0.05667,
+            "expectedRate": 0.05,
+            "delta": 0.00667,
+            "ci95": [
+              0.04494,
+              0.07122
+            ]
+          },
+          "development": {
+            "targets": 700,
+            "hits": 37,
+            "rate": 0.05286,
+            "expectedRate": 0.05,
+            "delta": 0.00286,
+            "ci95": [
+              0.03859,
+              0.07201
+            ]
+          },
+          "holdout": {
+            "targets": 500,
+            "hits": 31,
+            "rate": 0.062,
+            "expectedRate": 0.05,
+            "delta": 0.012,
+            "ci95": [
+              0.04402,
+              0.08666
+            ]
+          }
+        }
+      }
+    },
+    "exploratoryRankingByDevelopmentDelta": [
+      {
+        "rank": 1,
+        "id": "global",
+        "developmentDelta": 0.05,
+        "holdoutDelta": 0.066
+      },
+      {
+        "rank": 2,
+        "id": "global_recent",
+        "developmentDelta": 0.03429,
+        "holdoutDelta": 0.064
+      },
+      {
+        "rank": 3,
+        "id": "engine_w100_p14",
+        "developmentDelta": 0.03429,
+        "holdoutDelta": -0.012
+      },
+      {
+        "rank": 4,
+        "id": "engine_hourrecent",
+        "developmentDelta": 0.03,
+        "holdoutDelta": -0.038
+      },
+      {
+        "rank": 5,
+        "id": "engine_w10_p14",
+        "developmentDelta": 0.03,
+        "holdoutDelta": -0.038
+      },
+      {
+        "rank": 6,
+        "id": "engine_w50_p20",
+        "developmentDelta": 0.02143,
+        "holdoutDelta": -0.06
+      },
+      {
+        "rank": 7,
+        "id": "engine_w50_p12",
+        "developmentDelta": -0.00286,
+        "holdoutDelta": 0.036
+      },
+      {
+        "rank": 8,
+        "id": "engine_w50_p16",
+        "developmentDelta": -0.01429,
+        "holdoutDelta": 0.032
+      },
+      {
+        "rank": 9,
+        "id": "recent100",
+        "developmentDelta": -0.01714,
+        "holdoutDelta": 0.024
+      },
+      {
+        "rank": 10,
+        "id": "engine_w50_p14",
+        "developmentDelta": -0.02571,
+        "holdoutDelta": 0.032
+      },
+      {
+        "rank": 11,
+        "id": "recent20",
+        "developmentDelta": -0.02857,
+        "holdoutDelta": 0.04
+      },
+      {
+        "rank": 12,
+        "id": "recent50",
+        "developmentDelta": -0.04714,
+        "holdoutDelta": 0
+      },
+      {
+        "rank": 13,
+        "id": "engine_w20_p14",
+        "developmentDelta": -0.05143,
+        "holdoutDelta": 0.034
+      }
+    ],
+    "decision": "EXPLORATORY_ONLY"
   }
 ]
