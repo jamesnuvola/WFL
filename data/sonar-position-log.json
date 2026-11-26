@@ -50070,5 +50070,1143 @@
       }
     ],
     "decision": "EXPLORATORY_ONLY_NO_PROMOTION"
+  },
+  {
+    "runAt": "2026-11-26T18:50:40.444Z",
+    "dataset": {
+      "count": 30024,
+      "first": "2022-01-25T07:00",
+      "last": "2026-11-26T08:00"
+    },
+    "methodology": {
+      "name": "sorted-rank positional lab",
+      "positions": 10,
+      "positionMeaning": "rank after ascending sort in the official winning combination, NOT physical order of draw",
+      "sourceNote": "Official archive presents the 10-number winning combination sorted ascending; stored archive parser sorts it too. This lab cannot infer physical extraction order.",
+      "walkForward": {
+        "testTargets": 1200,
+        "developmentTargets": 700,
+        "holdoutTargets": 500,
+        "minTraining": 1000,
+        "allPredictionsUseOnlyPriorHistory": true,
+        "score": "exact intersection hits among the 10-number set; theoretical expectation 5"
+      },
+      "positionPrior": "Exact order-statistic distribution for a uniformly random 10-of-20 set; empirical rank frequencies shrink toward this prior (alpha=100).",
+      "numerone": "Kept separate; not used in positional model."
+    },
+    "positionDiagnostics": [
+      {
+        "position": 1,
+        "observations": 30024,
+        "chiSquare": 10.9203,
+        "degreesOfFreedom": 8,
+        "topObserved": [
+          {
+            "number": 1,
+            "observed": 14831,
+            "expectedProbability": 0.5,
+            "expectedCount": 15012,
+            "delta": -181
+          },
+          {
+            "number": 2,
+            "observed": 8061,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": 159.9473684210534
+          },
+          {
+            "number": 3,
+            "observed": 4010,
+            "expectedProbability": 0.13157894736842105,
+            "expectedCount": 3950.5263157894733,
+            "delta": 59.4736842105267
+          },
+          {
+            "number": 4,
+            "observed": 1813,
+            "expectedProbability": 0.06191950464396285,
+            "expectedCount": 1859.0712074303406,
+            "delta": -46.071207430340564
+          },
+          {
+            "number": 5,
+            "observed": 798,
+            "expectedProbability": 0.027089783281733747,
+            "expectedCount": 813.343653250774,
+            "delta": -15.343653250773968
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 1,
+            "observed": 14831,
+            "expectedProbability": 0.5,
+            "expectedCount": 15012,
+            "delta": -181
+          },
+          {
+            "number": 2,
+            "observed": 8061,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": 159.9473684210534
+          },
+          {
+            "number": 3,
+            "observed": 4010,
+            "expectedProbability": 0.13157894736842105,
+            "expectedCount": 3950.5263157894733,
+            "delta": 59.4736842105267
+          },
+          {
+            "number": 4,
+            "observed": 1813,
+            "expectedProbability": 0.06191950464396285,
+            "expectedCount": 1859.0712074303406,
+            "delta": -46.071207430340564
+          },
+          {
+            "number": 5,
+            "observed": 798,
+            "expectedProbability": 0.027089783281733747,
+            "expectedCount": 813.343653250774,
+            "delta": -15.343653250773968
+          }
+        ]
+      },
+      {
+        "position": 2,
+        "observations": 30024,
+        "chiSquare": 7.1222,
+        "degreesOfFreedom": 9,
+        "topObserved": [
+          {
+            "number": 3,
+            "observed": 7888,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": -13.052631578946603
+          },
+          {
+            "number": 2,
+            "observed": 7028,
+            "expectedProbability": 0.23684210526315788,
+            "expectedCount": 7110.9473684210525,
+            "delta": -82.94736842105249
+          },
+          {
+            "number": 4,
+            "observed": 6283,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": 8.634674922600425
+          },
+          {
+            "number": 5,
+            "observed": 4283,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 100.08978328173362
+          },
+          {
+            "number": 6,
+            "observed": 2469,
+            "expectedProbability": 0.08126934984520123,
+            "expectedCount": 2440.030959752322,
+            "delta": 28.969040247678095
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 5,
+            "observed": 4283,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 100.08978328173362
+          },
+          {
+            "number": 2,
+            "observed": 7028,
+            "expectedProbability": 0.23684210526315788,
+            "expectedCount": 7110.9473684210525,
+            "delta": -82.94736842105249
+          },
+          {
+            "number": 6,
+            "observed": 2469,
+            "expectedProbability": 0.08126934984520123,
+            "expectedCount": 2440.030959752322,
+            "delta": 28.969040247678095
+          },
+          {
+            "number": 7,
+            "observed": 1226,
+            "expectedProbability": 0.04179566563467492,
+            "expectedCount": 1254.8730650154798,
+            "delta": -28.873065015479824
+          },
+          {
+            "number": 8,
+            "observed": 550,
+            "expectedProbability": 0.018754465348892593,
+            "expectedCount": 563.0840676351512,
+            "delta": -13.0840676351512
+          }
+        ]
+      },
+      {
+        "position": 3,
+        "observations": 30024,
+        "chiSquare": 11.1785,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 5,
+            "observed": 6221,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -53.365325077399575
+          },
+          {
+            "number": 6,
+            "observed": 5608,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": 30.786377708977852
+          },
+          {
+            "number": 4,
+            "observed": 5576,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": -1.2136222910221477
+          },
+          {
+            "number": 7,
+            "observed": 4336,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 153.08978328173362
+          },
+          {
+            "number": 3,
+            "observed": 3086,
+            "expectedProbability": 0.10526315789473684,
+            "expectedCount": 3160.4210526315787,
+            "delta": -74.42105263157873
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 7,
+            "observed": 4336,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 153.08978328173362
+          },
+          {
+            "number": 3,
+            "observed": 3086,
+            "expectedProbability": 0.10526315789473684,
+            "expectedCount": 3160.4210526315787,
+            "delta": -74.42105263157873
+          },
+          {
+            "number": 5,
+            "observed": 6221,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -53.365325077399575
+          },
+          {
+            "number": 6,
+            "observed": 5608,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": 30.786377708977852
+          },
+          {
+            "number": 10,
+            "observed": 677,
+            "expectedProbability": 0.023382190564853102,
+            "expectedCount": 702.0268895191496,
+            "delta": -25.026889519149563
+          }
+        ]
+      },
+      {
+        "position": 4,
+        "observations": 30024,
+        "chiSquare": 6.5487,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 7,
+            "observed": 5574,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": -3.2136222910221477
+          },
+          {
+            "number": 8,
+            "observed": 5216,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": -39.45129792807802
+          },
+          {
+            "number": 6,
+            "observed": 4874,
+            "expectedProbability": 0.16253869969040247,
+            "expectedCount": 4880.061919504644,
+            "delta": -6.061919504643811
+          },
+          {
+            "number": 9,
+            "observed": 4254,
+            "expectedProbability": 0.14003334127173137,
+            "expectedCount": 4204.361038342463,
+            "delta": 49.63896165753704
+          },
+          {
+            "number": 5,
+            "observed": 3186,
+            "expectedProbability": 0.10835913312693499,
+            "expectedCount": 3253.374613003096,
+            "delta": -67.37461300309587
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 10,
+            "observed": 2959,
+            "expectedProbability": 0.09547727813981684,
+            "expectedCount": 2866.6097988698607,
+            "delta": 92.3902011301393
+          },
+          {
+            "number": 5,
+            "observed": 3186,
+            "expectedProbability": 0.10835913312693499,
+            "expectedCount": 3253.374613003096,
+            "delta": -67.37461300309587
+          },
+          {
+            "number": 9,
+            "observed": 4254,
+            "expectedProbability": 0.14003334127173137,
+            "expectedCount": 4204.361038342463,
+            "delta": 49.63896165753704
+          },
+          {
+            "number": 8,
+            "observed": 5216,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": -39.45129792807802
+          },
+          {
+            "number": 12,
+            "observed": 726,
+            "expectedProbability": 0.025005953798523457,
+            "expectedCount": 750.7787568468683,
+            "delta": -24.778756846868305
+          }
+        ]
+      },
+      {
+        "position": 5,
+        "observations": 30024,
+        "chiSquare": 9.5771,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 9,
+            "observed": 5260,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": 4.54870207192198
+          },
+          {
+            "number": 10,
+            "observed": 5091,
+            "expectedProbability": 0.17185910065167032,
+            "expectedCount": 5159.89763796575,
+            "delta": -68.89763796574971
+          },
+          {
+            "number": 8,
+            "observed": 4520,
+            "expectedProbability": 0.15003572279114075,
+            "expectedCount": 4504.67254108121,
+            "delta": 15.327458918790398
+          },
+          {
+            "number": 11,
+            "observed": 4349,
+            "expectedProbability": 0.14321591720972526,
+            "expectedCount": 4299.914698304791,
+            "delta": 49.08530169520873
+          },
+          {
+            "number": 12,
+            "observed": 3096,
+            "expectedProbability": 0.10002381519409383,
+            "expectedCount": 3003.115027387473,
+            "delta": 92.88497261252678
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 7,
+            "observed": 3032,
+            "expectedProbability": 0.1044891640866873,
+            "expectedCount": 3137.1826625387,
+            "delta": -105.18266253869979
+          },
+          {
+            "number": 12,
+            "observed": 3096,
+            "expectedProbability": 0.10002381519409383,
+            "expectedCount": 3003.115027387473,
+            "delta": 92.88497261252678
+          },
+          {
+            "number": 10,
+            "observed": 5091,
+            "expectedProbability": 0.17185910065167032,
+            "expectedCount": 5159.89763796575,
+            "delta": -68.89763796574971
+          },
+          {
+            "number": 11,
+            "observed": 4349,
+            "expectedProbability": 0.14321591720972526,
+            "expectedCount": 4299.914698304791,
+            "delta": 49.08530169520873
+          },
+          {
+            "number": 13,
+            "observed": 1668,
+            "expectedProbability": 0.05626339604667778,
+            "expectedCount": 1689.2522029054537,
+            "delta": -21.252202905453714
+          }
+        ]
+      },
+      {
+        "position": 6,
+        "observations": 30024,
+        "chiSquare": 3.6395,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 11,
+            "observed": 5214,
+            "expectedProbability": 0.17185910065167032,
+            "expectedCount": 5159.89763796575,
+            "delta": 54.10236203425029
+          },
+          {
+            "number": 12,
+            "observed": 5200,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": -55.45129792807802
+          },
+          {
+            "number": 13,
+            "observed": 4548,
+            "expectedProbability": 0.15003572279114075,
+            "expectedCount": 4504.67254108121,
+            "delta": 43.3274589187904
+          },
+          {
+            "number": 10,
+            "observed": 4318,
+            "expectedProbability": 0.14321591720972526,
+            "expectedCount": 4299.914698304791,
+            "delta": 18.085301695208727
+          },
+          {
+            "number": 14,
+            "observed": 3143,
+            "expectedProbability": 0.1044891640866873,
+            "expectedCount": 3137.1826625387,
+            "delta": 5.8173374613002125
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 12,
+            "observed": 5200,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": -55.45129792807802
+          },
+          {
+            "number": 11,
+            "observed": 5214,
+            "expectedProbability": 0.17185910065167032,
+            "expectedCount": 5159.89763796575,
+            "delta": 54.10236203425029
+          },
+          {
+            "number": 8,
+            "observed": 1638,
+            "expectedProbability": 0.05626339604667778,
+            "expectedCount": 1689.2522029054537,
+            "delta": -51.252202905453714
+          },
+          {
+            "number": 13,
+            "observed": 4548,
+            "expectedProbability": 0.15003572279114075,
+            "expectedCount": 4504.67254108121,
+            "delta": 43.3274589187904
+          },
+          {
+            "number": 10,
+            "observed": 4318,
+            "expectedProbability": 0.14321591720972526,
+            "expectedCount": 4299.914698304791,
+            "delta": 18.085301695208727
+          }
+        ]
+      },
+      {
+        "position": 7,
+        "observations": 30024,
+        "chiSquare": 11.1369,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 14,
+            "observed": 5441,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": -136.21362229102215
+          },
+          {
+            "number": 13,
+            "observed": 5286,
+            "expectedProbability": 0.1750416765896642,
+            "expectedCount": 5255.451297928078,
+            "delta": 30.54870207192198
+          },
+          {
+            "number": 15,
+            "observed": 4874,
+            "expectedProbability": 0.16253869969040247,
+            "expectedCount": 4880.061919504644,
+            "delta": -6.061919504643811
+          },
+          {
+            "number": 12,
+            "observed": 4318,
+            "expectedProbability": 0.14003334127173137,
+            "expectedCount": 4204.361038342463,
+            "delta": 113.63896165753704
+          },
+          {
+            "number": 16,
+            "observed": 3293,
+            "expectedProbability": 0.10835913312693499,
+            "expectedCount": 3253.374613003096,
+            "delta": 39.625386996904126
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 14,
+            "observed": 5441,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": -136.21362229102215
+          },
+          {
+            "number": 12,
+            "observed": 4318,
+            "expectedProbability": 0.14003334127173137,
+            "expectedCount": 4204.361038342463,
+            "delta": 113.63896165753704
+          },
+          {
+            "number": 17,
+            "observed": 1351,
+            "expectedProbability": 0.043343653250773995,
+            "expectedCount": 1301.3498452012384,
+            "delta": 49.650154798761605
+          },
+          {
+            "number": 10,
+            "observed": 1595,
+            "expectedProbability": 0.05455844465132391,
+            "expectedCount": 1638.0627422113491,
+            "delta": -43.06274221134913
+          },
+          {
+            "number": 16,
+            "observed": 3293,
+            "expectedProbability": 0.10835913312693499,
+            "expectedCount": 3253.374613003096,
+            "delta": 39.625386996904126
+          }
+        ]
+      },
+      {
+        "position": 8,
+        "observations": 30024,
+        "chiSquare": 15.9078,
+        "degreesOfFreedom": 10,
+        "topObserved": [
+          {
+            "number": 16,
+            "observed": 6128,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -146.36532507739958
+          },
+          {
+            "number": 17,
+            "observed": 5589,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": 11.786377708977852
+          },
+          {
+            "number": 15,
+            "observed": 5564,
+            "expectedProbability": 0.18575851393188855,
+            "expectedCount": 5577.213622291022,
+            "delta": -13.213622291022148
+          },
+          {
+            "number": 14,
+            "observed": 4269,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 86.08978328173362
+          },
+          {
+            "number": 18,
+            "observed": 3207,
+            "expectedProbability": 0.10526315789473684,
+            "expectedCount": 3160.4210526315787,
+            "delta": 46.57894736842127
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 16,
+            "observed": 6128,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -146.36532507739958
+          },
+          {
+            "number": 13,
+            "observed": 2808,
+            "expectedProbability": 0.09002143367468445,
+            "expectedCount": 2702.8035246487257,
+            "delta": 105.19647535127433
+          },
+          {
+            "number": 14,
+            "observed": 4269,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 86.08978328173362
+          },
+          {
+            "number": 12,
+            "observed": 1454,
+            "expectedProbability": 0.05001190759704691,
+            "expectedCount": 1501.5575136937366,
+            "delta": -47.55751369373661
+          },
+          {
+            "number": 18,
+            "observed": 3207,
+            "expectedProbability": 0.10526315789473684,
+            "expectedCount": 3160.4210526315787,
+            "delta": 46.57894736842127
+          }
+        ]
+      },
+      {
+        "position": 9,
+        "observations": 30024,
+        "chiSquare": 18.9698,
+        "degreesOfFreedom": 9,
+        "topObserved": [
+          {
+            "number": 18,
+            "observed": 7921,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": 19.947368421053397
+          },
+          {
+            "number": 19,
+            "observed": 6949,
+            "expectedProbability": 0.23684210526315788,
+            "expectedCount": 7110.9473684210525,
+            "delta": -161.9473684210525
+          },
+          {
+            "number": 17,
+            "observed": 6252,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -22.365325077399575
+          },
+          {
+            "number": 16,
+            "observed": 4278,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 95.08978328173362
+          },
+          {
+            "number": 15,
+            "observed": 2551,
+            "expectedProbability": 0.08126934984520123,
+            "expectedCount": 2440.030959752322,
+            "delta": 110.9690402476781
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 19,
+            "observed": 6949,
+            "expectedProbability": 0.23684210526315788,
+            "expectedCount": 7110.9473684210525,
+            "delta": -161.9473684210525
+          },
+          {
+            "number": 15,
+            "observed": 2551,
+            "expectedProbability": 0.08126934984520123,
+            "expectedCount": 2440.030959752322,
+            "delta": 110.9690402476781
+          },
+          {
+            "number": 16,
+            "observed": 4278,
+            "expectedProbability": 0.1393188854489164,
+            "expectedCount": 4182.910216718266,
+            "delta": 95.08978328173362
+          },
+          {
+            "number": 13,
+            "observed": 524,
+            "expectedProbability": 0.018754465348892593,
+            "expectedCount": 563.0840676351512,
+            "delta": -39.0840676351512
+          },
+          {
+            "number": 17,
+            "observed": 6252,
+            "expectedProbability": 0.2089783281733746,
+            "expectedCount": 6274.3653250774,
+            "delta": -22.365325077399575
+          }
+        ]
+      },
+      {
+        "position": 10,
+        "observations": 30024,
+        "chiSquare": 9.728,
+        "degreesOfFreedom": 8,
+        "topObserved": [
+          {
+            "number": 20,
+            "observed": 14924,
+            "expectedProbability": 0.5,
+            "expectedCount": 15012,
+            "delta": -88
+          },
+          {
+            "number": 19,
+            "observed": 7839,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": -62.0526315789466
+          },
+          {
+            "number": 18,
+            "observed": 4027,
+            "expectedProbability": 0.13157894736842105,
+            "expectedCount": 3950.5263157894733,
+            "delta": 76.4736842105267
+          },
+          {
+            "number": 17,
+            "observed": 1928,
+            "expectedProbability": 0.06191950464396285,
+            "expectedCount": 1859.0712074303406,
+            "delta": 68.92879256965944
+          },
+          {
+            "number": 16,
+            "observed": 828,
+            "expectedProbability": 0.027089783281733747,
+            "expectedCount": 813.343653250774,
+            "delta": 14.656346749226032
+          }
+        ],
+        "largestAbsoluteDeviations": [
+          {
+            "number": 20,
+            "observed": 14924,
+            "expectedProbability": 0.5,
+            "expectedCount": 15012,
+            "delta": -88
+          },
+          {
+            "number": 18,
+            "observed": 4027,
+            "expectedProbability": 0.13157894736842105,
+            "expectedCount": 3950.5263157894733,
+            "delta": 76.4736842105267
+          },
+          {
+            "number": 17,
+            "observed": 1928,
+            "expectedProbability": 0.06191950464396285,
+            "expectedCount": 1859.0712074303406,
+            "delta": 68.92879256965944
+          },
+          {
+            "number": 19,
+            "observed": 7839,
+            "expectedProbability": 0.2631578947368421,
+            "expectedCount": 7901.052631578947,
+            "delta": -62.0526315789466
+          },
+          {
+            "number": 15,
+            "observed": 299,
+            "expectedProbability": 0.010835913312693499,
+            "expectedCount": 325.3374613003096,
+            "delta": -26.3374613003096
+          }
+        ]
+      }
+    ],
+    "results": {
+      "positionGlobal": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.03417,
+          "expected": 5,
+          "delta": 0.03417,
+          "se": 0.03378,
+          "ci95": [
+            4.96796,
+            5.10037
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.02429,
+          "expected": 5,
+          "delta": 0.02429,
+          "se": 0.04554,
+          "ci95": [
+            4.93503,
+            5.11354
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.048,
+          "expected": 5,
+          "delta": 0.048,
+          "se": 0.05012,
+          "ci95": [
+            4.94976,
+            5.14624
+          ]
+        },
+        "vsHourrecent": {
+          "all": {
+            "meanDelta": -0.01083,
+            "se": 0.04823,
+            "ci95": [
+              -0.10536,
+              0.0837
+            ],
+            "positive": 468,
+            "negative": 460,
+            "tied": 272
+          },
+          "development": {
+            "meanDelta": -0.05429,
+            "se": 0.06431,
+            "ci95": [
+              -0.18034,
+              0.07177
+            ],
+            "positive": 274,
+            "negative": 278,
+            "tied": 148
+          },
+          "holdout": {
+            "meanDelta": 0.05,
+            "se": 0.07273,
+            "ci95": [
+              -0.09255,
+              0.19255
+            ],
+            "positive": 194,
+            "negative": 182,
+            "tied": 124
+          }
+        }
+      },
+      "positionRecent200": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 4.965,
+          "expected": 5,
+          "delta": -0.035,
+          "se": 0.03234,
+          "ci95": [
+            4.90162,
+            5.02838
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 4.93,
+          "expected": 5,
+          "delta": -0.07,
+          "se": 0.04302,
+          "ci95": [
+            4.84568,
+            5.01432
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.014,
+          "expected": 5,
+          "delta": 0.014,
+          "se": 0.04891,
+          "ci95": [
+            4.91813,
+            5.10987
+          ]
+        },
+        "vsHourrecent": {
+          "all": {
+            "meanDelta": -0.08,
+            "se": 0.04637,
+            "ci95": [
+              -0.17089,
+              0.01089
+            ],
+            "positive": 429,
+            "negative": 480,
+            "tied": 291
+          },
+          "development": {
+            "meanDelta": -0.14857,
+            "se": 0.06106,
+            "ci95": [
+              -0.26826,
+              -0.02888
+            ],
+            "positive": 233,
+            "negative": 290,
+            "tied": 177
+          },
+          "holdout": {
+            "meanDelta": 0.016,
+            "se": 0.07112,
+            "ci95": [
+              -0.12339,
+              0.15539
+            ],
+            "positive": 196,
+            "negative": 190,
+            "tied": 114
+          }
+        }
+      },
+      "positionRecent1000": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.015,
+          "expected": 5,
+          "delta": 0.015,
+          "se": 0.03316,
+          "ci95": [
+            4.95001,
+            5.07999
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.00286,
+          "expected": 5,
+          "delta": 0.00286,
+          "se": 0.04364,
+          "ci95": [
+            4.91732,
+            5.0884
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 5.032,
+          "expected": 5,
+          "delta": 0.032,
+          "se": 0.05102,
+          "ci95": [
+            4.932,
+            5.132
+          ]
+        },
+        "vsHourrecent": {
+          "all": {
+            "meanDelta": -0.03,
+            "se": 0.04708,
+            "ci95": [
+              -0.12227,
+              0.06227
+            ],
+            "positive": 448,
+            "negative": 477,
+            "tied": 275
+          },
+          "development": {
+            "meanDelta": -0.07571,
+            "se": 0.06269,
+            "ci95": [
+              -0.19859,
+              0.04716
+            ],
+            "positive": 254,
+            "negative": 286,
+            "tied": 160
+          },
+          "holdout": {
+            "meanDelta": 0.034,
+            "se": 0.07113,
+            "ci95": [
+              -0.10542,
+              0.17342
+            ],
+            "positive": 194,
+            "negative": 191,
+            "tied": 115
+          }
+        }
+      },
+      "hourrecentStatusquo": {
+        "all": {
+          "targets": 1200,
+          "meanHits": 5.045,
+          "expected": 5,
+          "delta": 0.045,
+          "se": 0.03248,
+          "ci95": [
+            4.98135,
+            5.10865
+          ]
+        },
+        "development": {
+          "targets": 700,
+          "meanHits": 5.07857,
+          "expected": 5,
+          "delta": 0.07857,
+          "se": 0.0417,
+          "ci95": [
+            4.99685,
+            5.1603
+          ]
+        },
+        "holdout": {
+          "targets": 500,
+          "meanHits": 4.998,
+          "expected": 5,
+          "delta": -0.002,
+          "se": 0.05163,
+          "ci95": [
+            4.89681,
+            5.09919
+          ]
+        },
+        "vsHourrecent": {
+          "all": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 1200
+          },
+          "development": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 700
+          },
+          "holdout": {
+            "meanDelta": 0,
+            "se": 0,
+            "ci95": [
+              0,
+              0
+            ],
+            "positive": 0,
+            "negative": 0,
+            "tied": 500
+          }
+        }
+      }
+    },
+    "challengerRanking": [
+      {
+        "id": "positionGlobal",
+        "developmentDelta": -0.05429,
+        "holdoutDelta": 0.05,
+        "holdoutCI": [
+          -0.09255,
+          0.19255
+        ]
+      },
+      {
+        "id": "positionRecent1000",
+        "developmentDelta": -0.07571,
+        "holdoutDelta": 0.034,
+        "holdoutCI": [
+          -0.10542,
+          0.17342
+        ]
+      },
+      {
+        "id": "positionRecent200",
+        "developmentDelta": -0.14857,
+        "holdoutDelta": 0.016,
+        "holdoutCI": [
+          -0.12339,
+          0.15539
+        ]
+      }
+    ],
+    "decision": "EXPLORATORY_ONLY_NO_PROMOTION"
   }
 ]
